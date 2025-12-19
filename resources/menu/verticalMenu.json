@@ -1,0 +1,326 @@
+{
+    "menu": [
+        {
+            "url": "/dashboard/home",
+            "name": "لوحة التحكم",
+            "icon": "menu-icon tf-icons ti ti-home",
+            "slug": "dashboard.index"
+        },
+        {
+            "name": "المراحل التعليمية",
+            "icon": "menu-icon tf-icons ti ti-school",
+            "slug": [
+                "dashboard.education_stages",
+                "dashboard.create.education_stages"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/education-stages",
+                    "name": "المراحل التعليمية",
+                    "slug": "dashboard.education_stages"
+                },
+                {
+                    "url": "/dashboard/stages/create",
+                    "name": "إضافة مرحلة تعليمية",
+                    "slug": "dashboard.create.education_stages"
+                }
+            ]
+        },
+        {
+            "name": "الصفوف الدراسية",
+            "icon": "menu-icon tf-icons ti ti-layout-board",
+            "slug": [
+                "dashboard.slider",
+                "dashboard.create.slider"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/sliders",
+                    "name": "الصفوف الدراسية",
+                    "slug": "dashboard.slider"
+                },
+                {
+                    "url": "/dashboard/sliders/create",
+                    "name": "إضافة صف دراسي",
+                    "slug": "dashboard.create.slider"
+                }
+            ]
+        },
+        {
+            "name": "حسابات الأدمن الفرعي",
+            "icon": "menu-icon tf-icons ti ti-users-group",
+            "slug": [
+                "dashboard.minadmin",
+                "dashboard.create.minadmin"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/minadmin",
+                    "name": "الحسابات",
+                    "slug": "dashboard.minadmin"
+                },
+                {
+                    "url": "/dashboard/minadmins/create",
+                    "name": "إضافة حساب جديد",
+                    "slug": "dashboard.create.minadmin"
+                }
+            ]
+        },
+        {
+            "url": "/dashboard/voucher_order",
+            "name": "طلبات الكوبونات",
+            "icon": "menu-icon tf-icons ti ti-ticket",
+            "slug": "dashboard.voucher_order"
+        },
+        {
+            "name": "المواد",
+            "icon": "menu-icon tf-icons ti ti-category",
+            "slug": [
+                "dashboard.category",
+                "dashboard.create.category"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/categories",
+                    "name": "المواد",
+                    "slug": "dashboard.category"
+                },
+                {
+                    "url": "/dashboard/categories/create",
+                    "name": "إضافة مادة",
+                    "slug": "dashboard.create.category"
+                }
+            ]
+        },
+        {
+            "name": "أكواد المدرسين",
+            "icon": "menu-icon tf-icons ti ti-discount-2",
+            "slug": [
+                "dashboard.coupons",
+                "dashboard.coupons.add"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/coupons",
+                    "name": "الكوبونات",
+                    "slug": "dashboard.coupons"
+                },
+                {
+                    "url": "/dashboard/coupons/add",
+                    "name": "إضافة كوبون",
+                    "slug": "dashboard.coupons.add"
+                }
+            ]
+        },
+        {
+            "name": "الكتب",
+            "icon": "menu-icon tf-icons ti ti-book-2",
+            "slug": [
+                "dashboard.product",
+                "dashboard.create.product"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/products",
+                    "name": "الكتب",
+                    "slug": "dashboard.product"
+                },
+                {
+                    "url": "/dashboard/products/create",
+                    "name": "إضافة كتاب",
+                    "slug": "dashboard.create.product"
+                }
+            ]
+        },
+        {
+            "name": "الأقسام",
+            "icon": "menu-icon tf-icons ti ti-folders",
+            "slug": [
+                "dashboard.main_categories",
+                "dashboard.create.main_categories"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/main_categories",
+                    "name": "الأقسام",
+                    "slug": "dashboard.main_categories"
+                },
+                {
+                    "url": "/dashboard/main_categories/create",
+                    "name": "إضافة قسم",
+                    "slug": "dashboard.create.main_categories"
+                }
+            ]
+        },
+        {
+            "name": "المدرسين",
+            "icon": "menu-icon tf-icons ti ti-users",
+            "slug": [
+                "dashboard.teachers",
+                "dashboard.create.teachers"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/teachers",
+                    "name": "المدرسين",
+                    "slug": "dashboard.teachers"
+                },
+                {
+                    "url": "/dashboard/teachers/create",
+                    "name": "إضافة مدرس",
+                    "slug": "dashboard.create.teachers"
+                }
+            ]
+        },
+        {
+            "name": "الطلبات",
+            "icon": "menu-icon tf-icons ti ti-shopping-bag",
+            "slug": [
+                "dashboard.orders",
+                "dashboard.orders.barcode"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/orders",
+                    "name": "كل الطلبات",
+                    "slug": "dashboard.orders"
+                },
+                {
+                    "url": "/dashboard/orders?state=reserved",
+                    "name": "الطلبات المحجوزة",
+                    "slug": "dashboard.orders"
+                },
+                {
+                    "url": "/dashboard/orders?state=pending",
+                    "name": "الطلبات المعلقة",
+                    "slug": "dashboard.orders"
+                },
+                {
+                    "url": "/dashboard/orders/barcode",
+                    "name": "الباركود",
+                    "slug": "dashboard.orders.barcode"
+                }
+            ]
+        },
+        {
+            "name": "العروض",
+            "icon": "menu-icon tf-icons ti ti-badge-percent",
+            "slug": [
+                "dashboard.offers",
+                "dashboard.create.offers"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/offers",
+                    "name": "العروض",
+                    "slug": "dashboard.offers"
+                },
+                {
+                    "url": "/dashboard/offers/create",
+                    "name": "إضافة عرض",
+                    "slug": "dashboard.create.offers"
+                }
+            ]
+        },
+        {
+            "name": "الخصومات",
+            "icon": "menu-icon tf-icons ti ti-percentage",
+            "slug": [
+                "dashboard.discount",
+                "dashboard.discount.create"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/discount",
+                    "name": "الخصومات",
+                    "slug": "dashboard.discount"
+                },
+                {
+                    "url": "/dashboard/discount/create",
+                    "name": "إضافة خصم",
+                    "slug": "dashboard.discount.create"
+                }
+            ]
+        },
+        {
+            "name": "طرق الشحن",
+            "icon": "menu-icon tf-icons ti ti-truck-delivery",
+            "slug": [
+                "dashboard.shipping-methods",
+                "dashboard.shipping-methods.create"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/shipping-methods",
+                    "name": "طرق الشحن",
+                    "slug": "dashboard.shipping-methods"
+                },
+                {
+                    "url": "/dashboard/shipping-methods/create",
+                    "name": "إضافة طريقة شحن",
+                    "slug": "dashboard.shipping-methods.create"
+                }
+            ]
+        },
+        {
+            "name": "الأسئلة الشائعة",
+            "icon": "menu-icon tf-icons ti ti-help-circle",
+            "slug": [
+                "dashboard.faqs",
+                "dashboard.faqs.create"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/faqs",
+                    "name": "الأسئلة الشائعة",
+                    "slug": "dashboard.faqs"
+                },
+                {
+                    "url": "/dashboard/faqs/create",
+                    "name": "إضافة سؤال جديد",
+                    "slug": "dashboard.faqs.create"
+                }
+            ]
+        },
+        {
+            "name": "إدارة المحافظات",
+            "icon": "menu-icon tf-icons ti ti-map-pin",
+            "slug": [
+                "dashboard.governorates.index",
+                "dashboard.governorates.create"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/governorates",
+                    "name": "المحافظات",
+                    "slug": "dashboard.governorates.index"
+                },
+                {
+                    "url": "/dashboard/governorates/create",
+                    "name": "إضافة محافظة",
+                    "slug": "dashboard.governorates.create"
+                }
+            ]
+        },
+        {
+            "name": "إدارة المدن",
+            "icon": "menu-icon tf-icons ti ti-building-skyscraper",
+            "slug": [
+                "dashboard.cities.index",
+                "dashboard.cities.create"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/cities",
+                    "name": "المدن",
+                    "slug": "dashboard.cities.index"
+                },
+                {
+                    "url": "/dashboard/cities/create",
+                    "name": "إضافة مدينة",
+                    "slug": "dashboard.cities.create"
+                }
+            ]
+        }
+    ]
+}
