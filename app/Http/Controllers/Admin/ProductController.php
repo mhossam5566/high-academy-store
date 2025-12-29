@@ -132,26 +132,30 @@ class ProductController extends Controller
                         : '';
                 })
                 ->addColumn('operation', function ($row) {
-                    $edit = '<a href="' . route('dashboard.product.edit', $row->id) . '" class="btn btn-sm btn-primary me-1">
-                        <i class="ti ti-edit me-1"></i>تعديل
+                    $buttons = '<div class="d-flex gap-1">';
+                    
+                    $buttons .= '<a href="' . route('dashboard.product.edit', $row->id) . '" class="btn btn-sm btn-primary" title="تعديل">
+                        <i class="ti ti-edit"></i>
                     </a>';
 
                     // Show either hide or show button based on is_deleted status
-                    $toggleButton = '';
                     if ($row->is_deleted) {
-                        $toggleButton = '<button data-id="' . $row->id . '" data-action="show" class="btn btn-sm btn-info me-1 toggle-visibility-btn">
-                            <i class="ti ti-eye me-1"></i>إظهار
+                        $buttons .= '<button data-id="' . $row->id . '" data-action="show" class="btn btn-sm btn-info toggle-visibility-btn" title="إظهار">
+                            <i class="ti ti-eye"></i>
                         </button>';
                     } else {
-                        $toggleButton = '<button data-id="' . $row->id . '" data-action="hide" class="btn btn-sm btn-warning me-1 toggle-visibility-btn">
-                            <i class="ti ti-eye-off me-1"></i>إخفاء
+                        $buttons .= '<button data-id="' . $row->id . '" data-action="hide" class="btn btn-sm btn-warning toggle-visibility-btn" title="إخفاء">
+                            <i class="ti ti-eye-off"></i>
                         </button>';
                     }
 
-                    $forceDelete = '<button data-id="' . $row->id . '" class="btn btn-sm btn-danger force-delete-btn">
-                        <i class="ti ti-trash me-1"></i>حذف نهائي
+                    $buttons .= '<button data-id="' . $row->id . '" class="btn btn-sm btn-danger force-delete-btn" title="حذف نهائي">
+                        <i class="ti ti-trash"></i>
                     </button>';
-                    return $edit . $toggleButton . $forceDelete;
+                    
+                    $buttons .= '</div>';
+                    
+                    return $buttons;
                 })
                 ->rawColumns(['operation', 'photo', 'best_seller', 'is_deleted', 'state'])
                 ->make(true);

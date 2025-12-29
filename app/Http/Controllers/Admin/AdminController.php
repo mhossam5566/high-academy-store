@@ -17,36 +17,73 @@ class AdminController extends Controller
 {
     use ImageTrait;
 
-    public function index()
+    public function index(Request $request)
     {
-        $statistics = $this->getStatistics();
-        return view('dashboard.pages.home.dashboard', compact('statistics'));
+        $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
+        $dateTo = $request->input('date_to', now()->endOfDay()->format('Y-m-d'));
+        
+        $statistics = $this->getStatistics($dateFrom, $dateTo);
+        return view('dashboard.pages.home.dashboard', compact('statistics', 'dateFrom', 'dateTo'));
     }
 
-    private function getStatistics()
+    private function getStatistics($dateFrom, $dateTo)
     {
-        // Orders Statistics
-        $totalOrders = \App\Models\Order::count();
-        $pendingOrders = \App\Models\Order::where('status', 'pending')->count();
-        $deliveredOrders = \App\Models\Order::where('status', 'delivered')->count();
-        $cancelledOrders = \App\Models\Order::where('status', 'cancelled')->count();
-        $paidOrders = \App\Models\Order::where('is_paid', 1)->count();
-        $unpaidOrders = \App\Models\Order::where('is_paid', 0)->count();
+        // Orders Statistics (filtered by date range)
+        $ordersQuery = \App\Models\Order::whereBetween('created_at', [$dateFrom, $dateTo . ' 23:59:59']);
+        $totalOrders = (clone $ordersQuery)->count();
+        $pendingOrders = (clone $ordersQuery)->where('status', 'pending')->count();
+        $deliveredOrders = (clone $ordersQuery)->where('status', 'delivered')->count();
+        $cancelledOrders = (clone $ordersQuery)->where('status', 'cancelled')->count();
+        $paidOrders = (clone $ordersQuery)->where('is_paid', 1)->count();
+        $unpaidOrders = (clone $ordersQuery)->where('is_paid', 0)->count();
 
-        // Revenue
-        $totalRevenue = \App\Models\Order::where('is_paid', 1)->sum('total');
+        // Revenue (filtered by date range)
+        $totalRevenue = (clone $ordersQuery)->where('is_paid', 1)->sum('total');
         $todayRevenue = \App\Models\Order::where('is_paid', 1)
             ->whereDate('created_at', today())->sum('total');
         $monthRevenue = \App\Models\Order::where('is_paid', 1)
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->sum('total');
+        $weekRevenue = \App\Models\Order::where('is_paid', 1)
+            ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->sum('total');
 
-        // Voucher Orders Statistics
-        $totalVoucherOrders = \App\Models\VouchersOrder::count();
-        $pendingVoucherOrders = \App\Models\VouchersOrder::where('state', 'pending')->count();
-        $successVoucherOrders = \App\Models\VouchersOrder::where('state', 'success')->count();
-        $completedVoucherOrders = \App\Models\VouchersOrder::where('state', 'completed')->count();
+        // Average Order Value
+        $avgOrderValue = $paidOrders > 0 ? $totalRevenue / $paidOrders : 0;
+
+        // Voucher Orders Statistics (filtered by date range)
+        $vouchersQuery = \App\Models\VouchersOrder::whereBetween('created_at', [$dateFrom, $dateTo . ' 23:59:59']);
+        $totalVoucherOrders = (clone $vouchersQuery)->count();
+        $pendingVoucherOrders = (clone $vouchersQuery)->where('state', 'pending')->count();
+        $successVoucherOrders = (clone $vouchersQuery)->where('state', 'success')->count();
+        $completedVoucherOrders = (clone $vouchersQuery)->where('state', 'completed')->count();
+
+        // Products & Users Statistics
+        $totalProducts = \App\Models\Product::count();
+        $activeProducts = \App\Models\Product::where('is_deleted', 0)->count();
+        $totalUsers = \App\Models\User::count();
+        $newUsersThisMonth = \App\Models\User::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        // Growth Rate (comparing with previous period)
+        $periodDays = \Carbon\Carbon::parse($dateFrom)->diffInDays(\Carbon\Carbon::parse($dateTo));
+        $previousDateFrom = \Carbon\Carbon::parse($dateFrom)->subDays($periodDays)->format('Y-m-d');
+        $previousDateTo = \Carbon\Carbon::parse($dateFrom)->subDay()->format('Y-m-d');
+        
+        $previousRevenue = \App\Models\Order::where('is_paid', 1)
+            ->whereBetween('created_at', [$previousDateFrom, $previousDateTo . ' 23:59:59'])
+            ->sum('total');
+        
+        $revenueGrowth = $previousRevenue > 0 
+            ? (($totalRevenue - $previousRevenue) / $previousRevenue) * 100 
+            : 0;
+
+        $previousOrders = \App\Models\Order::whereBetween('created_at', [$previousDateFrom, $previousDateTo . ' 23:59:59'])->count();
+        $ordersGrowth = $previousOrders > 0 
+            ? (($totalOrders - $previousOrders) / $previousOrders) * 100 
+            : 0;
 
         // Recent Orders
         $recentOrders = \App\Models\Order::with('user')
@@ -59,6 +96,23 @@ class AdminController extends Controller
             ->take(5)
             ->get();
 
+        // Monthly data for charts (last 6 months)
+        $monthlyData = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $monthlyData[] = [
+                'month' => $month->format('F'),
+                'month_ar' => $month->locale('ar')->translatedFormat('F'),
+                'revenue' => \App\Models\Order::where('is_paid', 1)
+                    ->whereMonth('created_at', $month->month)
+                    ->whereYear('created_at', $month->year)
+                    ->sum('total'),
+                'orders' => \App\Models\Order::whereMonth('created_at', $month->month)
+                    ->whereYear('created_at', $month->year)
+                    ->count(),
+            ];
+        }
+
         return [
             'orders' => [
                 'total' => $totalOrders,
@@ -68,11 +122,15 @@ class AdminController extends Controller
                 'paid' => $paidOrders,
                 'unpaid' => $unpaidOrders,
                 'recent' => $recentOrders,
+                'growth' => $ordersGrowth,
             ],
             'revenue' => [
                 'total' => $totalRevenue,
                 'today' => $todayRevenue,
                 'month' => $monthRevenue,
+                'week' => $weekRevenue,
+                'average' => $avgOrderValue,
+                'growth' => $revenueGrowth,
             ],
             'vouchers' => [
                 'total' => $totalVoucherOrders,
@@ -80,7 +138,16 @@ class AdminController extends Controller
                 'success' => $successVoucherOrders,
                 'completed' => $completedVoucherOrders,
                 'recent' => $recentVoucherOrders,
-            ]
+            ],
+            'products' => [
+                'total' => $totalProducts,
+                'active' => $activeProducts,
+            ],
+            'users' => [
+                'total' => $totalUsers,
+                'new_this_month' => $newUsersThisMonth,
+            ],
+            'monthly' => $monthlyData,
         ];
     }
 

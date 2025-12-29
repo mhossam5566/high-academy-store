@@ -2,7 +2,8 @@
 
 <?php $__env->startSection('vendor-style'); ?>
     <link rel="stylesheet" href="<?php echo e(asset('dashboard/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('dashboard/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')); ?>">
+    <link rel="stylesheet"
+        href="<?php echo e(asset('dashboard/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')); ?>">
     <link rel="stylesheet" href="<?php echo e(asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.css')); ?>">
     <link rel="stylesheet" href="<?php echo e(asset('dashboard/assets/vendor/libs/toastr/toastr.css')); ?>">
 <?php $__env->stopSection(); ?>
@@ -109,7 +110,10 @@
                 processing: true,
                 serverSide: true,
                 scrollX: true,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "الكل"]],
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "الكل"]
+                ],
                 ajax: {
                     url: '<?php echo e(route('dashboard.product.datatable')); ?>',
                     data: function(d) {
@@ -119,23 +123,71 @@
                         d.best_seller = $('#best_seller_filter').val();
                     }
                 },
-                columns: [
-                    { data: 'id', name: 'id', width: '50px' },
-                    { data: 'photo', name: 'photo', orderable: false, searchable: false },
-                    { data: 'name', name: 'name' },
-                    { data: 'short_name', name: 'short_name' },
-                    { data: 'price', name: 'price' },
-                    { data: 'quantity', name: 'quantity' },
-                    { data: 'main_category_id', name: 'main_category_id' },
-                    { data: 'category_id', name: 'category_id' },
-                    { data: 'slider_id', name: 'slider_id' },
-                    { data: 'brand_id', name: 'brand_id' },
-                    { data: 'is_deleted', name: 'is_deleted' },
-                    { data: 'best_seller', name: 'best_seller' },
-                    { data: 'state', name: 'state' },
-                    { data: 'operation', name: 'operation', orderable: false, searchable: false }
+                columns: [{
+                        data: 'id',
+                        name: 'id',
+                        width: '50px'
+                    },
+                    {
+                        data: 'photo',
+                        name: 'photo',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'short_name',
+                        name: 'short_name'
+                    },
+                    {
+                        data: 'price',
+                        name: 'price'
+                    },
+                    {
+                        data: 'quantity',
+                        name: 'quantity'
+                    },
+                    {
+                        data: 'main_category_id',
+                        name: 'main_category_id'
+                    },
+                    {
+                        data: 'category_id',
+                        name: 'category_id'
+                    },
+                    {
+                        data: 'slider_id',
+                        name: 'slider_id'
+                    },
+                    {
+                        data: 'brand_id',
+                        name: 'brand_id'
+                    },
+                    {
+                        data: 'is_deleted',
+                        name: 'is_deleted'
+                    },
+                    {
+                        data: 'best_seller',
+                        name: 'best_seller'
+                    },
+                    {
+                        data: 'state',
+                        name: 'state'
+                    },
+                    {
+                        data: 'operation',
+                        name: 'operation',
+                        orderable: false,
+                        searchable: false
+                    }
                 ],
-                order: [[0, 'desc']],
+                order: [
+                    [0, 'desc']
+                ],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json'
                 }
@@ -158,10 +210,10 @@
                 e.preventDefault();
                 var productId = $(this).data('id');
                 var action = $(this).data('action');
-                
+
                 var title = action === 'hide' ? 'هل تريد إخفاء المنتج؟' : 'هل تريد إظهار المنتج؟';
                 var confirmText = action === 'hide' ? 'نعم، أخفه' : 'نعم، أظهره';
-                
+
                 Swal.fire({
                     title: title,
                     icon: 'question',
@@ -200,7 +252,7 @@
             $(document).on('click', '.force-delete-btn', function(e) {
                 e.preventDefault();
                 var productId = $(this).data('id');
-                
+
                 Swal.fire({
                     title: 'تحذير!',
                     text: "سيتم حذف المنتج نهائياً ولا يمكن استرجاعه",

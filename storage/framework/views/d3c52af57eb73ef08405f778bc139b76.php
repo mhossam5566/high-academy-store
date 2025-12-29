@@ -19,15 +19,142 @@
                 </h4>
                 <p class="text-muted mb-0">مرحباً بك في نظام إدارة الطلبات</p>
             </div>
-            <div>
-                <span class="badge bg-label-primary"><?php echo e(now()->format('Y/m/d')); ?></span>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="GET" action="<?php echo e(route('dashboard.index')); ?>" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            <i class="ti ti-calendar me-1"></i>من تاريخ
+                        </label>
+                        <input type="date" class="form-control" name="date_from" value="<?php echo e($dateFrom); ?>">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            <i class="ti ti-calendar me-1"></i>إلى تاريخ
+                        </label>
+                        <input type="date" class="form-control" name="date_to" value="<?php echo e($dateTo); ?>">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="ti ti-filter me-1"></i>تصفية
+                        </button>
+                        <a href="<?php echo e(route('dashboard.index')); ?>" class="btn btn-label-secondary">
+                            <i class="ti ti-refresh me-1"></i>إعادة تعيين
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Key Statistics -->
+        <div class="row mb-4">
+            <!-- Total Products -->
+            <div class="col-xl-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="content-left">
+                                <span class="text-muted d-block mb-1">إجمالي المنتجات</span>
+                                <div class="d-flex align-items-center">
+                                    <h3 class="mb-0 me-2"><?php echo e(number_format($statistics['products']['total'])); ?></h3>
+                                </div>
+                                <small class="text-success">
+                                    <i class="ti ti-circle-check"></i>
+                                    <?php echo e($statistics['products']['active']); ?> نشط
+                                </small>
+                            </div>
+                            <div class="avatar">
+                                <span class="avatar-initial rounded bg-label-primary">
+                                    <i class="ti ti-package ti-md"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Users -->
+            <div class="col-xl-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="content-left">
+                                <span class="text-muted d-block mb-1">إجمالي العملاء</span>
+                                <div class="d-flex align-items-center">
+                                    <h3 class="mb-0 me-2"><?php echo e(number_format($statistics['users']['total'])); ?></h3>
+                                </div>
+                                <small class="text-info">
+                                    <i class="ti ti-user-plus"></i>
+                                    <?php echo e($statistics['users']['new_this_month']); ?> جديد هذا الشهر
+                                </small>
+                            </div>
+                            <div class="avatar">
+                                <span class="avatar-initial rounded bg-label-info">
+                                    <i class="ti ti-users ti-md"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Order Value -->
+            <div class="col-xl-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="content-left">
+                                <span class="text-muted d-block mb-1">متوسط قيمة الطلب</span>
+                                <div class="d-flex align-items-center">
+                                    <h3 class="mb-0 me-2"><?php echo e(number_format($statistics['revenue']['average'], 2)); ?></h3>
+                                </div>
+                                <small class="text-muted">جنيه</small>
+                            </div>
+                            <div class="avatar">
+                                <span class="avatar-initial rounded bg-label-warning">
+                                    <i class="ti ti-calculator ti-md"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Growth Rate -->
+            <div class="col-xl-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="content-left">
+                                <span class="text-muted d-block mb-1">معدل النمو</span>
+                                <div class="d-flex align-items-center">
+                                    <h3 class="mb-0 me-2 <?php echo e($statistics['revenue']['growth'] >= 0 ? 'text-success' : 'text-danger'); ?>">
+                                        <?php echo e(number_format(abs($statistics['revenue']['growth']), 1)); ?>%
+                                    </h3>
+                                </div>
+                                <small class="<?php echo e($statistics['revenue']['growth'] >= 0 ? 'text-success' : 'text-danger'); ?>">
+                                    <i class="ti <?php echo e($statistics['revenue']['growth'] >= 0 ? 'ti-trending-up' : 'ti-trending-down'); ?>"></i>
+                                    مقارنة بالفترة السابقة
+                                </small>
+                            </div>
+                            <div class="avatar">
+                                <span class="avatar-initial rounded bg-label-<?php echo e($statistics['revenue']['growth'] >= 0 ? 'success' : 'danger'); ?>">
+                                    <i class="ti ti-chart-line ti-md"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Revenue Cards -->
         <div class="row mb-4">
             <!-- Total Revenue -->
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 mb-4">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
@@ -72,8 +199,31 @@
                 </div>
             </div>
 
+            <!-- Week Revenue -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="content-left">
+                                <span class="text-muted">إيرادات الأسبوع</span>
+                                <div class="d-flex align-items-center my-2">
+                                    <h3 class="mb-0 me-2"><?php echo e(number_format($statistics['revenue']['week'], 2)); ?></h3>
+                                    <span class="text-success">جنيه</span>
+                                </div>
+                                <small class="mb-0">آخر 7 أيام</small>
+                            </div>
+                            <div class="avatar">
+                                <span class="avatar-initial rounded bg-label-primary">
+                                    <i class="ti ti-calendar-week ti-md"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Month Revenue -->
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 mb-4">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
@@ -482,13 +632,9 @@
             series: [{
                 name: 'الإيرادات',
                 data: [
-                    <?php echo e(number_format($statistics['revenue']['total'] * 0.15, 0, '', '')); ?>,
-                    <?php echo e(number_format($statistics['revenue']['total'] * 0.18, 0, '', '')); ?>,
-                    <?php echo e(number_format($statistics['revenue']['total'] * 0.22, 0, '', '')); ?>,
-                    <?php echo e(number_format($statistics['revenue']['total'] * 0.20, 0, '', '')); ?>,
-                    <?php echo e(number_format($statistics['revenue']['total'] * 0.25, 0, '', '')); ?>,
-                    <?php echo e(number_format($statistics['revenue']['month'], 0, '', '')); ?>
-
+                    <?php $__currentLoopData = $statistics['monthly']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $month): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php echo e(number_format($month['revenue'], 0, '', '')); ?>,
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 ]
             }],
             chart: {
@@ -519,7 +665,11 @@
                 }
             },
             xaxis: {
-                categories: ['يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+                categories: [
+                    <?php $__currentLoopData = $statistics['monthly']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $month): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        '<?php echo e($month['month_ar']); ?>',
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                ],
                 labels: {
                     style: {
                         fontSize: '13px'
@@ -551,13 +701,9 @@
             series: [{
                 name: 'عدد الطلبات',
                 data: [
-                    <?php echo e(intval($statistics['orders']['total'] * 0.12)); ?>,
-                    <?php echo e(intval($statistics['orders']['total'] * 0.15)); ?>,
-                    <?php echo e(intval($statistics['orders']['total'] * 0.18)); ?>,
-                    <?php echo e(intval($statistics['orders']['total'] * 0.17)); ?>,
-                    <?php echo e(intval($statistics['orders']['total'] * 0.20)); ?>,
-                    <?php echo e(intval($statistics['orders']['pending'] + $statistics['orders']['delivered'])); ?>
-
+                    <?php $__currentLoopData = $statistics['monthly']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $month): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php echo e($month['orders']); ?>,
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 ]
             }],
             chart: {
@@ -586,7 +732,11 @@
             },
             colors: ['#56ca00'],
             xaxis: {
-                categories: ['يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+                categories: [
+                    <?php $__currentLoopData = $statistics['monthly']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $month): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        '<?php echo e($month['month_ar']); ?>',
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                ],
                 labels: {
                     style: {
                         fontSize: '13px'

@@ -46,7 +46,7 @@ Route::get('/', function () {
         return redirect()->route('dashboard.index');
     }
     return redirect()->route('login');
-});
+})->name('dashboard.root');
 
 Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::get('/home', [AdminController::class, 'index'])->name('index');
