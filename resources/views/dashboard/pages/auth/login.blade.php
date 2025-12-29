@@ -25,7 +25,7 @@
 
 @section('page-script')
     <script src="{{ asset('dashboard/assets/js/pages-auth.js') }}"></script>
-    <script src="{{ asset('dashboard/assets/js/form-ajax.js') }}"></script>
+    {{-- <script src="{{ asset('dashboard/assets/js/form-ajax.js') }}"></script> --}}
 @endsection
 
 @section('content')
