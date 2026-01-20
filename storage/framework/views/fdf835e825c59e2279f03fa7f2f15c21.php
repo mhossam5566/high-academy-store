@@ -1,10 +1,8 @@
-@extends('user.layouts.master')
-
-@section('title')
+<?php $__env->startSection('title'); ?>
     الأسئلة الشائعة
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <style>
         .page-title {
             text-align: center;
@@ -277,37 +275,39 @@
 
     <div class="container-fluid">
         <div class="faq-container">
-            @forelse(\App\Models\Faq::active()->ordered()->get() as $index => $faq)
-                @if ($index == 0 || $index % 2 == 0)
+            <?php $__empty_1 = true; $__currentLoopData = \App\Models\Faq::active()->ordered()->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <?php if($index == 0 || $index % 2 == 0): ?>
                     <div class="faq-grid">
-                @endif
+                <?php endif; ?>
 
                 <div class="faq-card">
-                    <div class="faq-number">{{ $index + 1 }}</div>
+                    <div class="faq-number"><?php echo e($index + 1); ?></div>
 
                     <div class="faq-icon">
                         <i class="fas fa-question"></i>
                     </div>
 
                     <div class="faq-question">
-                        {{ $faq->question }}
+                        <?php echo e($faq->question); ?>
+
                     </div>
 
                     <div class="faq-answer">
-                        <div class="answer-content" id="answer-{{ $index }}">
-                            {!! nl2br(e($faq->answer)) !!}
+                        <div class="answer-content" id="answer-<?php echo e($index); ?>">
+                            <?php echo nl2br(e($faq->answer)); ?>
+
                         </div>
-                        <span class="read-more-btn" onclick="toggleAnswer({{ $index }})">
+                        <span class="read-more-btn" onclick="toggleAnswer(<?php echo e($index); ?>)">
                             <i class="fas fa-chevron-down"></i>
                             <span class="read-more-text">قراءة المزيد</span>
                         </span>
                     </div>
                 </div>
 
-                @if ($index == count(\App\Models\Faq::active()->ordered()->get()) - 1 || $index % 2 == 1)
+                <?php if($index == count(\App\Models\Faq::active()->ordered()->get()) - 1 || $index % 2 == 1): ?>
         </div>
-        @endif
-    @empty
+        <?php endif; ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <div class="empty-state">
             <div class="empty-state-icon">
                 <i class="fas fa-inbox"></i>
@@ -315,7 +315,7 @@
             <h4>لا توجد أسئلة شائعة حالياً</h4>
             <p>سيتم إضافة الأسئلة الشائعة قريباً. تابعنا للمزيد من المعلومات</p>
         </div>
-        @endforelse
+        <?php endif; ?>
     </div>
     </div>
 
@@ -341,4 +341,6 @@
             }
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('user.layouts.master', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\laravel\High_Academy\resources\views/user/fqa.blade.php ENDPATH**/ ?>

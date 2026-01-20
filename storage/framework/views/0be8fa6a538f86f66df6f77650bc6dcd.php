@@ -1,14 +1,13 @@
-@extends('user.layouts.master')
-@section('title')
+<?php $__env->startSection('title'); ?>
     صفحه الدفع
-@endsection
+<?php $__env->stopSection(); ?>
 
-@php
+<?php
     $discountSetting = DB::table('discount_settings')->first();
-@endphp
+?>
 
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Checkout Start -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -48,17 +47,19 @@
                     </h5>
 
                     <!-- Display a success flash, if any -->
-                    @if (session('success'))
+                    <?php if(session('success')): ?>
                         <div class="alert alert-success">
-                            {{ session('success') }}
+                            <?php echo e(session('success')); ?>
+
                         </div>
-                    @endif
+                    <?php endif; ?>
                     <!-- Display an error flash, if any -->
-                    @if (session('error'))
+                    <?php if(session('error')): ?>
                         <div class="alert alert-danger">
-                            {{ session('error') }}
+                            <?php echo e(session('error')); ?>
+
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <div class="row col-12">
                         <div class="col-md-6 col-12">
@@ -67,43 +68,42 @@
                                     <tr>
                                         <th scope="col">وصف المنتج</th>
                                         <th scope="col">سعر المنتج</th>
-                                        {{-- <th scope="col">لون المنتج</th>
-                                        <th scope="col">حجم المنتج</th> --}}
+                                        
                                         <th scope="col">العدد</th>
-                                        {{-- <th scope="col">الاجمالي</th> --}}
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <form id="order">
-                                        @foreach (Cart::instance('shopping')->content() as $item)
+                                        <?php $__currentLoopData = Cart::instance('shopping')->content(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <tr>
-                                                <input type="hidden" name="product_id[]" value="{{ $item->id }}">
-                                                <input type="hidden" name="amount[]" value="{{ $item->qty }}">
-                                                <input type="hidden" name="price[]" value="{{ $item->price }}">
-                                                <input type="hidden" name="size[]" value="{{ $item->options->size }}">
-                                                <input type="hidden" name="color[]" value="{{ $item->options->color }}">
-                                                <input type="hidden" name="total_price[]" value="{{ $item->subtotal() }}">
+                                                <input type="hidden" name="product_id[]" value="<?php echo e($item->id); ?>">
+                                                <input type="hidden" name="amount[]" value="<?php echo e($item->qty); ?>">
+                                                <input type="hidden" name="price[]" value="<?php echo e($item->price); ?>">
+                                                <input type="hidden" name="size[]" value="<?php echo e($item->options->size); ?>">
+                                                <input type="hidden" name="color[]" value="<?php echo e($item->options->color); ?>">
+                                                <input type="hidden" name="total_price[]" value="<?php echo e($item->subtotal()); ?>">
                                                 <td>
-                                                    <a href="{{ route('user.product.show', $item->id) }}"
+                                                    <a href="<?php echo e(route('user.product.show', $item->id)); ?>"
                                                         class="nav-link text-dark">
-                                                        {{ $item->name }}
+                                                        <?php echo e($item->name); ?>
+
                                                     </a>
                                                 </td>
-                                                <td>{{ number_format($item->price, 2) }} جنيه</td>
-                                                {{-- <td>{{ $item->options->color }} </td>
-                                                <td>{{ $item->options->size }} </td> --}}
-                                                <td>{{ $item->qty }}</td>
-                                                {{-- <td>{{ $item->subtotal() }} جنيه</td> --}}
+                                                <td><?php echo e(number_format($item->price, 2)); ?> جنيه</td>
+                                                
+                                                <td><?php echo e($item->qty); ?></td>
+                                                
                                             </tr>
-                                        @endforeach
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </form>
                                 </tbody>
                             </table>
                         </div>
 
-                        {{-- START LOCATION AND TOTAL --}}
+                        
                         <div class="col-md-6 col-12">
-                            @php
+                            <?php
                                 // Original subtotal as float
                                 $cartSubtotal = (float) str_replace(',', '', Cart::subtotal());
 
@@ -114,33 +114,34 @@ $discountAmount = session()->has('applied_discount')
 
                                 // Subtotal after discount (before shipping)
                                 $preShippingTotal = max($cartSubtotal - $discountAmount, 0);
-                            @endphp
+                            ?>
 
-                            {{-- Hidden input: discounted subtotal (before shipping) --}}
-                            <input type="hidden" name="all_total" value="{{ $preShippingTotal }}" id="all_total">
+                            
+                            <input type="hidden" name="all_total" value="<?php echo e($preShippingTotal); ?>" id="all_total">
 
-                            {{-- Show the discount line if discount is applied --}}
-                            @if ($discountAmount > 0)
+                            
+                            <?php if($discountAmount > 0): ?>
                                 <div class="alert alert-success" style="text-align: center;">
                                     تم تطبيق الخصم بنجاح! <br>
-                                    رمز الكوبون: <strong>{{ session('applied_discount')['code'] }}</strong> <br>
-                                    قيمة الخصم: <strong>{{ $discountAmount }} جنيه</strong>
+                                    رمز الكوبون: <strong><?php echo e(session('applied_discount')['code']); ?></strong> <br>
+                                    قيمة الخصم: <strong><?php echo e($discountAmount); ?> جنيه</strong>
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
 
                             <form id="location-data">
-                                @csrf
+                                <?php echo csrf_field(); ?>
                                 <div class="form-group">
                                     <label for="governorates">اختر المحافظة</label>
                                     <select class="form-control" id="governorates" name="government"
                                         onchange="calculateTotal()">
                                         <option value="">اختر المحافظة</option>
-                                        @foreach ($governoratesData as $governorate)
-                                            <option value="{{ $governorate->id }}" gov-price="{{ $governorate->price }}">
-                                                {{ $governorate->governorate_name_ar }}
+                                        <?php $__currentLoopData = $governoratesData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $governorate): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($governorate->id); ?>" gov-price="<?php echo e($governorate->price); ?>">
+                                                <?php echo e($governorate->governorate_name_ar); ?>
+
                                             </option>
-                                        @endforeach
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -174,41 +175,28 @@ $discountAmount = session()->has('applied_discount')
                                         pattern="\d{11}" minlength="11" maxlength="11" placeholder="رقم موبايل الاحتياطي"
                                         required />
                                 </div>
-                                {{-- <div class="form-group">
-                                    <label for="near_post">اسم اقرب مكتب بريد</label>
-                                    <input class="form-control" id="near_post" name="near_post"
-                                        placeholder="اسم اقرب مكتب بريد" />
-                                </div> --}}
+                                
 
                             </form>
                             <!-- [ADDED] Discount Form here in the checkout -->
-                            @if ($discountSetting && $discountSetting->discount_enabled)
+                            <?php if($discountSetting && $discountSetting->discount_enabled): ?>
                                 <div class="row mb-4">
                                     <div class="col-md-12">
-                                        <form action="{{ route('user.checkout.applyDiscount') }}" method="POST"
+                                        <form action="<?php echo e(route('user.checkout.applyDiscount')); ?>" method="POST"
                                             class="d-flex">
-                                            @csrf
+                                            <?php echo csrf_field(); ?>
                                             <input type="text" name="coupon_code" class="form-control"
                                                 placeholder="ادخل كود الخصم"
-                                                @if (session()->has('applied_discount')) value="{{ session('applied_discount')['code'] }}" @endif>
+                                                <?php if(session()->has('applied_discount')): ?> value="<?php echo e(session('applied_discount')['code']); ?>" <?php endif; ?>>
                                             <button type="submit" class="btn edit_btn ms-2">
                                                 تطبيق
                                             </button>
                                         </form>
 
                                     </div>
-                                    {{-- <div class="col-md-12 mt-2">
-                            @if (session()->has('applied_discount'))
-                                <form action="{{ route('user.checkout.removeDiscount') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-danger">
-                                        إزالة الخصم
-                                    </button>
-                                </form>
-                            @endif
-                        </div> --}}
+                                    
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
 
 
@@ -218,7 +206,7 @@ $discountAmount = session()->has('applied_discount')
                                         الاستلام</label>
                                     <select class="form-control" id="shipping_method" name="shipping_method_id">
                                         <option value="">اختر طريقة الشحن</option>
-                                        {{-- Shipping options will be populated by JavaScript --}}
+                                        
                                     </select>
                                     <!-- Shipping method details -->
                                     <div id="shipping_info" class="mt-3" style="display: none;">
@@ -232,7 +220,7 @@ $discountAmount = session()->has('applied_discount')
                                         <p id="post_cost_row" class="fs-5" style="display: none;">
                                             <strong>تكلفة التوصيل لمكتب البريد:</strong>
                                             <span id="post_shipping_cost">0.00</span> جنيه <br>
-                                            <a href="{{ route('user.fqa') }}" class=" btn btn-success ms-2"
+                                            <a href="<?php echo e(route('user.fqa')); ?>" class=" btn btn-success ms-2"
                                                 data-bs-toggle="tooltip" data-bs-placement="top">
                                                 تعرف علي طريقة الاستلام</a>
 
@@ -266,11 +254,11 @@ $discountAmount = session()->has('applied_discount')
                                 <h3 id="all"></h3>
                             </div>
                         </div>
-                        {{-- END LOCATION AND TOTAL --}}
+                        
 
 
 
-                        {{-- START PAYMENT --}}
+                        
                         <div class="accordion hidden" id="accordionExample">
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
@@ -294,9 +282,9 @@ $discountAmount = session()->has('applied_discount')
                                     </div>
                                 </div>
                             </div>
-                            {{-- More payment items ... --}}
+                            
                         </div>
-                        {{-- END PAYMENT --}}
+                        
                     </div>
 
                     <div class="col-12 mt-5">
@@ -326,19 +314,19 @@ $discountAmount = session()->has('applied_discount')
             </div>
         </div>
 
-        {{-- Hidden paragraph to store discounted subtotal for JavaScript --}}
-        <p id="total" style="display: none;">{{ $preShippingTotal }}</p>
+        
+        <p id="total" style="display: none;"><?php echo e($preShippingTotal); ?></p>
         <!-- Checkout End -->
-    @endsection
+    <?php $__env->stopSection(); ?>
 
-    @section('js')
+    <?php $__env->startSection('js'); ?>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
             integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
         <!-- Import Sweet Alert -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.all.min.js"></script>
 
-        @php
+        <?php
             $cartItems = Cart::instance('shopping')->content();
             $totalProducts = $cartItems->count();
 
@@ -358,10 +346,10 @@ $discountAmount = session()->has('applied_discount')
                 $productTax += $taxableQuantity * $product->model->tax;
                 $productSlowTax += $taxableQuantity * $product->model->slowTax;
             }
-        @endphp
+        ?>
         <script>
-            const TAX_HOME = {{ $productTax }};
-            const TAX_POST = {{ $productSlowTax }};
+            const TAX_HOME = <?php echo e($productTax); ?>;
+            const TAX_POST = <?php echo e($productSlowTax); ?>;
         </script>
 
         <script>
@@ -369,8 +357,8 @@ $discountAmount = session()->has('applied_discount')
             document.addEventListener('DOMContentLoaded', function() {
 
                 // --- Get data and elements from the page ---
-                const allShippingMethods = @json($shippingMethods);
-                const governoratesDataset = @json($governoratesData);
+                const allShippingMethods = <?php echo json_encode($shippingMethods, 15, 512) ?>;
+                const governoratesDataset = <?php echo json_encode($governoratesData, 15, 512) ?>;
                 const governoratesSelect = document.getElementById('governorates');
                 const shippingSelect = document.getElementById('shipping_method');
 
@@ -506,9 +494,9 @@ $discountAmount = session()->has('applied_discount')
         </script>
 
         <script>
-            const shippingMethods = @json($shippingMethods);
-            const governoratesData = @json($governoratesData);
-            const citiesData = @json($citiesData);
+            const shippingMethods = <?php echo json_encode($shippingMethods, 15, 512) ?>;
+            const governoratesData = <?php echo json_encode($governoratesData, 15, 512) ?>;
+            const citiesData = <?php echo json_encode($citiesData, 15, 512) ?>;
             const shippingSelect = document.getElementById('shipping_method');
 
             function setupPaymentHandler(buttonId, routeUrl, extraFormId = null) {
@@ -566,7 +554,7 @@ $discountAmount = session()->has('applied_discount')
                         processData: false,
                         contentType: false,
                         headers: {
-                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                            'X-CSRF-TOKEN': "<?php echo e(csrf_token()); ?>"
                         },
                         success: function(response) {
                             if (response.url) {
@@ -604,10 +592,10 @@ $discountAmount = session()->has('applied_discount')
                 });
             }
 
-            setupPaymentHandler('#credit_card', "{{ route('cards.pay') }}");
-            setupPaymentHandler('#fawry', "{{ route('fawry.pay') }}");
-            setupPaymentHandler('#wallet', "{{ route('fawry.wallet.pay') }}", '#ewallets-form');
-            setupPaymentHandler('#insta-pay', "{{ route('manual.pay') }}", '#instapay-form');
+            setupPaymentHandler('#credit_card', "<?php echo e(route('cards.pay')); ?>");
+            setupPaymentHandler('#fawry', "<?php echo e(route('fawry.pay')); ?>");
+            setupPaymentHandler('#wallet', "<?php echo e(route('fawry.wallet.pay')); ?>", '#ewallets-form');
+            setupPaymentHandler('#insta-pay', "<?php echo e(route('manual.pay')); ?>", '#instapay-form');
 
             function calculateTotal() {
                 const discountedSubtotal = parseFloat(document.getElementById("total").innerText.trim()) || 0;
@@ -732,7 +720,7 @@ $discountAmount = session()->has('applied_discount')
             accordion.classList.add('hidden');
 
             document.addEventListener('DOMContentLoaded', function() {
-                const citiesData = @json($citiesData);
+                const citiesData = <?php echo json_encode($citiesData, 15, 512) ?>;
 
                 document.getElementById('governorates').addEventListener('change', function() {
                     const governorateId = this.value;
@@ -790,7 +778,7 @@ $discountAmount = session()->has('applied_discount')
             });
         </script>
 
-        @if ($orders !== null)
+        <?php if($orders !== null): ?>
             <script>
                 Swal.fire({
                     title: "سهلناها عليك, جبنا بيانات الشحن من طلبك السابق",
@@ -798,18 +786,18 @@ $discountAmount = session()->has('applied_discount')
                     confirmButtonText: "حسنا",
                     showCloseButton: true
                 }).then((result) => {
-                    document.getElementById('governorates').value = "{{ $addressId ?? '' }}";
+                    document.getElementById('governorates').value = "<?php echo e($addressId ?? ''); ?>";
                     document.getElementById('governorates').dispatchEvent(new Event('change'));
-                    document.getElementById('cities').value = "{{ $citiId ?? '' }}";
+                    document.getElementById('cities').value = "<?php echo e($citiId ?? ''); ?>";
                     document.getElementById('cities').dispatchEvent(new Event('change'));
-                    document.getElementById('address').value = "{{ $orders->address }}";
-                    document.getElementById('user_name').value = "{{ $orders->name }}";
-                    document.getElementById('mobile').value = "{{ $orders->mobile }}";
-                    document.getElementById('temp_mobile').value = "{{ $orders->temp_mobile }}";
-                    document.getElementById('near_post').value = "{{ $orders->near_post }}";
+                    document.getElementById('address').value = "<?php echo e($orders->address); ?>";
+                    document.getElementById('user_name').value = "<?php echo e($orders->name); ?>";
+                    document.getElementById('mobile').value = "<?php echo e($orders->mobile); ?>";
+                    document.getElementById('temp_mobile').value = "<?php echo e($orders->temp_mobile); ?>";
+                    document.getElementById('near_post').value = "<?php echo e($orders->near_post); ?>";
                 });
             </script>
-        @endif
+        <?php endif; ?>
 
         <script type="text/javascript">
             function showPreview(event) {
@@ -830,4 +818,6 @@ $discountAmount = session()->has('applied_discount')
                 }
             }
         </script>
-    @endsection
+    <?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('user.layouts.master', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\laravel\High_Academy\resources\views/user/card.blade.php ENDPATH**/ ?>

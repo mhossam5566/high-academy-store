@@ -5093,3 +5093,7 @@ Stack trace:
 #71 E:\\laravel\\High_Academy\\server.php(21): require_once('...')
 #72 {main}
 "} 
+[2026-01-20 20:48:05] local.ERROR: Maximum execution time of 30 seconds exceeded {"userId":95,"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 30 seconds exceeded at E:\\laravel\\High_Academy\\vendor\\php-flasher\\flasher\\Http\\Csp\\ContentSecurityPolicyHandler.php:22)
+[stacktrace]
+#0 {main}
+"} 

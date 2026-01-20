@@ -1,8 +1,6 @@
-@extends('user.layouts.master')
+<?php $__env->startSection('title', 'متابعة طلبــــــاتي'); ?>
 
-@section('title', 'متابعة طلبــــــاتي')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
         crossorigin="anonymous">
     <style>
@@ -38,7 +36,8 @@
                 <div class="d-flex flex-column align-items-center">
                     <div class="d-flex align-items-center justify-content-center bg-secondary text-white rounded-circle"
                         style="width: 80px; height: 80px; font-size: 20px;">
-                        {{ $reservedCount }}
+                        <?php echo e($reservedCount); ?>
+
                     </div>
                     <h4 class="mt-2 order-status">الطلبات المحجوزة</h4>
                 </div>
@@ -47,7 +46,8 @@
                 <div class="d-flex flex-column align-items-center">
                     <div class="d-flex align-items-center justify-content-center bg-success text-white rounded-circle"
                         style="width: 80px; height: 80px; font-size: 20px;">
-                        {{ $successCount }}
+                        <?php echo e($successCount); ?>
+
                     </div>
                     <p class="mt-2 order-status">الطلبات الناجحة</p>
                 </div>
@@ -56,7 +56,8 @@
                 <div class="d-flex flex-column align-items-center">
                     <div class="d-flex align-items-center justify-content-center bg-info text-white rounded-circle"
                         style="width: 80px; height: 80px; font-size: 20px;">
-                        {{ $pendingCount }}
+                        <?php echo e($pendingCount); ?>
+
                     </div>
                     <p class="mt-2 order-status">الطلبات المعلقة</p>
                 </div>
@@ -66,7 +67,8 @@
                 <div class="d-flex flex-column align-items-center">
                     <div class="d-flex align-items-center justify-content-center bg-danger text-white rounded-circle"
                         style="width: 80px; height: 80px; font-size: 20px;">
-                        {{ $cancelledCount }}
+                        <?php echo e($cancelledCount); ?>
+
                     </div>
                     <p class="mt-2 order-status">الطلبات الملغية</p>
                 </div>
@@ -76,125 +78,128 @@
                 <div class="d-flex flex-column align-items-center">
                     <div class="d-flex align-items-center justify-content-center bg-primary text-white rounded-circle"
                         style="width: 80px; height: 80px; font-size: 20px;">
-                        {{ $successPercentage }}%
+                        <?php echo e($successPercentage); ?>%
                     </div>
                     <p class="mt-2 order-status">نسبة النجاح</p>
                 </div>
             </div>
         </div>
 
-        @if ($orders->isEmpty())
+        <?php if($orders->isEmpty()): ?>
             <h3 class="text-center">لا يوجد أي طلبات حالياً</h3>
-        @endif
+        <?php endif; ?>
 
         <div class="row g-4">
-            @foreach ($orders as $o)
-                @php $ship = optional($o->shipping); @endphp
+            <?php $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $o): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php $ship = optional($o->shipping); ?>
                 <div class="col-md-6">
                     <div class="card h-100" dir="rtl">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <strong>طلب رقم : {{ $o->id }}</strong>
-                            @switch($o->status)
-                                @case('new')
+                            <strong>طلب رقم : <?php echo e($o->id); ?></strong>
+                            <?php switch($o->status):
+                                case ('new'): ?>
                                     <span class="badge bg-warning text-dark">طلب جديد</span>
-                                @break
+                                <?php break; ?>
 
-                                @case('success')
+                                <?php case ('success'): ?>
                                     <span class="badge bg-success">طلب ناجح</span>
-                                @break
+                                <?php break; ?>
 
-                                @case('cancelled')
+                                <?php case ('cancelled'): ?>
                                     <span class="badge bg-danger">طلب ملغي</span>
-                                @break
+                                <?php break; ?>
 
-                                @case('reserved')
+                                <?php case ('reserved'): ?>
                                     <span class="badge bg-info">طلب محجوز</span>
-                                @break
-                                @case('pending')
+                                <?php break; ?>
+                                <?php case ('pending'): ?>
                                     <span class="badge bg-info">طلب معلق</span>
-                                @break
+                                <?php break; ?>
 
-                                @default
+                                <?php default: ?>
                                     <span class="badge bg-secondary">غير معروف</span>
-                            @endswitch
+                            <?php endswitch; ?>
                         </div>
 
                         <div class="card-body">
-                            {{-- Shipping Method --}}
+                            
                             <div class="d-flex justify-content-between mb-2">
                                 <strong>طريقة الشحن</strong>
                                 <span class="text-primary">
-                                    {{ $ship->name ?? '-' }}
+                                    <?php echo e($ship->name ?? '-'); ?>
+
                                     (
-                                    @if ($ship->type === 'post')
+                                    <?php if($ship->type === 'post'): ?>
                                         مكتب بريد
-                                    @elseif($ship->type === 'home')
+                                    <?php elseif($ship->type === 'home'): ?>
                                         توصيل لباب البيت
-                                    @elseif($ship->type === 'branch')
+                                    <?php elseif($ship->type === 'branch'): ?>
                                         استلام من المكتبة
-                                    @else
+                                    <?php else: ?>
                                         -
-                                    @endif
+                                    <?php endif; ?>
                                     )
                                 </span>
                             </div>
 
-                            {{-- Shipping Address --}}
+                            
                             <div class="d-flex justify-content-between mb-2">
                                 <strong>عنوان الشحن</strong>
-                                <span>{{ $ship->address ?? '-' }}</span>
+                                <span><?php echo e($ship->address ?? '-'); ?></span>
                             </div>
 
-                            {{-- Shipping Phones --}}
+                            
                             <div class="d-flex justify-content-between mb-2">
                                 <strong>أرقام التواصل</strong>
-                                <span>{{ $ship->phones ? implode(' - ', $ship->phones) : '-' }}</span>
+                                <span><?php echo e($ship->phones ? implode(' - ', $ship->phones) : '-'); ?></span>
                             </div>
 
-                            {{-- Order Total --}}
+                            
                             <div class="d-flex justify-content-between mb-2">
                                 <strong>المبلغ المدفوع</strong>
-                                <span>{{ number_format($o->total, 2) }} جنيه</span>
+                                <span><?php echo e(number_format($o->total, 2)); ?> جنيه</span>
                             </div>
 
-                            {{-- Payment Method --}}
+                            
                             <div class="d-flex justify-content-between mb-2">
                                 <strong>طريقة الدفع</strong>
-                                <span>{{ $o->method }}</span>
+                                <span><?php echo e($o->method); ?></span>
                             </div>
 
-                            {{-- Order Date --}}
+                            
                             <div class="d-flex justify-content-between mb-2">
                                 <strong>توقيت الطلب</strong>
-                                <span>{{ $o->created_at->format('Y-m-d H:i') }}</span>
+                                <span><?php echo e($o->created_at->format('Y-m-d H:i')); ?></span>
                             </div>
 
-                            {{-- Delivery Estimate (only on success) --}}
-                            @if ($o->status === 'success')
+                            
+                            <?php if($o->status === 'success'): ?>
                                 <div class="d-flex justify-content-between mb-2">
                                     <strong>تاريخ الاستلام المتوقع</strong>
-                                    @if ($ship->type === 'home')
+                                    <?php if($ship->type === 'home'): ?>
                                         <span class="text-success">خلال 3 أيام عمل</span>
-                                    @else
+                                    <?php else: ?>
                                         <span class="text-success">من 3 إلى 5 أيام عمل</span>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
 
-                        <a href="{{ route('user.order.details', $o->id) }}"
+                        <a href="<?php echo e(route('user.order.details', $o->id)); ?>"
                             class="card-footer text-center text-decoration-none">
                             <h5>انقر لعرض تفاصيل الطلب</h5>
                         </a>
                     </div>
                 </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('js')
+<?php $__env->startSection('js'); ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
         integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('user.layouts.master', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\laravel\High_Academy\resources\views/user/myorders.blade.php ENDPATH**/ ?>
