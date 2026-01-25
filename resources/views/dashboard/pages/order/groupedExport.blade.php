@@ -262,7 +262,41 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
             <br>
         @endforeach
     </p>
-    <h2>الكتب المطلوبة</h2>
+
+    @foreach ($grouped as $shipping => $shippingOrders)
+        <h2>الكتب المطلوبة - {{ $shipping }}</h2>
+        @php
+            $shippingDetails = collect($shippingOrders)->flatMap(function ($order) {
+                return $order->orderDetails;
+            });
+            $shippingBooks = $shippingDetails->groupBy(fn($detail) => $detail->products->id)
+                ->map(function ($group) {
+                    return [
+                        'name' => $group->first()->products->short_name ?? $group->first()->products->name,
+                        'total' => $group->sum('amout'),
+                    ];
+                });
+        @endphp
+        <table class="export">
+            <thead>
+                <tr>
+                    <th>اسم الكتاب</th>
+                    <th>الكمية</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($shippingBooks as $book)
+                    <tr>
+                        <td>{{ $book['name'] }}</td>
+                        <td>{{ $book['total'] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <br><br>
+    @endforeach
+
+    <h2>الكتب المطلوبة - الإجمالي</h2>
     @php
         $allDetails = collect($orders)->flatMap(function ($order) {
             return $order->orderDetails;

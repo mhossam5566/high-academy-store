@@ -648,12 +648,23 @@ class OrderController extends Controller
 
         return redirect()->back()->with('success', 'تم تحديث الطلب بنجاح ✨');
     }
-    public function update_all_reversed_order(): \Illuminate\Http\RedirectResponse
+    public function update_all_reversed_order(Request $request): \Illuminate\Http\RedirectResponse
     {
-        $orders = Order::query()->where('status', '=', 'reserved')->get();
+        $query = Order::query()->where('status', '=', 'reserved');
+
+        // Filter by book if book_id is provided
+        if ($request->has('book_id') && !empty($request->book_id)) {
+            $query->whereHas('orderDetails', function ($q) use ($request) {
+                $q->where('product_id', $request->book_id);
+            });
+        }
+
+        $orders = $query->get();
+
         foreach ($orders as $order) {
             $order->update(['status' => 'success']);
         }
+
         return redirect()->to(route('dashboard.orders'));
     }
 

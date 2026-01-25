@@ -202,9 +202,18 @@
 @section('page-script')
     <script>
         function confirmUpdateAllReversed() {
+            let status = $('#orderStatus').val();
+            let bookId = $('#bookSelect').val();
+
+            let message = 'سيتم تحويل جميع الطلبات المحجوزة إلى حالة ناجح.';
+            if (status === 'reserved' && bookId) {
+                let bookName = $('#bookSelect option:selected').text();
+                message = 'سيتم تحويل جميع الطلبات المحجوزة التي تحتوي على "' + bookName + '" إلى حالة ناجح.';
+            }
+
             Swal.fire({
                 title: 'هل أنت متأكد؟',
-                text: 'سيتم تحويل جميع الطلبات المحجوزة إلى حالة ناجح. هل تريد المتابعة؟',
+                text: message + ' هل تريد المتابعة؟',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -214,7 +223,11 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = "{{ route('dashboard.update_all_reversed_order') }}";
+                    let url = "{{ route('dashboard.update_all_reversed_order') }}";
+                    if (status === 'reserved' && bookId) {
+                        url += '?book_id=' + bookId;
+                    }
+                    window.location.href = url;
                 }
             });
         }

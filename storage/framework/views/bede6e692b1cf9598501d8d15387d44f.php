@@ -269,7 +269,41 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
             <br>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
-    <h2>الكتب المطلوبة</h2>
+
+    <?php $__currentLoopData = $grouped; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $shipping => $shippingOrders): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <h2>الكتب المطلوبة - <?php echo e($shipping); ?></h2>
+        <?php
+            $shippingDetails = collect($shippingOrders)->flatMap(function ($order) {
+                return $order->orderDetails;
+            });
+            $shippingBooks = $shippingDetails->groupBy(fn($detail) => $detail->products->id)
+                ->map(function ($group) {
+                    return [
+                        'name' => $group->first()->products->short_name ?? $group->first()->products->name,
+                        'total' => $group->sum('amout'),
+                    ];
+                });
+        ?>
+        <table class="export">
+            <thead>
+                <tr>
+                    <th>اسم الكتاب</th>
+                    <th>الكمية</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $__currentLoopData = $shippingBooks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $book): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <tr>
+                        <td><?php echo e($book['name']); ?></td>
+                        <td><?php echo e($book['total']); ?></td>
+                    </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </tbody>
+        </table>
+        <br><br>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+    <h2>الكتب المطلوبة - الإجمالي</h2>
     <?php
         $allDetails = collect($orders)->flatMap(function ($order) {
             return $order->orderDetails;
