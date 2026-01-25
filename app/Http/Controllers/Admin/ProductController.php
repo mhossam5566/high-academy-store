@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\EditProductRequest;
-use App\Http\Requests\ProductRequest;
 use App\Models\Brand;
-use App\Models\Category;
-use App\Models\MainCategory;
-use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\Slider;
-use App\Services\ProductService;
-use App\Traits\DeleteTrait;
-use App\Traits\GeneralTrait;
+use App\Models\Product;
+use App\Models\Category;
 use App\Traits\ImageTrait;
+use App\Traits\DeleteTrait;
+use App\Models\MainCategory;
+use App\Models\ProductImage;
+use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
+use App\Services\ProductService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductRequest;
 use Yajra\DataTables\Facades\DataTables;
+use App\Http\Requests\EditProductRequest;
 
 class ProductController extends Controller
 {
@@ -133,7 +133,7 @@ class ProductController extends Controller
                 })
                 ->addColumn('operation', function ($row) {
                     $buttons = '<div class="d-flex gap-1">';
-                    
+
                     $buttons .= '<a href="' . route('dashboard.product.edit', $row->id) . '" class="btn btn-sm btn-primary" title="تعديل">
                         <i class="ti ti-edit"></i>
                     </a>';
@@ -152,9 +152,9 @@ class ProductController extends Controller
                     $buttons .= '<button data-id="' . $row->id . '" class="btn btn-sm btn-danger force-delete-btn" title="حذف نهائي">
                         <i class="ti ti-trash"></i>
                     </button>';
-                    
+
                     $buttons .= '</div>';
-                    
+
                     return $buttons;
                 })
                 ->rawColumns(['operation', 'photo', 'best_seller', 'is_deleted', 'state'])

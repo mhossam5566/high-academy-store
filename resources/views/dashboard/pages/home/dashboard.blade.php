@@ -133,17 +133,21 @@
                             <div class="content-left">
                                 <span class="text-muted d-block mb-1">معدل النمو</span>
                                 <div class="d-flex align-items-center">
-                                    <h3 class="mb-0 me-2 {{ $statistics['revenue']['growth'] >= 0 ? 'text-success' : 'text-danger' }}">
+                                    <h3
+                                        class="mb-0 me-2 {{ $statistics['revenue']['growth'] >= 0 ? 'text-success' : 'text-danger' }}">
                                         {{ number_format(abs($statistics['revenue']['growth']), 1) }}%
                                     </h3>
                                 </div>
-                                <small class="{{ $statistics['revenue']['growth'] >= 0 ? 'text-success' : 'text-danger' }}">
-                                    <i class="ti {{ $statistics['revenue']['growth'] >= 0 ? 'ti-trending-up' : 'ti-trending-down' }}"></i>
+                                <small
+                                    class="{{ $statistics['revenue']['growth'] >= 0 ? 'text-success' : 'text-danger' }}">
+                                    <i
+                                        class="ti {{ $statistics['revenue']['growth'] >= 0 ? 'ti-trending-up' : 'ti-trending-down' }}"></i>
                                     مقارنة بالفترة السابقة
                                 </small>
                             </div>
                             <div class="avatar">
-                                <span class="avatar-initial rounded bg-label-{{ $statistics['revenue']['growth'] >= 0 ? 'success' : 'danger' }}">
+                                <span
+                                    class="avatar-initial rounded bg-label-{{ $statistics['revenue']['growth'] >= 0 ? 'success' : 'danger' }}">
                                     <i class="ti ti-chart-line ti-md"></i>
                                 </span>
                             </div>
@@ -632,7 +636,7 @@
             series: [{
                 name: 'الإيرادات',
                 data: [
-                    @foreach($statistics['monthly'] as $month)
+                    @foreach ($statistics['monthly'] as $month)
                         {{ number_format($month['revenue'], 0, '', '') }},
                     @endforeach
                 ]
@@ -666,7 +670,7 @@
             },
             xaxis: {
                 categories: [
-                    @foreach($statistics['monthly'] as $month)
+                    @foreach ($statistics['monthly'] as $month)
                         '{{ $month['month_ar'] }}',
                     @endforeach
                 ],
@@ -701,7 +705,7 @@
             series: [{
                 name: 'عدد الطلبات',
                 data: [
-                    @foreach($statistics['monthly'] as $month)
+                    @foreach ($statistics['monthly'] as $month)
                         {{ $month['orders'] }},
                     @endforeach
                 ]
@@ -733,7 +737,7 @@
             colors: ['#56ca00'],
             xaxis: {
                 categories: [
-                    @foreach($statistics['monthly'] as $month)
+                    @foreach ($statistics['monthly'] as $month)
                         '{{ $month['month_ar'] }}',
                     @endforeach
                 ],

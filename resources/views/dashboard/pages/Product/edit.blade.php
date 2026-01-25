@@ -23,7 +23,7 @@
     </div>
 
     <form id="productForm" data-ajax data-redirect="{{ route('dashboard.product') }}"
-        action="{{ route('dashboard.update.product') }}" method="POST" enctype="multipart/form-data">
+        action="{{ route('dashboard.product.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="product_id" value="{{ $product->id }}">
 
@@ -102,6 +102,20 @@
                         <label class="form-label">تعليق (عندما يكون غير متوفر)</label>
                         <input type="text" name="commit" value="{{ $product->commit }}" class="form-control">
                     </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">المنتج متوفر؟</label>
+                        <select name="state" id="state" class="form-select @error('state') is-invalid @enderror">
+                            <option value="">اختر الحالة</option>
+                            <option value="0" {{ $product->state == 0 ? 'selected' : '' }}>غير متوفر</option>
+                            <option value="1" {{ $product->state == 1 ? 'selected' : '' }}>متوفر</option>
+                            <option value="2" {{ $product->state == 2 ? 'selected' : '' }}>يمكن حجزه</option>
+                            <option value="3" {{ $product->state == 3 ? 'selected' : '' }}>سيتوفر قريبا</option>
+                        </select>
+                        @error('state')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
             </div>
         </div>
@@ -159,12 +173,14 @@
                     <div class="col-md-4">
                         <label class="form-label">لديه عرض؟</label>
                         <select name="have_offer" id="have_offer" class="form-select">
+                            <option value="">اختر</option>
                             <option value="0" {{ $product->have_offer == 0 ? 'selected' : '' }}>لا</option>
                             <option value="1" {{ $product->have_offer == 1 ? 'selected' : '' }}>نعم</option>
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-4" id="offer_type_div"
+                        style="display: {{ $product->have_offer == 1 ? 'block' : 'none' }};">
                         <label class="form-label">نوع العرض</label>
                         <select name="offer_type" id="offer_type" class="form-select">
                             <option value="">اختر النوع</option>
@@ -175,7 +191,8 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-4" id="offer_value_div"
+                        style="display: {{ $product->have_offer == 1 ? 'block' : 'none' }};">
                         <label class="form-label">قيمة العرض</label>
                         <input type="number" name="offer_value" id="offer_value" value="{{ $product->offer_value }}"
                             step="0.01" class="form-control">
@@ -255,22 +272,38 @@
                     <div class="col-md-6">
                         <label class="form-label">الأحجام</label>
                         <select name="sizes[]" id="size" class="form-select select2" multiple>
-                            @foreach ($sizes as $size)
-                                <option value="{{ $size }}"
-                                    {{ in_array($size, json_decode($product->sizes ?? '[]')) ? 'selected' : '' }}>
-                                    {{ $size }}</option>
-                            @endforeach
+                            @if (is_array($product->sizes))
+                                @foreach ($sizes as $size)
+                                    <option value="{{ $size }}"
+                                        {{ in_array($size, $product->sizes) ? 'selected' : '' }}>{{ $size }}
+                                    </option>
+                                @endforeach
+                            @else
+                                @foreach ($sizes as $size)
+                                    <option value="{{ $size }}"
+                                        {{ in_array($size, json_decode($product->sizes ?? '[]')) ? 'selected' : '' }}>
+                                        {{ $size }}</option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">الألوان</label>
                         <select name="colors[]" id="color" class="form-select select2" multiple>
-                            @foreach ($colors as $color)
-                                <option value="{{ $color }}"
-                                    {{ in_array($color, json_decode($product->colors ?? '[]')) ? 'selected' : '' }}>
-                                    {{ $color }}</option>
-                            @endforeach
+                            @if (is_array($product->colors))
+                                @foreach ($colors as $color)
+                                    <option value="{{ $color }}"
+                                        {{ in_array($color, $product->colors) ? 'selected' : '' }}>{{ $color }}
+                                    </option>
+                                @endforeach
+                            @else
+                                @foreach ($colors as $color)
+                                    <option value="{{ $color }}"
+                                        {{ in_array($color, json_decode($product->colors ?? '[]')) ? 'selected' : '' }}>
+                                        {{ $color }}</option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
                 </div>
@@ -329,13 +362,23 @@
 
                     @if ($product->images && count($product->images) > 0)
                         <div class="col-12">
-                            <label class="form-label">الصور الحالية</label>
-                            <div class="row g-2">
+                            <label class="form-label">الصور الحالية (يمكنك حذف الصور غير المرغوبة)</label>
+                            <div class="row g-3">
                                 @foreach ($product->images as $image)
-                                    <div class="col-md-2">
-                                        <div class="position-relative">
-                                            <img src="{{ asset($image->image) }}" class="img-thumbnail"
-                                                alt="Product Image">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <img src="{{ asset('storage/' . $image->image_path) }}" class="card-img-top"
+                                                alt="Product Image" style="height: 200px; object-fit: cover;">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        id="img_{{ $image->id }}" name="delete_images[]"
+                                                        value="{{ $image->id }}">
+                                                    <label class="form-check-label" for="img_{{ $image->id }}">
+                                                        حذف هذه الصورة
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -391,6 +434,25 @@
 
             // Calculate on page load
             calculateFinalPrice();
+
+            // Toggle offer fields based on have_offer
+            $('#have_offer').on('change', function() {
+                if ($(this).val() === '1') {
+                    $('#offer_type_div').show();
+                    $('#offer_value_div').show();
+                } else {
+                    $('#offer_type_div').hide();
+                    $('#offer_value_div').hide();
+                    $('#offer_value').val(0);
+                    $('#final_price_alert').hide();
+                }
+            });
+
+            // Initialize offer fields visibility on page load
+            if ($('#have_offer').val() === '1') {
+                $('#offer_type_div').show();
+                $('#offer_value_div').show();
+            }
         });
     </script>
 @endsection

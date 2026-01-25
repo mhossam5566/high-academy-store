@@ -2,7 +2,8 @@
 
 <?php $__env->startSection('vendor-style'); ?>
     <link rel="stylesheet" href="<?php echo e(asset('dashboard/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('dashboard/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')); ?>">
+    <link rel="stylesheet"
+        href="<?php echo e(asset('dashboard/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')); ?>">
     <link rel="stylesheet" href="<?php echo e(asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.css')); ?>">
 <?php $__env->stopSection(); ?>
 
@@ -31,16 +32,21 @@
                 <div class="col-md-6">
                     <label class="form-label">حالة الطلب</label>
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100" id="stateFilterBtn" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100" id="stateFilterBtn"
+                            data-bs-toggle="dropdown">
                             <span id="stateFilterLabel">كل الحالات</span>
                         </button>
                         <ul class="dropdown-menu w-100">
                             <li><a href="#" class="dropdown-item state-filter-item" data-value="">كل الحالات</a></li>
                             <li><a href="#" class="dropdown-item state-filter-item" data-value="new">طلب جديد</a></li>
-                            <li><a href="#" class="dropdown-item state-filter-item" data-value="reserved">طلب محجوز</a></li>
-                            <li><a href="#" class="dropdown-item state-filter-item" data-value="success">طلب ناجح</a></li>
-                            <li><a href="#" class="dropdown-item state-filter-item" data-value="pending">طلب معلق</a></li>
-                            <li><a href="#" class="dropdown-item state-filter-item" data-value="cancelled">تم الإلغاء</a></li>
+                            <li><a href="#" class="dropdown-item state-filter-item" data-value="reserved">طلب
+                                    محجوز</a></li>
+                            <li><a href="#" class="dropdown-item state-filter-item" data-value="success">طلب ناجح</a>
+                            </li>
+                            <li><a href="#" class="dropdown-item state-filter-item" data-value="pending">طلب معلق</a>
+                            </li>
+                            <li><a href="#" class="dropdown-item state-filter-item" data-value="cancelled">تم
+                                    الإلغاء</a></li>
                         </ul>
                     </div>
                 </div>
@@ -49,7 +55,8 @@
                 <div class="col-md-6">
                     <label class="form-label">طريقة الشحن</label>
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100" id="shippingFilterBtn" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100" id="shippingFilterBtn"
+                            data-bs-toggle="dropdown">
                             <span id="shippingFilterLabel">كل طرق الشحن</span>
                         </button>
                         <ul class="dropdown-menu w-100">
@@ -60,7 +67,8 @@
                             </li>
                             <?php $__currentLoopData = $shippingMethods; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $method): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <li>
-                                    <a href="#" class="dropdown-item shipping-filter-item" data-value="<?php echo e($method->id); ?>">
+                                    <a href="#" class="dropdown-item shipping-filter-item"
+                                        data-value="<?php echo e($method->id); ?>">
                                         <?php echo e($method->name); ?>
 
                                     </a>
@@ -83,13 +91,22 @@
         <div class="card-body">
             <!-- Order Type Selection -->
             <div class="row g-3 mb-3">
-                <div class="col-md-12">
+                <div class="col-md-12" id="orderStatusContainer">
                     <label class="form-label fw-bold">نوع الطلب</label>
                     <select id="orderStatus" class="form-select">
                         <option value="" disabled selected>اختر نوع الطلب</option>
                         <option value="success">الطلبات الناجحة</option>
                         <option value="reserved">الطلبات المحجوزة</option>
                         <option value="pending">الطلبات المعلقة</option>
+                    </select>
+                </div>
+                <div class="col-md-6" id="bookSelectContainer" style="display: none;">
+                    <label class="form-label fw-bold">اختر الكتاب</label>
+                    <select id="bookSelect" class="form-select">
+                        <option value="">جميع الكتب</option>
+                        <?php $__currentLoopData = $reversable_books; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $book): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($book->id); ?>"><?php echo e($book->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
             </div>
@@ -99,7 +116,8 @@
                 <div class="col-md-6">
                     <label class="form-label">تصدير الطلبات يدوياً</label>
                     <div class="input-group">
-                        <input type="number" id="orderLimit" class="form-control" placeholder="عدد الطلبات" min="1" oninput="validateInput(this)">
+                        <input type="number" id="orderLimit" class="form-control" placeholder="عدد الطلبات" min="1"
+                            oninput="validateInput(this)">
                         <button class="btn btn-success" onclick="exportOrders()">
                             <i class="ti ti-download me-1"></i>تصدير
                         </button>
@@ -110,7 +128,8 @@
                 <div class="col-md-6">
                     <label class="form-label">تصدير الطلبات بالتفاصيل</label>
                     <div class="input-group">
-                        <input type="number" id="orderSuccessLimit" class="form-control" placeholder="عدد الطلبات" min="1" oninput="validateInput(this)">
+                        <input type="number" id="orderSuccessLimit" class="form-control" placeholder="عدد الطلبات"
+                            min="1" oninput="validateInput(this)">
                         <button class="btn btn-success" onclick="exportOrdersSuccess()">
                             <i class="ti ti-download me-1"></i>تصدير
                         </button>
@@ -121,7 +140,8 @@
                 <div class="col-md-6">
                     <label class="form-label">تصدير الطلبات الناجحة بالتفصيل</label>
                     <div class="input-group">
-                        <input type="number" id="orderGroupedLimit" class="form-control" placeholder="عدد الطلبات" min="1" oninput="validateInput(this)">
+                        <input type="number" id="orderGroupedLimit" class="form-control" placeholder="عدد الطلبات"
+                            min="1" oninput="validateInput(this)">
                         <button class="btn btn-info" onclick="exportGroupedOrders()">
                             <i class="ti ti-download me-1"></i>تصدير
                         </button>
@@ -132,7 +152,8 @@
                 <div class="col-md-6">
                     <label class="form-label">تصدير طلبات الفروع</label>
                     <div class="input-group">
-                        <input type="number" id="orderBranchLimit" class="form-control" placeholder="عدد الطلبات" min="1" oninput="validateInput(this)">
+                        <input type="number" id="orderBranchLimit" class="form-control" placeholder="عدد الطلبات"
+                            min="1" oninput="validateInput(this)">
                         <button class="btn btn-info" onclick="exportBranchOrders()">
                             <i class="ti ti-download me-1"></i>تصدير
                         </button>
@@ -220,20 +241,58 @@
                         d.shipping = shippingFilterValue;
                     }
                 },
-                columns: [
-                    { data: 'id', name: 'id' },
-                    { data: 'name', name: 'name' },
-                    { data: 'phone', name: 'mobile' },
-                    { data: 'address', name: 'address' },
-                    { data: 'shipping_method', name: 'shipping_method' },
-                    { data: 'total', name: 'total' },
-                    { data: 'method', name: 'method' },
-                    { data: 'account', name: 'account' },
-                    { data: 'image', name: 'image' },
-                    { data: 'state', name: 'state' },
-                    { data: 'change_status', name: 'change_status' },
-                    { data: 'edit_order', name: 'edit_order' },
-                    { data: 'details', name: 'details' },
+                columns: [{
+                        data: 'id',
+                        name: 'id'
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'phone',
+                        name: 'mobile'
+                    },
+                    {
+                        data: 'address',
+                        name: 'address'
+                    },
+                    {
+                        data: 'shipping_method',
+                        name: 'shipping_method'
+                    },
+                    {
+                        data: 'total',
+                        name: 'total'
+                    },
+                    {
+                        data: 'method',
+                        name: 'method'
+                    },
+                    {
+                        data: 'account',
+                        name: 'account'
+                    },
+                    {
+                        data: 'image',
+                        name: 'image'
+                    },
+                    {
+                        data: 'state',
+                        name: 'state'
+                    },
+                    {
+                        data: 'change_status',
+                        name: 'change_status'
+                    },
+                    {
+                        data: 'edit_order',
+                        name: 'edit_order'
+                    },
+                    {
+                        data: 'details',
+                        name: 'details'
+                    },
                 ],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json'
@@ -259,7 +318,8 @@
                 $('#export').attr('href', baseExportUrl + '?' + params.toString());
 
                 if (stateFilterValue) {
-                    $('#successExport').attr('href', baseSuccessExportUrl + '?' + params.toString()).removeClass('disabled');
+                    $('#successExport').attr('href', baseSuccessExportUrl + '?' + params.toString()).removeClass(
+                        'disabled');
                 } else {
                     $('#successExport').attr('href', '#').addClass('disabled');
                 }
@@ -297,6 +357,19 @@
             }
         }
 
+        // Show/Hide book select based on order status
+        $('#orderStatus').on('change', function() {
+            let status = $(this).val();
+            if (status === 'reserved') {
+                $('#orderStatusContainer').removeClass('col-md-12').addClass('col-md-6');
+                $('#bookSelectContainer').slideDown();
+            } else {
+                $('#orderStatusContainer').removeClass('col-md-6').addClass('col-md-12');
+                $('#bookSelectContainer').slideUp();
+                $('#bookSelect').val('');
+            }
+        });
+
         function exportOrders() {
             let limit = document.getElementById("orderLimit").value || 10;
             let status = $('#orderStatus').val();
@@ -314,6 +387,13 @@
             let url = new URL("<?php echo e(route('dashboard.orders.export')); ?>");
             url.searchParams.append('limit', limit);
             url.searchParams.append('status', status);
+
+            if (status === 'reserved') {
+                let bookId = $('#bookSelect').val();
+                if (bookId) {
+                    url.searchParams.append('book_id', bookId);
+                }
+            }
 
             window.location.href = url.toString();
             document.getElementById("orderLimit").value = '';
@@ -337,6 +417,13 @@
             url.searchParams.append('limit', limit);
             url.searchParams.append('status', status);
 
+            if (status === 'reserved') {
+                let bookId = $('#bookSelect').val();
+                if (bookId) {
+                    url.searchParams.append('book_id', bookId);
+                }
+            }
+
             window.location.href = url.toString();
             document.getElementById("orderSuccessLimit").value = '';
         }
@@ -359,6 +446,13 @@
             url.searchParams.append('limit', limit);
             url.searchParams.append('status', status);
 
+            if (status === 'reserved') {
+                let bookId = $('#bookSelect').val();
+                if (bookId) {
+                    url.searchParams.append('book_id', bookId);
+                }
+            }
+
             window.location.href = url.toString();
             document.getElementById("orderGroupedLimit").value = '';
         }
@@ -380,6 +474,13 @@
             let url = new URL("<?php echo e(route('dashboard.orders.export.branch')); ?>");
             url.searchParams.append('limit', limit);
             url.searchParams.append('status', status);
+
+            if (status === 'reserved') {
+                let bookId = $('#bookSelect').val();
+                if (bookId) {
+                    url.searchParams.append('book_id', bookId);
+                }
+            }
 
             window.location.href = url.toString();
             document.getElementById("orderBranchLimit").value = '';

@@ -23,7 +23,7 @@
     </div>
 
     <form id="productForm" data-ajax data-redirect="<?php echo e(route('dashboard.product')); ?>"
-        action="<?php echo e(route('dashboard.update.product')); ?>" method="POST" enctype="multipart/form-data">
+        action="<?php echo e(route('dashboard.product.update')); ?>" method="POST" enctype="multipart/form-data">
         <?php echo csrf_field(); ?>
         <input type="hidden" name="product_id" value="<?php echo e($product->id); ?>">
 
@@ -132,6 +132,34 @@ unset($__errorArgs, $__bag); ?>
                         <label class="form-label">تعليق (عندما يكون غير متوفر)</label>
                         <input type="text" name="commit" value="<?php echo e($product->commit); ?>" class="form-control">
                     </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">المنتج متوفر؟</label>
+                        <select name="state" id="state" class="form-select <?php $__errorArgs = ['state'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                            <option value="">اختر الحالة</option>
+                            <option value="0" <?php echo e($product->state == 0 ? 'selected' : ''); ?>>غير متوفر</option>
+                            <option value="1" <?php echo e($product->state == 1 ? 'selected' : ''); ?>>متوفر</option>
+                            <option value="2" <?php echo e($product->state == 2 ? 'selected' : ''); ?>>يمكن حجزه</option>
+                            <option value="3" <?php echo e($product->state == 3 ? 'selected' : ''); ?>>سيتوفر قريبا</option>
+                        </select>
+                        <?php $__errorArgs = ['state'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -189,12 +217,13 @@ unset($__errorArgs, $__bag); ?>
                     <div class="col-md-4">
                         <label class="form-label">لديه عرض؟</label>
                         <select name="have_offer" id="have_offer" class="form-select">
+                            <option value="">اختر</option>
                             <option value="0" <?php echo e($product->have_offer == 0 ? 'selected' : ''); ?>>لا</option>
                             <option value="1" <?php echo e($product->have_offer == 1 ? 'selected' : ''); ?>>نعم</option>
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-4" id="offer_type_div" style="display: <?php echo e($product->have_offer == 1 ? 'block' : 'none'); ?>;">
                         <label class="form-label">نوع العرض</label>
                         <select name="offer_type" id="offer_type" class="form-select">
                             <option value="">اختر النوع</option>
@@ -205,7 +234,7 @@ unset($__errorArgs, $__bag); ?>
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-4" id="offer_value_div" style="display: <?php echo e($product->have_offer == 1 ? 'block' : 'none'); ?>;">
                         <label class="form-label">قيمة العرض</label>
                         <input type="number" name="offer_value" id="offer_value" value="<?php echo e($product->offer_value); ?>"
                             step="0.01" class="form-control">
@@ -289,22 +318,30 @@ unset($__errorArgs, $__bag); ?>
                     <div class="col-md-6">
                         <label class="form-label">الأحجام</label>
                         <select name="sizes[]" id="size" class="form-select select2" multiple>
-                            <?php $__currentLoopData = $sizes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $size): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($size); ?>"
-                                    <?php echo e(in_array($size, json_decode($product->sizes ?? '[]')) ? 'selected' : ''); ?>>
-                                    <?php echo e($size); ?></option>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php if(is_array($product->sizes)): ?>
+                                <?php $__currentLoopData = $sizes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $size): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($size); ?>" <?php echo e(in_array($size,$product->sizes) ? 'selected' : ''); ?>><?php echo e($size); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php else: ?>
+                                <?php $__currentLoopData = $sizes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $size): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($size); ?>" <?php echo e(in_array($size, json_decode($product->sizes ?? '[]')) ? 'selected' : ''); ?>><?php echo e($size); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endif; ?>
                         </select>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">الألوان</label>
                         <select name="colors[]" id="color" class="form-select select2" multiple>
-                            <?php $__currentLoopData = $colors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($color); ?>"
-                                    <?php echo e(in_array($color, json_decode($product->colors ?? '[]')) ? 'selected' : ''); ?>>
-                                    <?php echo e($color); ?></option>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php if(is_array($product->colors)): ?>
+                                <?php $__currentLoopData = $colors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($color); ?>" <?php echo e(in_array($color,$product->colors) ? 'selected' : ''); ?>><?php echo e($color); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php else: ?>
+                                <?php $__currentLoopData = $colors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($color); ?>" <?php echo e(in_array($color, json_decode($product->colors ?? '[]')) ? 'selected' : ''); ?>><?php echo e($color); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endif; ?>
                         </select>
                     </div>
                 </div>
@@ -363,13 +400,22 @@ unset($__errorArgs, $__bag); ?>
 
                     <?php if($product->images && count($product->images) > 0): ?>
                         <div class="col-12">
-                            <label class="form-label">الصور الحالية</label>
-                            <div class="row g-2">
+                            <label class="form-label">الصور الحالية (يمكنك حذف الصور غير المرغوبة)</label>
+                            <div class="row g-3">
                                 <?php $__currentLoopData = $product->images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <div class="col-md-2">
-                                        <div class="position-relative">
-                                            <img src="<?php echo e(asset($image->image)); ?>" class="img-thumbnail"
-                                                alt="Product Image">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <img src="<?php echo e(asset('storage/' . $image->image_path)); ?>" class="card-img-top"
+                                                alt="Product Image" style="height: 200px; object-fit: cover;">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="img_<?php echo e($image->id); ?>"
+                                                           name="delete_images[]" value="<?php echo e($image->id); ?>">
+                                                    <label class="form-check-label" for="img_<?php echo e($image->id); ?>">
+                                                        حذف هذه الصورة
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -425,6 +471,25 @@ unset($__errorArgs, $__bag); ?>
 
             // Calculate on page load
             calculateFinalPrice();
+
+            // Toggle offer fields based on have_offer
+            $('#have_offer').on('change', function() {
+                if ($(this).val() === '1') {
+                    $('#offer_type_div').show();
+                    $('#offer_value_div').show();
+                } else {
+                    $('#offer_type_div').hide();
+                    $('#offer_value_div').hide();
+                    $('#offer_value').val(0);
+                    $('#final_price_alert').hide();
+                }
+            });
+
+            // Initialize offer fields visibility on page load
+            if ($('#have_offer').val() === '1') {
+                $('#offer_type_div').show();
+                $('#offer_value_div').show();
+            }
         });
     </script>
 <?php $__env->stopSection(); ?>

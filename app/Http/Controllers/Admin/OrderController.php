@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Mail\delivery;
-use App\Mail\successPaid;
+use Mpdf\Mpdf;
 use App\Models\Order;
+use App\Mail\delivery;
 use App\Models\Product;
-use App\Models\ShippingMethod;
-use App\Services\SliderService;
+use App\Mail\successPaid;
+use App\Traits\ImageTrait;
 use App\Traits\DeleteTrait;
 use App\Traits\GeneralTrait;
-use App\Traits\ImageTrait;
 use Illuminate\Http\Request;
+use App\Models\ShippingMethod;
+use App\Services\SliderService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
-use Mpdf\Mpdf;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -33,7 +33,8 @@ class OrderController extends Controller
     public function index()
     {
         $shippingMethods = ShippingMethod::all();
-        return view('dashboard.pages.order.index', compact('shippingMethods'));
+        $reversable_books = Product::where('state', '2')->get();
+        return view('dashboard.pages.order.index', compact('shippingMethods', 'reversable_books'));
     }
 
     public function barcodeOrders()
@@ -370,6 +371,7 @@ class OrderController extends Controller
         $limit = $request->query('limit', 10);
         $status = $request->query('status');
         $shipping = $request->query('shipping');
+        $bookId = $request->query('book_id');
 
         $query = Order::with('shipping')->latest();
 
@@ -379,6 +381,12 @@ class OrderController extends Controller
 
         if ($shipping) {
             $query->where('shipping_method', $shipping);
+        }
+
+        if ($bookId) {
+            $query->whereHas('orderDetails', function ($q) use ($bookId) {
+                $q->where('product_id', $bookId);
+            });
         }
 
         $orders = $query->limit($limit)->get();
@@ -404,6 +412,7 @@ class OrderController extends Controller
         $limit = $request->query('limit', 10);
         $status = $request->query('status');
         $shipping = $request->query('shipping');
+        $bookId = $request->query('book_id');
 
         $query = Order::with(['orderDetails.products', 'shipping'])
             ->whereDoesntHave('shipping', function ($q) {
@@ -417,6 +426,12 @@ class OrderController extends Controller
 
         if ($shipping) {
             $query->where('shipping_method', $shipping);
+        }
+
+        if ($bookId) {
+            $query->whereHas('orderDetails', function ($q) use ($bookId) {
+                $q->where('product_id', $bookId);
+            });
         }
 
         $orders = $query->limit($limit)->get();
@@ -441,6 +456,7 @@ class OrderController extends Controller
         $limit = $request->query('limit', 10);
         $status = $request->query('status');
         $shipping = $request->query('shipping');
+        $bookId = $request->query('book_id');
 
         $query = Order::with('shipping')->latest();
 
@@ -450,6 +466,12 @@ class OrderController extends Controller
 
         if ($shipping) {
             $query->where('shipping_method', $shipping);
+        }
+
+        if ($bookId) {
+            $query->whereHas('orderDetails', function ($q) use ($bookId) {
+                $q->where('product_id', $bookId);
+            });
         }
 
         $orders = $query->limit($limit)->get();
@@ -476,6 +498,7 @@ class OrderController extends Controller
         $limit = $request->query('limit', 10);
         $status = $request->query('status');
         $shipping = $request->query('shipping');
+        $bookId = $request->query('book_id');
 
         $query = Order::with(['orderDetails.products', 'shipping'])
             ->whereHas('shipping', function ($q) {
@@ -489,6 +512,12 @@ class OrderController extends Controller
 
         if ($shipping) {
             $query->where('shipping_method', $shipping);
+        }
+
+        if ($bookId) {
+            $query->whereHas('orderDetails', function ($q) use ($bookId) {
+                $q->where('product_id', $bookId);
+            });
         }
 
         $orders = $query->limit($limit)->get();

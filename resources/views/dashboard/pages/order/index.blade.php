@@ -92,13 +92,22 @@
         <div class="card-body">
             <!-- Order Type Selection -->
             <div class="row g-3 mb-3">
-                <div class="col-md-12">
+                <div class="col-md-12" id="orderStatusContainer">
                     <label class="form-label fw-bold">نوع الطلب</label>
                     <select id="orderStatus" class="form-select">
                         <option value="" disabled selected>اختر نوع الطلب</option>
                         <option value="success">الطلبات الناجحة</option>
                         <option value="reserved">الطلبات المحجوزة</option>
                         <option value="pending">الطلبات المعلقة</option>
+                    </select>
+                </div>
+                <div class="col-md-6" id="bookSelectContainer" style="display: none;">
+                    <label class="form-label fw-bold">اختر الكتاب</label>
+                    <select id="bookSelect" class="form-select">
+                        <option value="">جميع الكتب</option>
+                        @foreach ($reversable_books as $book)
+                            <option value="{{ $book->id }}">{{ $book->name }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -349,6 +358,19 @@
             }
         }
 
+        // Show/Hide book select based on order status
+        $('#orderStatus').on('change', function() {
+            let status = $(this).val();
+            if (status === 'reserved') {
+                $('#orderStatusContainer').removeClass('col-md-12').addClass('col-md-6');
+                $('#bookSelectContainer').slideDown();
+            } else {
+                $('#orderStatusContainer').removeClass('col-md-6').addClass('col-md-12');
+                $('#bookSelectContainer').slideUp();
+                $('#bookSelect').val('');
+            }
+        });
+
         function exportOrders() {
             let limit = document.getElementById("orderLimit").value || 10;
             let status = $('#orderStatus').val();
@@ -366,6 +388,13 @@
             let url = new URL("{{ route('dashboard.orders.export') }}");
             url.searchParams.append('limit', limit);
             url.searchParams.append('status', status);
+
+            if (status === 'reserved') {
+                let bookId = $('#bookSelect').val();
+                if (bookId) {
+                    url.searchParams.append('book_id', bookId);
+                }
+            }
 
             window.location.href = url.toString();
             document.getElementById("orderLimit").value = '';
@@ -389,6 +418,13 @@
             url.searchParams.append('limit', limit);
             url.searchParams.append('status', status);
 
+            if (status === 'reserved') {
+                let bookId = $('#bookSelect').val();
+                if (bookId) {
+                    url.searchParams.append('book_id', bookId);
+                }
+            }
+
             window.location.href = url.toString();
             document.getElementById("orderSuccessLimit").value = '';
         }
@@ -411,6 +447,13 @@
             url.searchParams.append('limit', limit);
             url.searchParams.append('status', status);
 
+            if (status === 'reserved') {
+                let bookId = $('#bookSelect').val();
+                if (bookId) {
+                    url.searchParams.append('book_id', bookId);
+                }
+            }
+
             window.location.href = url.toString();
             document.getElementById("orderGroupedLimit").value = '';
         }
@@ -432,6 +475,13 @@
             let url = new URL("{{ route('dashboard.orders.export.branch') }}");
             url.searchParams.append('limit', limit);
             url.searchParams.append('status', status);
+
+            if (status === 'reserved') {
+                let bookId = $('#bookSelect').val();
+                if (bookId) {
+                    url.searchParams.append('book_id', bookId);
+                }
+            }
 
             window.location.href = url.toString();
             document.getElementById("orderBranchLimit").value = '';

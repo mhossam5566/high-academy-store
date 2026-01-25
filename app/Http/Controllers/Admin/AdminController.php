@@ -21,7 +21,7 @@ class AdminController extends Controller
     {
         $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
         $dateTo = $request->input('date_to', now()->endOfDay()->format('Y-m-d'));
-        
+
         $statistics = $this->getStatistics($dateFrom, $dateTo);
         return view('dashboard.pages.home.dashboard', compact('statistics', 'dateFrom', 'dateTo'));
     }
@@ -71,18 +71,18 @@ class AdminController extends Controller
         $periodDays = \Carbon\Carbon::parse($dateFrom)->diffInDays(\Carbon\Carbon::parse($dateTo));
         $previousDateFrom = \Carbon\Carbon::parse($dateFrom)->subDays($periodDays)->format('Y-m-d');
         $previousDateTo = \Carbon\Carbon::parse($dateFrom)->subDay()->format('Y-m-d');
-        
+
         $previousRevenue = \App\Models\Order::where('is_paid', 1)
             ->whereBetween('created_at', [$previousDateFrom, $previousDateTo . ' 23:59:59'])
             ->sum('total');
-        
-        $revenueGrowth = $previousRevenue > 0 
-            ? (($totalRevenue - $previousRevenue) / $previousRevenue) * 100 
+
+        $revenueGrowth = $previousRevenue > 0
+            ? (($totalRevenue - $previousRevenue) / $previousRevenue) * 100
             : 0;
 
         $previousOrders = \App\Models\Order::whereBetween('created_at', [$previousDateFrom, $previousDateTo . ' 23:59:59'])->count();
-        $ordersGrowth = $previousOrders > 0 
-            ? (($totalOrders - $previousOrders) / $previousOrders) * 100 
+        $ordersGrowth = $previousOrders > 0
+            ? (($totalOrders - $previousOrders) / $previousOrders) * 100
             : 0;
 
         // Recent Orders
