@@ -7,13 +7,13 @@ use App\Traits\ImageTrait;
 use App\Traits\DeleteTrait;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Services\CategoryService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryRequest;
-use App\Http\Requests\EditCategoryRequest;
-use App\Services\CategoryService;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Validation\Rule;
+use App\Http\Requests\EditCategoryRequest;
 
 class CategoryController extends Controller
 {
@@ -28,7 +28,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-        return view('dashboard.pages.Category.index');
+        return view('dashboard.pages.category.index');
     }
 
     public function datatable()
