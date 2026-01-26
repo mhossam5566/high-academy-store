@@ -125,7 +125,8 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
                     $city = $parts[1] ?? '';
                 ?>
                 <div style="border: 1px dashed #1c2b30; padding: 5px; margin: 0px 0 20px 0;">
-                    <p style="text-align: center; font-size: 26px; font-weight: 900; margin-bottom: 0px; margin-top: 0px;">
+                    <p
+                        style="text-align: center; font-size: 26px; font-weight: 900; margin-bottom: 0px; margin-top: 0px;">
                         High Academy Store</p>
 
                     <table class="success">
@@ -163,16 +164,19 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
                             <td class="cell cell3">
                                 <h2 style="color: #118B50; font-size:20px; margin: 0px;">الراسل</h2>
                                 <br>
-                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">الاسم</b>:
+                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b
+                                        style="color: #118B50;">الاسم</b>:
                                     مكتبة يُسْر عنهم</p>
                                 <br />
-                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">المهندس</b>:
+                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b
+                                        style="color: #118B50;">المهندس</b>:
                                     احمد علام</p>
                                 <br />
                                 <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">رقم
                                         الموبيل</b>: 01060683708</p>
                                 <br />
-                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">العنوان</b>:
+                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b
+                                        style="color: #118B50;">العنوان</b>:
                                     المنوفية - شبين الكوم <br> امام نادى
                                     التجارة
                                 </p>
@@ -220,7 +224,6 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
     <?php $__currentLoopData = collect($grouped)->except(['شحن لاقرب مكتب بريد', 'شحن لباب البيت']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $shipping => $o): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -243,7 +246,7 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
                         <td><?php echo e($order->id); ?></td>
                         <td><?php echo e($order->name); ?></td>
                         <td><?php echo e($order->mobile); ?></td>
-                        <td><?php echo e(($order->shipping_method == 2) ? 'البريد السريع' : (optional($order->shipping)->name ?: $order->shipping_method)); ?>
+                        <td><?php echo e($order->shipping_method == 2 ? 'البريد السريع' : (optional($order->shipping)->name ?: $order->shipping_method)); ?>
 
                         </td>
                         <td><?php echo e($order->address); ?></td>
@@ -270,37 +273,55 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
 
-    <?php $__currentLoopData = $grouped; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $shipping => $shippingOrders): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-        <h2>الكتب المطلوبة - <?php echo e($shipping); ?></h2>
-        <?php
+    <?php
+        $groupedArray = [];
+        foreach ($grouped as $shipping => $shippingOrders) {
             $shippingDetails = collect($shippingOrders)->flatMap(function ($order) {
                 return $order->orderDetails;
             });
-            $shippingBooks = $shippingDetails->groupBy(fn($detail) => $detail->products->id)
-                ->map(function ($group) {
-                    return [
-                        'name' => $group->first()->products->short_name ?? $group->first()->products->name,
-                        'total' => $group->sum('amout'),
-                    ];
-                });
-        ?>
-        <table class="export">
-            <thead>
-                <tr>
-                    <th>اسم الكتاب</th>
-                    <th>الكمية</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php $__currentLoopData = $shippingBooks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $book): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <tr>
-                        <td><?php echo e($book['name']); ?></td>
-                        <td><?php echo e($book['total']); ?></td>
-                    </tr>
+            $shippingBooks = $shippingDetails->groupBy(fn($detail) => $detail->products->id)->map(function ($group) {
+                return [
+                    'name' => $group->first()->products->short_name ?? $group->first()->products->name,
+                    'total' => $group->sum('amout'),
+                ];
+            });
+            $groupedArray[] = [
+                'shipping' => $shipping,
+                'books' => $shippingBooks
+            ];
+        }
+        $chunkedGroups = array_chunk($groupedArray, 2);
+    ?>
+
+    <?php $__currentLoopData = $chunkedGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $chunk): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr>
+                <?php $__currentLoopData = $chunk; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <td style="width: 50%; vertical-align: top; padding: 10px;">
+                        <h3 style="margin: 0 0 10px 0;">الكتب المطلوبة - <?php echo e($group['shipping']); ?></h3>
+                        <table class="export">
+                            <thead>
+                                <tr>
+                                    <th>اسم الكتاب</th>
+                                    <th>الكمية</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $__currentLoopData = $group['books']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $book): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr>
+                                        <td><?php echo e($book['name']); ?></td>
+                                        <td><?php echo e($book['total']); ?></td>
+                                    </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </tbody>
+                        </table>
+                    </td>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </tbody>
+                <?php if(count($chunk) == 1): ?>
+                    <td style="width: 50%;"></td>
+                <?php endif; ?>
+            </tr>
         </table>
-        <br><br>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
     <h2>الكتب المطلوبة - الإجمالي</h2>
@@ -308,13 +329,12 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
         $allDetails = collect($orders)->flatMap(function ($order) {
             return $order->orderDetails;
         });
-        $mergedBooks = $allDetails->groupBy(fn($detail) => $detail->products->id)
-            ->map(function ($group) {
-                return [
-                    'name' => $group->first()->products->short_name ?? $group->first()->products->name,
-                    'total' => $group->sum('amout'),
-                ];
-            });
+        $mergedBooks = $allDetails->groupBy(fn($detail) => $detail->products->id)->map(function ($group) {
+            return [
+                'name' => $group->first()->products->short_name ?? $group->first()->products->name,
+                'total' => $group->sum('amout'),
+            ];
+        });
     ?>
     <table class="export">
         <thead>

@@ -125,7 +125,8 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
                     $city = $parts[1] ?? '';
                 @endphp
                 <div style="border: 1px dashed #1c2b30; padding: 5px; margin: 0px 0 20px 0;">
-                    <p style="text-align: center; font-size: 26px; font-weight: 900; margin-bottom: 0px; margin-top: 0px;">
+                    <p
+                        style="text-align: center; font-size: 26px; font-weight: 900; margin-bottom: 0px; margin-top: 0px;">
                         High Academy Store</p>
 
                     <table class="success">
@@ -160,21 +161,24 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
                             <td class="cell cell3">
                                 <h2 style="color: #118B50; font-size:20px; margin: 0px;">الراسل</h2>
                                 <br>
-                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">الاسم</b>:
+                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b
+                                        style="color: #118B50;">الاسم</b>:
                                     مكتبة يُسْر عنهم</p>
                                 <br />
-                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">المهندس</b>:
+                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b
+                                        style="color: #118B50;">المهندس</b>:
                                     احمد علام</p>
                                 <br />
                                 <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">رقم
                                         الموبيل</b>: 01060683708</p>
                                 <br />
-                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">العنوان</b>:
+                                <p style="font-size: 14px; color: #118B50; margin: 0px;"><b
+                                        style="color: #118B50;">العنوان</b>:
                                     المنوفية - شبين الكوم <br> امام نادى
                                     التجارة
                                 </p>
                                 <br />
-                                @if($order->shipping_method == 2)
+                                @if ($order->shipping_method == 2)
                                     <p><b>نوع الشحن</b>:
                                         <span style="color: red;">البريد السريع</span>
                                     </p>
@@ -215,7 +219,6 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
                 </div>
             @endforeach
         </div>
-
     @endforeach
 
     @foreach (collect($grouped)->except(['شحن لاقرب مكتب بريد', 'شحن لباب البيت']) as $shipping => $o)
@@ -238,7 +241,7 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
                         <td>{{ $order->id }}</td>
                         <td>{{ $order->name }}</td>
                         <td>{{ $order->mobile }}</td>
-                        <td>{{ ($order->shipping_method == 2) ? 'البريد السريع' : (optional($order->shipping)->name ?: $order->shipping_method) }}
+                        <td>{{ $order->shipping_method == 2 ? 'البريد السريع' : (optional($order->shipping)->name ?: $order->shipping_method) }}
                         </td>
                         <td>{{ $order->address }}</td>
 
@@ -263,37 +266,55 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
         @endforeach
     </p>
 
-    @foreach ($grouped as $shipping => $shippingOrders)
-        <h2>الكتب المطلوبة - {{ $shipping }}</h2>
-        @php
+    @php
+        $groupedArray = [];
+        foreach ($grouped as $shipping => $shippingOrders) {
             $shippingDetails = collect($shippingOrders)->flatMap(function ($order) {
                 return $order->orderDetails;
             });
-            $shippingBooks = $shippingDetails->groupBy(fn($detail) => $detail->products->id)
-                ->map(function ($group) {
-                    return [
-                        'name' => $group->first()->products->short_name ?? $group->first()->products->name,
-                        'total' => $group->sum('amout'),
-                    ];
-                });
-        @endphp
-        <table class="export">
-            <thead>
-                <tr>
-                    <th>اسم الكتاب</th>
-                    <th>الكمية</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($shippingBooks as $book)
-                    <tr>
-                        <td>{{ $book['name'] }}</td>
-                        <td>{{ $book['total'] }}</td>
-                    </tr>
+            $shippingBooks = $shippingDetails->groupBy(fn($detail) => $detail->products->id)->map(function ($group) {
+                return [
+                    'name' => $group->first()->products->short_name ?? $group->first()->products->name,
+                    'total' => $group->sum('amout'),
+                ];
+            });
+            $groupedArray[] = [
+                'shipping' => $shipping,
+                'books' => $shippingBooks,
+            ];
+        }
+        $chunkedGroups = array_chunk($groupedArray, 2);
+    @endphp
+
+    @foreach ($chunkedGroups as $chunk)
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr>
+                @foreach ($chunk as $group)
+                    <td style="width: 50%; vertical-align: top; padding: 10px;">
+                        <h3 style="margin: 0 0 10px 0;">الكتب المطلوبة - {{ $group['shipping'] }}</h3>
+                        <table class="export">
+                            <thead>
+                                <tr>
+                                    <th>اسم الكتاب</th>
+                                    <th>الكمية</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($group['books'] as $book)
+                                    <tr>
+                                        <td>{{ $book['name'] }}</td>
+                                        <td>{{ $book['total'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </td>
                 @endforeach
-            </tbody>
+                @if (count($chunk) == 1)
+                    <td style="width: 50%;"></td>
+                @endif
+            </tr>
         </table>
-        <br><br>
     @endforeach
 
     <h2>الكتب المطلوبة - الإجمالي</h2>
@@ -301,13 +322,12 @@ $grouped = $orders->groupBy(fn($order) => $order->shipping->name ?? $order->ship
         $allDetails = collect($orders)->flatMap(function ($order) {
             return $order->orderDetails;
         });
-        $mergedBooks = $allDetails->groupBy(fn($detail) => $detail->products->id)
-            ->map(function ($group) {
-                return [
-                    'name' => $group->first()->products->short_name ?? $group->first()->products->name,
-                    'total' => $group->sum('amout'),
-                ];
-            });
+        $mergedBooks = $allDetails->groupBy(fn($detail) => $detail->products->id)->map(function ($group) {
+            return [
+                'name' => $group->first()->products->short_name ?? $group->first()->products->name,
+                'total' => $group->sum('amout'),
+            ];
+        });
     @endphp
     <table class="export">
         <thead>
