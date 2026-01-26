@@ -64,7 +64,7 @@ class CategoryController extends Controller
     public function create()
     {
         $cats = Category::where('is_parent', 1)->get();
-        return view('dashboard.pages.Category.create', compact('cats'));
+        return view('dashboard.pages.category.create', compact('cats'));
     }
 
     public function store(CategoryRequest $request)
