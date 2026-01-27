@@ -66,49 +66,6 @@
                         </a>
                     </div>
                 @endif
-{{--                    <div class="col-12 text-center mt-5">--}}
-{{--                        <div class="d-flex justify-content-center gap-3 flex-wrap">--}}
-{{--                            @if (!empty($item->colors))--}}
-{{--                                <div>--}}
-{{--                                    <select id="colorSelect{{ $item->id }}"--}}
-{{--                                            class="form-select border-primary fw-bold text-center"--}}
-{{--                                            style="max-width: 200px;" name="color" data-product-id="{{ $item->id }}">--}}
-{{--                                        <option value="" disabled selected>اختر اللون</option>--}}
-{{--                                        @foreach($item->colors as $color)--}}
-{{--                                            <option value="{{ $color }}">{{ $color }}</option>--}}
-{{--                                        @endforeach--}}
-{{--                                    </select>--}}
-{{--                                </div>--}}
-{{--                            @endif--}}
-
-{{--                            @if (!empty($item->sizes))--}}
-{{--                                <div>--}}
-{{--                                    <select id="sizeSelect{{ $item->id }}"--}}
-{{--                                            class="form-select border-primary fw-bold text-center"--}}
-{{--                                            style="max-width: 200px;" name="color" data-product-id="{{ $item->id }}">>--}}
-{{--                                        <option value="" disabled selected>اختر الحجم</option>--}}
-{{--                                        @foreach($item->sizes as $size)--}}
-{{--                                            <option value="{{ $size }}">{{ $size }}</option>--}}
-{{--                                        @endforeach--}}
-{{--                                    </select>--}}
-{{--                                </div>--}}
-{{--                            @endif--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-
-
-                    {{-- <!--<h6>-->
-    <a
-        class="h6 fw-bold text-decoration-none lh-base"
-        href="{{ route('user.product.show', $item->id) }}"
-    >
-        {{ $item->name }}
-    </a>
-    @endif --}}
-                    <!--</h6>-->
-                </div>
-            </div>
-
 
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="price-section">
@@ -137,31 +94,7 @@
                     
                     <div class="quantity-controls">
                         @auth
-                            @if ($item->state == 1 && $item->quantity > 0)
-                                <div
-                                    class="d-flex btns justify-content-center justify-content-lg-end align-items-center g-2">
-                                    <button
-                                        class="count-btn  border-0 text-white px-2 px-md-3 px-lg-2 px-xxl-2  py-1 py-md-2 rounded-circle"
-                                        style="background-color: #d2d5d6"
-                                        onclick="decreaseQuantity({{ $item->id }},event)">
-                                        <i class="fa-solid fa-minus"></i>
-                                    </button>
-                                    <span
-                                        class="count-num fw-bold text-white bg-primary mx-2 px-2 px-md-4 px-xxl-2 py-1 rounded-pill text-black"
-                                        id="quantity{{ $item->id }}">0</span>
-                                    <button
-                                        class="count-btn border-0 text-white px-md-3 px-lg-2 px-xxl-1 py-1 py-md-2  rounded-circle"
-                                        style="background-color: #1c2b30"
-                                        onclick="increaseQuantity({{ $item->id }},event , {{$item->max_qty_for_order}})">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </button>
-                                </div>
-                            @elseif($item->state == 2)
-                                <div
-                                    class="d-flex btns justify-content-center justify-content-lg-end align-items-center g-2">
-                                    <button
-                                        class="count-btn  border-0 text-white px-2 px-md-3 px-lg-2 px-xxl-2  py-1 py-md-2 rounded-circle"
-                                        style="background-color: #d2d5d6" || $item->state == 2)
+                            @if (($item->state == 1 && $item->quantity > 0) || $item->state == 2)
                                 <div class="d-flex align-items-center gap-1">
                                     <button class="qty-btn qty-minus" onclick="decreaseQuantity({{ $item->id }},event)">
                                         <i class="fa-solid fa-minus"></i>
@@ -220,18 +153,7 @@
 @endforeach
 
 <style>
-
-    .add-btn {
-        transform: translateY(180%);
-        background-color: #e99239;
-        color: #000 !important;
-        transition: background-color .3s, transform .5s;
-
-        &:hover {
-            background-color: #e67d15;
-        }
-    }
-/* Product Card Styles */
+    /* Product Card Styles */
     .product-card {
         background: #fff;
         border-radius: 16px;
@@ -402,6 +324,16 @@
         box-shadow: 0 6px 16px rgba(233, 146, 57, 0.4);
     }
 
+    /* Lazy Loading */
+    img.lazy {
+        filter: blur(10px);
+        transition: filter 0.3s;
+    }
+
+    img.lazy:not([src]) {
+        background-color: #f0f0f0;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .product-title {
@@ -420,118 +352,30 @@
         }
         
         .qty-display {
-            min-width: 30px
+            min-width: 30px;
+            font-size: 14px;
         }
+    }
 
-        .col-xxl-2 {
-            flex: 0 0 auto;
-            width: 16.666667%;
-            max-width: 16.666667%;
-        }
-
-        .col-xxl-3 {
-            flex: 0 0 auto;
-            width: 25%;
-            max-width: 25%;
-        }
-
-        .col-xxl-4 {
-            flex: 0 0 auto;
-            width: 33.333333%;
-            max-width: 33.333333%;
-        }
-
-        .col-xxl-5 {
-            flex: 0 0 auto;
-            width: 41.666667%;
-            max-width: 41.666667%;
-        }
-
-        .col-xxl-6 {
-            flex: 0 0 auto;
-            width: 50%;
-            max-width: 50%;
-        }
-
-        .col-xxl-7 {
-            flex: 0 0 auto;
-            width: 58.333333%;
-            max-width: 58.333333%;
-        }
-
-        .col-xxl-8 {
-            flex: 0 0 auto;
-            width: 66.666667%;
-            max-width: 66.666667%;
-        }
-
-        .col-xxl-9 {
-            flex: 0 0 auto;
-            width: 75%;
-            max-width: 75%;
-        }
-
-        .col-xxl-10 {
-            flex: 0 0 auto;
-            width: 83.333333%;
-            max-width: 83.333333%;
-        }
-
-        .col-xxl-11 {
-            flex: 0 0 auto;
-            width: 91.666667%;
-            max-width: 91.666667%;
-        }
-
-        .col-xxl-12 {
-            flex: 0 0 auto;
-            width: 100%;
-            max-width: 100%;
-        }
-
+    /* XXL Breakpoint */
+    @media (min-width: 1400px) {
         .col-xxl-5-cols {
             flex: 0 0 auto;
             width: 20%;
             max-width: 20%;
         }
-
-        .px-xxl-2 {
-            padding-left: 0.5rem !important;
-            /* Bootstrap's spacing scale: 2 = 0.5rem */
-            padding-right: 0.5rem !important;
-        }
-
-        .font-size {
-            font-size: 1.5rem !important;
-        }
-    }
-
-    /* Ensure it overrides Bootstrap */
-    .col-xxl- * {
-        box-sizing: border-box !important;
-        /* Override for specificity */
-    }
-
-    .font-size {
-        font-size: 1.2rem;
     }
 
     @media (max-width: 600px) {
-        .font-size {
-            font-size: 1rem;
-        }
-
         .product-image {
             max-height: 242px !important;
         }
-
     }
 </style>
+
 <!-- Lazy Loading Script -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        let mostOrderedProducts = @JSON($mostOrderedProducts);
-        console.log(mostOrderedProducts);
         const lazyImages = document.querySelectorAll("img.lazy");
 
         if ("IntersectionObserver" in window) {
@@ -550,7 +394,6 @@
                 observer.observe(img);
             });
         } else {
-            // Fallback for older browsers
             lazyImages.forEach(img => {
                 img.src = img.dataset.src;
                 img.classList.remove("lazy");
@@ -558,15 +401,15 @@
         }
     });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function increaseQuantity(id, event, maxQty) {
-        event.stopPropagation(); // منع انتشار الحدث
+        event.stopPropagation();
 
         let quantityElement = $(`#quantity${id}`);
-        let quantity = parseInt(quantityElement.text()) || 0; // منع NaN
+        let quantity = parseInt(quantityElement.text()) || 0;
 
-        // التحقق من الحد الأقصى قبل الزيادة
         if (quantity >= maxQty) {
             Swal.fire({
                 icon: "info",
@@ -577,20 +420,17 @@
             });
             return;
         }
-        // زيادة الكمية
+
         quantity += 1;
         quantityElement.html(quantity);
-        // تحديث بيانات الزر الخاص بالسلة
+
         let cartButton = $(`#add_to_cart${id}`);
         cartButton.data("quantity", quantity);
-        cartButton.attr("data-quantity", quantity); // تحديث DOM أيضًا
-
-        console.log(`✅ المنتج ID: ${id} | الكمية الجديدة: ${quantity} | الحد الأقصى: ${maxQty}`);
+        cartButton.attr("data-quantity", quantity);
     }
 
-
     function decreaseQuantity(id, event) {
-        event.stopPropagation(); // Prevent the click event from bubbling to the link
+        event.stopPropagation();
         let quantity = parseInt($(`#quantity${id}`).text());
         if (quantity > 0) {
             quantity -= 1;
