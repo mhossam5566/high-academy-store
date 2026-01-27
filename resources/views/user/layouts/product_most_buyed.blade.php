@@ -213,21 +213,13 @@
                         <i class="fas fa-shopping-cart me-1"></i>
                         اضافة للسلة
                     </button>
-                @endguestlute;
-        padding: 4px 0;
-        top: 10px;
-        right: -25px;
-        width: 100px;
-        background-color: red;
-    }
+                @endguest
+            </div>
+        </div>
+    </div>
+@endforeach
 
-    .add-btn-container {
-        overflow: hidden;
-    }
-
-    .product-item:hover .add-btn {
-        transform: translateY(0);
-    }
+<style>
 
     .add-btn {
         transform: translateY(180%);
