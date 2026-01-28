@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Voucher extends Model
 {
     use HasFactory;
-    
+
     protected $fillable= [
         'coupon_id',
         'code',
@@ -16,11 +16,11 @@ class Voucher extends Model
         'is_used',
         'user_id'
         ];
-        
+
     public function coupon(){
         return $this->belongsTo(Coupon::class);
     }
-    
+
     public function user(){
         return $this->belongsTo(User::class);
     }
@@ -29,7 +29,7 @@ class Voucher extends Model
    if($this->image == null){
        return null;
    }else{
-       return url($this->image);
+       return url('storage'.$this->image);
    }
 }
 }
