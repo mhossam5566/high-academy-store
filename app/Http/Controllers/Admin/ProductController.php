@@ -11,6 +11,7 @@ use App\Traits\DeleteTrait;
 use App\Models\MainCategory;
 use App\Models\ProductImage;
 use App\Traits\GeneralTrait;
+use App\Traits\MediaHandler;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
 use App\Http\Controllers\Controller;
@@ -20,7 +21,7 @@ use App\Http\Requests\EditProductRequest;
 
 class ProductController extends Controller
 {
-    use ImageTrait, DeleteTrait, GeneralTrait;
+    use ImageTrait, DeleteTrait, GeneralTrait , MediaHandler;
 
     protected $productService;
     private $colors = ['احمر', 'ازرق', 'اسود', 'بني', 'اصفر', 'ابيض', 'اخضر'];
