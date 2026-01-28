@@ -21,7 +21,7 @@ use App\Http\Requests\EditProductRequest;
 
 class ProductController extends Controller
 {
-    use ImageTrait, DeleteTrait, GeneralTrait , MediaHandler;
+    use ImageTrait, DeleteTrait, GeneralTrait, MediaHandler;
 
     protected $productService;
     private $colors = ['احمر', 'ازرق', 'اسود', 'بني', 'اصفر', 'ابيض', 'اخضر'];
@@ -190,12 +190,10 @@ class ProductController extends Controller
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
-                    $destinationPath = public_path('storage/images');
-                    $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                    $image->move($destinationPath, $filename);
+                    $imagePath = self::upload($image, 'images/products');
                     ProductImage::create([
                         'product_id' => $product->id,
-                        'image_path' => "/images/" . $filename,
+                        'image_path' => $imagePath,
                     ]);
                 }
             }

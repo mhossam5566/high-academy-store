@@ -3,14 +3,14 @@
 namespace App\Services;
 
 use App\Models\Slider;
-use App\Traits\ImageTrait;
+use App\Traits\MediaHandler;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 
 
 class SliderService
 {
-    use ImageTrait;
+    use MediaHandler;
 
     # Index
     public function findAll()
@@ -23,8 +23,7 @@ class SliderService
     public function save($request, $data)
     {
         if ($request->photo) {
-            $image_name = $this->ImageNamePath($request->file('photo'), 'public/images/sliders');
-            $data['photo'] = $image_name;
+            $data['photo'] = self::upload($request->file('photo'), 'images/sliders');
         }
         $slider = Slider::create($data);
         return $slider;
@@ -36,11 +35,10 @@ class SliderService
         $data = $request->only('title:ar', 'stage_id', 'title:en', 'description:ar', 'description:en', 'is_active');
 
         if ($request->photo) {
-            if ($slider->photo != 'default.png') {
-                Storage::delete('public/images/sliders/' . $slider->photo);
+            if ($slider->photo && $slider->photo != 'default.png') {
+                self::deleteMedia($slider->photo);
             }
-            $image_name = $this->ImageNamePath($request->file('photo'), 'public/images/sliders');
-            $data['photo'] = $image_name;
+            $data['photo'] = self::upload($request->file('photo'), 'images/sliders');
         }
 
         $slider->update($data);

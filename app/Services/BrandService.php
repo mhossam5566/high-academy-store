@@ -3,14 +3,13 @@
 namespace App\Services;
 
 use App\Models\Brand;
-use App\Traits\ImageTrait;
+use App\Traits\MediaHandler;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Storage;
 
 
 class BrandService
 {
-    use ImageTrait;
+    use MediaHandler;
 
     # Index
     public function findAll()
@@ -20,31 +19,23 @@ class BrandService
     }
 
     # Insert
-    public function save($request,$data)
+    public function save($request, $data)
     {
         if ($request->hasFile('photo')) {
-            $image = $request->file('photo');
-            $destinationPath = public_path('storage/images/brands');
-            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $filename);
-            $data['photo'] = $filename;
+            $data['photo'] = self::upload($request->file('photo'), 'images/brands');
         }
         $brand = Brand::create($data);
         return $brand;
     }
 
     # Edit
-    public function update($request, $brand,$data)
+    public function update($request, $brand, $data)
     {
         if ($request->hasFile('photo')) {
-            if ($brand->photo != 'default.png') {
-                Storage::delete('public/images/brands/' . $brand->photo);
+            if ($brand->photo && $brand->photo != 'default.png') {
+                self::deleteMedia($brand->photo);
             }
-            $image = $request->file('photo');
-            $destinationPath = public_path('storage/images/brands');
-            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $filename);
-            $data['photo'] = $filename;
+            $data['photo'] = self::upload($request->file('photo'), 'images/brands');
         }
 
         $brand->update($data);

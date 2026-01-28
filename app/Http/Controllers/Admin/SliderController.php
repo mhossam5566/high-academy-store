@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Stage;
 use App\Models\Slider;
-use App\Traits\ImageTrait;
+use App\Traits\MediaHandler;
 use App\Traits\DeleteTrait;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class SliderController extends Controller
 {
-    use ImageTrait, DeleteTrait, GeneralTrait;
+    use MediaHandler, DeleteTrait, GeneralTrait;
 
     protected $sliderService;
 
@@ -47,7 +47,7 @@ class SliderController extends Controller
             //     return $row->is_active == 1 ? 'Active' : 'InActive';
             // })
             ->addColumn('photo', function ($row) {
-                $image = '<img src ="' . $row->image_path . '" alt="profile-image" style="height:120px;width:150px" class="avatar rounded me-2" >';
+                $image = '<img src ="' . url('storage/' . $row->photo) . '" alt="profile-image" style="height:120px;width:150px" class="avatar rounded me-2" >';
                 return $image;
             })
             ->addColumn('operation', function ($row) {
@@ -90,8 +90,8 @@ class SliderController extends Controller
     public function destroy(Request $request)
     {
         $slider = slider::FindOrFail($request->id);
-        if ($slider->photo != 'default.png') {
-            Storage::delete('public/images/sliders/' . $slider->photo);
+        if ($slider->photo && $slider->photo != 'default.png') {
+            self::deleteMedia($slider->photo);
         }
         return $this->Delete($request->id, $slider);
     }

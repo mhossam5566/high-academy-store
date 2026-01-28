@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Yajra\DataTables\Facades\DataTables;
 use App\Models\Coupon;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use App\Models\Voucher;
+use Illuminate\Support\Str;
+use App\Traits\MediaHandler;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 
 class VoucherController extends Controller
 {
+    use MediaHandler;
     public function index(Coupon $coupon)
     {
 
@@ -28,7 +30,7 @@ class VoucherController extends Controller
             })
             ->addColumn('image', function ($row) {
                 if ($row->image !== null) {
-                    $image = '<img src="' . url($row->image) . '" alt="coupon-image" style="height:80px;width:100px" class="rounded">';
+                    $image = '<img src="' . url('storage/' . $row->image) . '" alt="coupon-image" style="height:80px;width:100px" class="rounded">';
                     return $image;
                 } else {
                     return null;
@@ -75,23 +77,13 @@ class VoucherController extends Controller
         ]);
 
         $imagePath = null;
-
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = Str::random(10) . '.' . $image->getClientOriginalExtension();
-
-            // حفظ الصورة في المسار public/images/coupons
-            $image->storeAs('public/images/vouchers', $imageName);
-
-            // تسجيل المسار المختلف في قاعدة البيانات
-            $imagePath = 'data/images/vouchers/' . $imageName;
+            $imagePath = self::upload($request->file('image'), 'images/vouchers');
         }
-
 
         $voucher = $coupon->vouchers()->create([
             'code' => $request->code,
             'image' => $imagePath
-
         ]);
 
 
@@ -125,26 +117,18 @@ class VoucherController extends Controller
 
         // إزالة الصورة إذا تم إرسال remove_image = true
         if ($request->remove_image) {
-            if ($voucher->image && Storage::exists('public/' . str_replace('/storage/', '', $voucher->image))) {
-                Storage::delete('public/' . str_replace('/storage/', '', $voucher->image));
+            if ($voucher->image) {
+                self::deleteMedia($voucher->image);
             }
             $voucher->image = null; // إزالة المسار من قاعدة البيانات
         }
 
         // التحقق من الصورة الجديدة
         if ($request->hasFile('image')) {
-            // حذف الصورة القديمة إذا كانت موجودة
-            if ($voucher->image && Storage::exists('public/' . str_replace('/storage/', '', $voucher->image))) {
-                Storage::delete('public/' . str_replace('/storage/', '', $voucher->image));
+            if ($voucher->image) {
+                self::deleteMedia($voucher->image);
             }
-
-            // رفع الصورة الجديدة
-            $image = $request->file('image');
-            $imageName = Str::random(10) . '.' . $image->getClientOriginalExtension();
-            $imagePath = $image->storeAs('public/images/vouchers', $imageName);
-
-            $imagePath = 'storage/images/vouchers/' . $imageName; // المسار الجديد
-            $voucher->image = $imagePath;
+            $voucher->image = self::upload($request->file('image'), 'images/vouchers');
         }
 
         // حفظ التغييرات
@@ -166,6 +150,9 @@ class VoucherController extends Controller
 
 
         $voucher = Voucher::findOrFail($request->id);
+        if ($voucher->image) {
+            self::deleteMedia($voucher->image);
+        }
         $voucher->delete();
 
 

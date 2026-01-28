@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Brand;
-use App\Traits\ImageTrait;
 use App\Traits\DeleteTrait;
 use App\Traits\GeneralTrait;
+use App\Traits\MediaHandler;
 use Illuminate\Http\Request;
 use App\Services\BrandService;
 use Illuminate\Validation\Rule;
@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 
 class BrandController extends Controller
 {
-    use ImageTrait, DeleteTrait, GeneralTrait;
+    use MediaHandler, DeleteTrait, GeneralTrait;
 
     protected $brandService;
 
@@ -40,7 +40,7 @@ class BrandController extends Controller
                 return $row->title;
             })
             ->addColumn('photo', function ($row) {
-                $image = '<img src ="' . $row->image_path . '" alt="profile-image" style="height:120px;width:150px" class="avatar rounded me-2" >';
+                $image = '<img src ="' . url('storage/' . $row->photo) . '" alt="profile-image" style="height:120px;width:150px" class="avatar rounded me-2" >';
                 return $image;
             })
             ->addColumn('operation', function ($row) {
@@ -85,8 +85,8 @@ class BrandController extends Controller
     public function destroy(Request $request)
     {
         $brand = Brand::FindOrFail($request->id);
-        if ($brand->photo != 'default.png') {
-            Storage::delete('public/images/brands/' . $brand->photo);
+        if ($brand->photo && $brand->photo != 'default.png') {
+            self::deleteMedia($brand->photo);
         }
         return $this->Delete($request->id, $brand);
     }

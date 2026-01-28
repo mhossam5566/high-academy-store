@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Yajra\DataTables\Facades\DataTables;
 use App\Models\Coupon;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Traits\MediaHandler;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 
 class CouponController extends Controller
 {
+    use MediaHandler;
     public function index()
     {
         return view('dashboard.pages.coupon.index');
@@ -29,7 +31,7 @@ class CouponController extends Controller
             })
             ->addColumn('image', function ($row) {
                 if ($row->image !== null) {
-                    $image = '<img src="' . url($row->image) . '" alt="coupon-image" style="height:80px;width:100px" class="rounded">';
+                    $image = '<img src="' . url('storage/' . $row->image) . '" alt="coupon-image" style="height:80px;width:100px" class="rounded">';
                     return $image;
                 } else {
                     return null;
@@ -69,20 +71,8 @@ class CouponController extends Controller
         ]);
 
         $imagePath = null;
-
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = Str::random(10) . '.' . $image->getClientOriginalExtension();
-
-            // Create directory if it doesn't exist
-            $path = public_path('data/images/coupons');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-
-            // Move the file directly to public folder
-            $image->move($path, $imageName);
-            $imagePath = 'data/images/coupons/' . $imageName;
+            $imagePath = self::upload($request->file('image'), 'images/coupons');
         }
 
         $coupon = Coupon::create([
@@ -116,23 +106,10 @@ class CouponController extends Controller
         $coupon = Coupon::findOrFail($id);
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($coupon->image && file_exists(public_path($coupon->image))) {
-                unlink(public_path($coupon->image));
+            if ($coupon->image) {
+                self::deleteMedia($coupon->image);
             }
-
-            $image = $request->file('image');
-            $imageName = Str::random(10) . '.' . $image->getClientOriginalExtension();
-
-            // Create directory if it doesn't exist
-            $path = public_path('data/images/coupons');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-
-            // Move the file directly to public folder
-            $image->move($path, $imageName);
-            $coupon->image = 'data/images/coupons/' . $imageName;
+            $coupon->image = self::upload($request->file('image'), 'images/coupons');
         }
 
         $coupon->name = $request->name;
@@ -156,8 +133,8 @@ class CouponController extends Controller
         $coupon = Coupon::findOrFail($request->id);
 
 
-        if ($coupon->image && Storage::exists('public/' . str_replace('/storage/', '', $coupon->image))) {
-            Storage::delete('public/' . str_replace('/storage/', '', $coupon->image));
+        if ($coupon->image) {
+            self::deleteMedia($coupon->image);
         }
 
 

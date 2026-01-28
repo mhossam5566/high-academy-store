@@ -3,14 +3,13 @@
 namespace App\Services;
 
 use App\Models\Stage;
-use App\Traits\ImageTrait;
+use App\Traits\MediaHandler;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Storage;
 
 
 class StageService
 {
-    use ImageTrait;
+    use MediaHandler;
 
     # Index
     public function findAll()
@@ -23,8 +22,7 @@ class StageService
     public function save($request, $data)
     {
         if ($request->photo) {
-            $image_name = $this->ImageNamePath($request->file('photo'), 'public/images/Stages');
-            $data['photo'] = $image_name;
+            $data['photo'] = self::upload($request->file('photo'), 'images/Stages');
         }
         $Stage = Stage::create($data);
         return $Stage;
@@ -36,11 +34,10 @@ class StageService
         $data = $request->only('title:ar', 'title:en', 'description:ar', 'description:en', 'is_active');
 
         if ($request->photo) {
-            if ($Stage->photo != 'default.png') {
-                Storage::delete('public/images/Stages/' . $Stage->photo);
+            if ($Stage->photo && $Stage->photo != 'default.png') {
+                self::deleteMedia($Stage->photo);
             }
-            $image_name = $this->ImageNamePath($request->file('photo'), 'public/images/Stages');
-            $data['photo'] = $image_name;
+            $data['photo'] = self::upload($request->file('photo'), 'images/Stages');
         }
 
         $Stage->update($data);

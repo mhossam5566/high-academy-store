@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\EditstageRequest;
-use App\Http\Requests\stageRequest;
 use App\Models\Stage;
-use App\Services\StageService;
 use App\Traits\DeleteTrait;
 use App\Traits\GeneralTrait;
-use App\Traits\ImageTrait;
+use App\Traits\MediaHandler;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Services\StageService;
 use Illuminate\Validation\Rule;
+use App\Http\Requests\stageRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\EditstageRequest;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 
 class StageController extends Controller
 {
-    use ImageTrait, DeleteTrait, GeneralTrait;
+    use MediaHandler, DeleteTrait, GeneralTrait;
 
     protected $stageService;
 
@@ -47,7 +47,7 @@ class StageController extends Controller
             //     return $row->is_active == 1 ? 'Active' : 'InActive';
             // })
             ->addColumn('photo', function ($row) {
-                $image = '<img src ="' . $row->image_path . '" alt="profile-image" style="height:120px;width:150px" class="avatar rounded me-2" >';
+                $image = '<img src ="' . url('storage/' . $row->photo) . '" alt="profile-image" style="height:120px;width:150px" class="avatar rounded me-2" >';
                 return $image;
             })
             ->addColumn('operation', function ($row) {
@@ -88,8 +88,8 @@ class StageController extends Controller
     public function destroy(Request $request)
     {
         $stage = stage::FindOrFail($request->id);
-        if ($stage->photo != 'default.png') {
-            Storage::delete('public/images/stages/' . $stage->photo);
+        if ($stage->photo && $stage->photo != 'default.png') {
+            self::deleteMedia($stage->photo);
         }
         return $this->Delete($request->id, $stage);
     }
