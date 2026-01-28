@@ -14,20 +14,19 @@ class Coupon extends Model
         'image',
         'price',
         'type'
-    ];
+        ];
 
-    public function vouchers()
-    {
-        return $this->HasMany(Voucher::class);
-    }
-
-    public function getImagePathAttribute()
-    {
-        if ($this->image == null) {
-            return null;
-        } else {
-            return storage_path($this->image);
+        public function vouchers(){
+            return $this->HasMany(Voucher::class);
         }
-    }
+
+        public function getImagePathAttribute()
+{
+   if($this->image == null){
+       return null;
+   }else{
+       return url('storage/' . $this->image);
+   }
+}
 
 }
