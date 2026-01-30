@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\ProductEnum;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Enums\ProductEnum;
 use Illuminate\Database\Eloquent\Model;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -62,7 +62,7 @@ class Product extends Model implements TranslatableContract
 
     public function getImagePathAttribute()
     {
-        return asset('storage/images/products/' . $this->photo);
+        return asset('storage/' . $this->photo);
     }
 
     public function mainCategory()
