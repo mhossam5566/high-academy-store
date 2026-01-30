@@ -362,14 +362,14 @@ img.lazy:not([src]) {
 @media (min-width: 1200px) {
     .product-image {
         max-height: auto;
-        height: 500px;
+        height: 300px;
     }
 }
 
 @media (min-width: 1600px) {
     .product-image {
         max-height: auto;
-        min-height: 500px;
+        min-height: 300px;
     }
 }
 
