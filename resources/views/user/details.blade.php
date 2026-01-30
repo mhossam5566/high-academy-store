@@ -33,11 +33,11 @@ $brands = $product->brands->title ?? 'غير محدد';
 @section('content')
     <style>
         /* ============================================
-               Modern Product Detail Page Styles
-               ============================================ */
+                   Modern Product Detail Page Styles
+                   ============================================ */
 
         .product-detail-container {
-            mar
+            margin-top: 40px;
             padding: 40px 0;
             background: #f8f9fa;
         }
@@ -684,8 +684,10 @@ $brands = $product->brands->title ?? 'غير محدد';
                                         <i class="fas fa-align-right"></i>
                                         <span>الوصف</span>
                                     </h3>
-                                    <center>  <p class="description-text">{{ $product->description }}</p></center>
-                                  
+                                    <center>
+                                        <p class="description-text">{{ $product->description }}</p>
+                                    </center>
+
                                 </div>
                             @endif
 
