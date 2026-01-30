@@ -5,11 +5,11 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\User\VoucherController;
 use App\Http\Controllers\User\CheckoutController;
 use App\Http\Controllers\User\WishlistController;
-use App\Http\Controllers\User\VoucherController;
-use App\Http\Controllers\User\UserAddressController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\User\UserAddressController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 use App\Http\Controllers\User\OfferController as UserOfferController;
@@ -41,8 +41,8 @@ Route::group(
         Route::get("/reset-password/{token}", [ForgotPasswordController::class, "newpassform"])->middleware("guest")->name("password.reset");
         Route::post("/reset-password", [ForgotPasswordController::class, "reset"])->name("password.update")->middleware("guest");
         Route::put('/order/{id}/update', [UserController::class, 'updateOrder'])
-        ->name('user.order.update')  // Changed from 'order.update'
-        ->middleware('auth');
+            ->name('user.order.update')  // Changed from 'order.update'
+            ->middleware('auth');
         Route::name('user.')->group(function () {
             Route::get('/', [UserController::class, 'index'])->name('home');
             Route::get('/login', [UserController::class, 'login'])->middleware("guest")->name('login.user');
@@ -65,7 +65,7 @@ Route::group(
             // Route::get('/order/{id}/edit', [UserController::class, 'editOrder'])
             //     ->name('order.edit')
             //     ->withoutMiddleware(['localize']);
-                
+    
             Route::get('/myvouchers', [UserController::class, 'myvouchers'])->middleware("UserAuth")->name('vochers.user');
             Route::get('/myaccount', [UserController::class, 'edit'])->middleware("UserAuth")->name('myaccount');
             Route::post('/user/update', [UserController::class, 'update'])->middleware("UserAuth")->name('myaccount.update');
@@ -114,3 +114,11 @@ Route::post("pay/fawry/wallet", [CheckoutController::class, "fawry_pay_wallet"])
 Route::post("fawry/webhook", [PaymentController::class, "fawry_webhook"])->name("fawry.webhook");
 
 Route::get("cronjob", [PaymentController::class, 'cronjob']);
+
+Route::get('test', function () {
+    $products = \App\Models\Product::get();
+    foreach ($products as $product) {
+        $product->photo = 'images/products/' . $product->photo;
+        $product->save();
+    }
+});
