@@ -13,7 +13,7 @@
             }
         }
     @endphp
-    <div class="col-xxl-5-cols col-xl-3 col-lg-4 col-6 pb-2">
+    <div class="col-xxl-5-cols col-xl-3 col-lg-4 col-12 pb-2">
         <div class="modern-product-card position-relative" style="height: 100%;">
 
             {{-- Status Ribbon - Redesigned --}}
