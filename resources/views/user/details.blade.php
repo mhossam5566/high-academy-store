@@ -37,6 +37,7 @@ $brands = $product->brands->title ?? 'غير محدد';
                ============================================ */
 
         .product-detail-container {
+            mar
             padding: 40px 0;
             background: #f8f9fa;
         }
