@@ -683,7 +683,8 @@ $brands = $product->brands->title ?? 'غير محدد';
                                         <i class="fas fa-align-right"></i>
                                         <span>الوصف</span>
                                     </h3>
-                                    <p class="description-text">{{ $product->description }}</p>
+                                    <center>  <p class="description-text">{{ $product->description }}</p></center>
+                                  
                                 </div>
                             @endif
 
