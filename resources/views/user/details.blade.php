@@ -33,8 +33,8 @@ $brands = $product->brands->title ?? 'غير محدد';
 @section('content')
     <style>
         /* ============================================
-       Modern Product Detail Page Styles
-       ============================================ */
+           Modern Product Detail Page Styles
+           ============================================ */
 
         .product-detail-container {
             padding: 40px 0;
@@ -313,7 +313,7 @@ $brands = $product->brands->title ?? 'غير محدد';
             color: #1f2937;
             margin-bottom: 12px;
             display: flex;
-            align-items: center;
+            align-items: t;
             gap: 8px;
         }
 
