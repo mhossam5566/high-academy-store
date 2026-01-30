@@ -13,494 +13,594 @@
             }
         }
     @endphp
-    <div class="col-xxl-5-cols col-xl-3 col-lg-4  col-6 pb-1">
+    <div class="col-xxl-5-cols col-xl-3 col-lg-4 col-6 pb-2">
+        <div class="modern-product-card position-relative" style="height: 100%;">
 
-        <div class="product-item bg-light mb-4 position-relative d-flex flex-column justify-content-between rounded-5"
-            style="min-height: 100%; border-radius: 20px;">
             {{-- Debug state value --}}
-            @if(config('app.debug'))
-                <div style="position: absolute; top: 5px; left: 5px; background: red; color: white; padding: 2px 5px; font-size: 10px; z-index: 10;">
+            @if (config('app.debug'))
+                <div
+                    style="position: absolute; top: 5px; left: 5px; background: red; color: white; padding: 2px 5px; font-size: 10px; z-index: 10;">
                     State: {{ $item->state }}
                 </div>
             @endif
+
+            {{-- Status Ribbon - Redesigned --}}
             @if ($item->state == 0)
-                <div class="ribbon-wrapper">
-                    <div class="ribbon">غير متاح</div>
+                <div class="status-badge unavailable">
+                    <i class="fas fa-times-circle"></i> غير متاح
                 </div>
             @elseif($item->state == 2)
-                <div class="ribbon-wrapper">
-                    <div class="ribbon">احجز الان</div>
+                <div class="status-badge booking">
+                    <i class="fas fa-calendar-check"></i> احجز الآن
                 </div>
             @elseif($item->state == 3)
-                <div class="ribbon-wrapper">
-                    <div class="ribbon bg-info">سيتوفر قريبا</div>
+                <div class="status-badge coming-soon">
+                    <i class="fas fa-clock"></i> قريباً
                 </div>
-            @else
             @endif
-            <a href="{{ route('user.product.show', $item->id) }}" class="text-decoration-none ">
-                <div class="product-img ">
-                    <div class="overflow-hidden w-100 position-relative"
-                        style="border-top-left-radius: 20px;border-top-right-radius: 20px;">
 
+            <a href="{{ route('user.product.show', $item->id) }}" class="text-decoration-none card-link">
+                {{-- Product Image Section --}}
+                <div class="product-image-wrapper">
+                    <img class="product-img lazy" data-src="{{ $item->image_path }}" alt="{{ $item->name }}" />
 
-                        <img class="img-fluid w-100 lazy product-image" data-src="{{ $item->image_path }}"
-                            alt="صوره المنتج {{ $item->name }}" />
+                    {{-- Offer Badge --}}
+                    @if ($item->have_offer == 1)
+                        <div class="offer-badge">
+                            @if ($item->offer_type == 'percentage')
+                                <span class="discount-value">{{ $item->offer_value }}%</span>
+                                <span class="discount-label">خصم</span>
+                            @else
+                                <span class="discount-value">{{ $item->offer_value }}</span>
+                                <span class="discount-label">جنيه خصم</span>
+                            @endif
+                        </div>
+                    @endif
+                </div>
 
-
-                        {{-- <div class="product-action">
-            @auth
-                @if ($item->state == 1 && $item->quantity > 0)
-                    <a class="add_to_cart btn btn-outline-dark btn-square overflow-hidden"
-                        id="add_to_cart{{ $item->id }}" data-quantity="1" data-product-id="{{ $item->id }}">
-                        <i class="fas fa-cart-plus"></i></a>
-                @else
-                    <a class="btn btn-outline-dark btn-square overflow-hidden"
-                        href="{{ route('user.product.show', $item->id) }}">
-                        <i class="fas fa-eye"></i></a>
-                @endif
-            @else
-                <a class="btn btn-outline-dark btn-square overflow-hidden"
-                    href="{{ route('user.product.show', $item->id) }}">
-                    <i class="fas fa-eye"></i></a>
-            @endauth
-        </div> --}}
-                    </div>
-                    <div class="mt-3 p-2 text-center fw-bold text-decoration-none lh-base text-center m-0">
-                        <p class="font-size fs-sm-5 text-black fw-bold text-decoration-none lh-base text-center m-0">
-                            {{ $item->name }}
-                        </p>
-                        <p class="mt-2 font-size fw-lighter text-black">
-                            {{ $item->category ? $item->category->title . ' - ' : '' }}
-                            {{ $item->brands ? $item->brands->title . ' - ' : '' }}
-                            {{ $item->sliders->title ?? '' }}
-                        </p>
-                    </div>
+                {{-- Product Info Section --}}
+                <div class="product-info">
+                    <h3 class="product-title">{{ $item->name }}</h3>
+                    <p class="product-meta">
+                        {{ $item->category ? $item->category->title : '' }}
+                        @if ($item->brands)
+                            <span class="meta-separator">•</span> {{ $item->brands->title }}
+                        @endif
+                        @if (isset($item->sliders->title))
+                            <span class="meta-separator">•</span> {{ $item->sliders->title }}
+                        @endif
+                    </p>
                 </div>
             </a>
 
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 text-center">
-                         @if ($item->commit != null)
-                            <div class=" rounded-2 bg-danger bg-gradient-danger px-2 py-1">
-                                <p class="text-white m-0">
-                                    {{ $item->commit }}
-                                </p>
-                            </div>
-                        @endif
-                        @if($item->state == 3)
-                          <div class="mt-3">
-                            <a href="https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23"
-                            class= "bg-success text-white px-2 py-1 rounded-2 "
-                            target="_blank"
-                            rel="noopener noreferrer">
-                            <i class="fab fa-whatsapp fa-lg"></i>
-                            تابع معانا
-                             </a>
-                          </div>
-                        @endif
-                    </div>
-                    {{--                    <div class="col-12 text-center mt-3"> --}}
-                    {{--                        <div class="d-flex justify-content-center gap-3 flex-wrap"> --}}
-                    {{--                            @if (!empty($item->colors)) --}}
-                    {{--                                <div> --}}
-                    {{--                                    <select id="colorSelect{{ $item->id }}" --}}
-                    {{--                                            class="form-select border-primary fw-bold text-center" --}}
-                    {{--                                            style="max-width: 200px;" name="color" data-product-id="{{ $item->id }}"> --}}
-                    {{--                                        <option value="" disabled selected>اختر اللون</option> --}}
-                    {{--                                        @foreach ($item->colors as $color) --}}
-                    {{--                                            <option value="{{ $color }}">{{ $color }}</option> --}}
-                    {{--                                        @endforeach --}}
-                    {{--                                    </select> --}}
-                    {{--                                </div> --}}
-                    {{--                            @endif --}}
-
-                    {{--                            @if (!empty($item->sizes)) --}}
-                    {{--                                <div> --}}
-                    {{--                                    <select id="sizeSelect{{ $item->id }}" --}}
-                    {{--                                            class="form-select border-primary fw-bold text-center" --}}
-                    {{--                                            style="max-width: 200px;" name="color" data-product-id="{{ $item->id }}">> --}}
-                    {{--                                        <option value="" disabled selected>اختر الحجم</option> --}}
-                    {{--                                        @foreach ($item->sizes as $size) --}}
-                    {{--                                            <option value="{{ $size }}">{{ $size }}</option> --}}
-                    {{--                                        @endforeach --}}
-                    {{--                                    </select> --}}
-                    {{--                                </div> --}}
-                    {{--                            @endif --}}
-                    {{--                        </div> --}}
-                    {{--                    </div> --}}
-                    {{-- <!--<h6>-->
-    <a
-        class="h6 fw-bold text-decoration-none lh-base"
-        href="{{ route('user.product.show', $item->id) }}"
-    >
-        {{ $item->name }}
-    </a>
-    @endif --}}
-                    <!--</h6>-->
+            {{-- Commit Message --}}
+            @if ($item->commit != null)
+                <div class="commit-message">
+                    <i class="fas fa-info-circle"></i> {{ $item->commit }}
                 </div>
-            </div>
+            @endif
 
+            {{-- WhatsApp Follow Button --}}
+            @if ($item->state == 3)
+                <div class="whatsapp-follow">
+                    <a href="https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23" class="whatsapp-btn"
+                        target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-whatsapp"></i> تابعنا على واتساب
+                    </a>
+                </div>
+            @endif
 
-            <div class="d-flex flex-column flex-wrap align-items-center justify-content-between px-2 py-4">
-                <div class="row gy-4 align-items-center justify-content-center w-100 mt-4 px-sm-4 px-md-0">
-                    <div class="col-md-6 col-12">
-                        <div class="d-flex flex-column align-items-center align-items-md-start  price ">
-                            @if ($item->have_offer == 1)
-                                <h5 class="fs-5 fw-bold mb-0">
-                                    <span>EGP</span>
-                                    <span class="text-primary">
-                                        {{ getOfferPrice($item) }}</span>
-                                </h5>
-                                <div class="position-relative">
-                                    <h6 class="text-muted fs-5 mb-0 text-decoration-line-through">
-                                        <span>EGP</span>
-                                        <span class="text-primary">{{ $item->price }}</span>
-                                    </h6>
-                                    <!-- Tooltip for price -->
-                                    <span class="tooltip-text"
-                                        style="
-                visibility: hidden;
-                background-color: rgba(0, 0, 0, 0.75);
-                color: #fff;
-                text-align: center;
-                border-radius: 5px;
-                padding: 5px;
-                position: absolute;
-                z-index: 1;
-                bottom: 120%; /* Position above */
-                left: 50%;
-                transform: translateX(-50%);
-                white-space: nowrap;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            ">
-                                        @if ($item->offer_type == 'percentage')
-                                            خصم {{ $item->offer_value }} % لفتره محدودة
-                                        @else
-                                            خصم {{ $item->offer_value }} جنيه لفتره محدودة
-                                        @endif
-                                    </span>
-                                </div>
-                            @else
-                                <h5 class="fs-5 fw-bold mb-0">
-                                    <span>EGP</span>
-                                    <span class="text-primary">
-                                        {{ $item->price }}</span>
-                                </h5>
-                            @endif
+            {{-- Price and Action Section --}}
+            <div class="card-footer">
+                {{-- Price Section --}}
+                <div class="price-section">
+                    @if ($item->have_offer == 1)
+                        <div class="price-wrapper">
+                            <span class="current-price">{{ getOfferPrice($item) }} <small>جنيه</small></span>
+                            <span class="old-price">{{ $item->price }}</span>
                         </div>
-                    </div>
-                    <div class="col-md-6 col-12">
-                        @auth
-                            @if ($item->state == 1 && $item->quantity > 0)
-                                <div
-                                    class="d-flex btns justify-content-center justify-content-lg-end align-items-center g-2">
-                                    <button
-                                        class="count-btn  border-0 text-white px-2 px-md-3 px-lg-2 px-xxl-2  py-1 py-md-2 rounded-circle"
-                                        style="background-color: #d2d5d6"
-                                        onclick="decreaseQuantity({{ $item->id }},event)">
-                                        <i class="fa-solid fa-minus"></i>
-                                    </button>
-                                    <span
-                                        class="count-num fw-bold text-white bg-primary mx-2 px-2 px-md-4 px-xxl-2 py-1 rounded-pill text-black"
-                                        id="quantity{{ $item->id }}">0</span>
-                                    <button
-                                        class="count-btn border-0 text-white px-md-3 px-lg-2 px-xxl-1 py-1 py-md-2  rounded-circle"
-                                        style="background-color: #1c2b30"
-                                        onclick="increaseQuantity({{ $item->id }},event , {{ $item->max_qty_for_order }})">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </button>
-                                </div>
-                            @elseif($item->state == 2)
-                                <div
-                                    class="d-flex btns justify-content-center justify-content-lg-end align-items-center g-2">
-                                    <button
-                                        class="count-btn  border-0 text-white px-2 px-md-3 px-lg-2 px-xxl-2  py-1 py-md-2 rounded-circle"
-                                        style="background-color: #d2d5d6"
-                                        onclick="decreaseQuantity({{ $item->id }},event)">
-                                        <i class="fa-solid fa-minus"></i>
-                                    </button>
-                                    <span
-                                        class="count-num fw-bold text-white bg-primary mx-2 px-2 px-md-4 px-xxl-2 py-1 rounded-pill text-black"
-                                        id="quantity{{ $item->id }}">0</span>
-                                    <button
-                                        class="count-btn border-0 text-white px-md-3 px-lg-2 px-xxl-1 py-1 py-md-2  rounded-circle"
-                                        style="background-color: #1c2b30"
-                                        onclick="increaseQuantity({{ $item->id }},event , {{ $item->max_qty_for_order }})">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </button>
-                                </div>
-                            @endif
-                        @endauth
+                    @else
+                        <span class="current-price">{{ $item->price }} <small>جنيه</small></span>
+                    @endif
+                </div>
 
-                        @guest
-                            <div class="d-flex btns justify-content-center justify-content-lg-end align-items-center g-2">
-                                <button
-                                    class="login count-btn  border-0 text-white px-2 px-md-3 px-lg-2 px-xxl-2 py-1 py-md-2 rounded-circle"
-                                    style="background-color: #d2d5d6">
-                                    <i class="fa-solid fa-minus"></i>
-                                </button>
-                                <span
-                                    class="count-num fw-bold text-white bg-primary  mx-2 px-2 px-md-4 px-xxl-2 py-1 rounded-pill text-black"
-                                    id="quantity{{ $item->id }}">0</span>
-                                <button
-                                    class="login count-btn border-0 text-white px-md-3 px-lg-2 px-xxl-2 py-1 py-md-2 rounded-circle"
-                                    style="background-color: #1c2b30">
-                                    <i class="fa-solid fa-plus"></i>
-                                </button>
-                            </div>
-                        @endguest
-                    </div>
+                {{-- Quantity Controls & Add to Cart --}}
+                <div class="action-section">
                     @auth
                         @if ($item->state == 1 && $item->quantity > 0)
-
-                            <div class="col-12">
-                                <div
-                                    class="mt-1 add-btn-container d-flex justify-content-center align-items-center w-100">
-                                    <a class="add_to_cart btn add-btn btn-square text-black px-4 py-4 rounded w-100"
-                                       id="add_to_cart{{ $item->id }}" data-quantity="1"
-                                       data-product-id="{{ $item->id }}">
-                                        اضافة الى السلة
-                                    </a>
-                                </div>
-                            </div>
-                        @elseif($item->state == 2)
-                            <div class="col-12">
-                                <div
-                                    class="mt-1 add-btn-container d-flex justify-content-center align-items-center w-100">
-                                    <a class="add_to_cart btn add-btn btn-square text-black px-4 py-4 rounded w-100"
-                                       id="add_to_cart{{ $item->id }}" data-quantity="1"
-                                       data-product-id="{{ $item->id }}">
-                                        احجز الان
-                                    </a>
-                                </div>
-                            </div>
-                        @elseif($item->state == 3)
-                            <div class="col-12">
-                                <div class="mt-1 add-btn-container d-flex justify-content-center align-items-center w-100">
-                                    <button class="btn btn-info btn-square text-white px-2 py-4 rounded w-100" disabled>
-                                        سيتوفر قريبا
-                                    </button>
-                                </div>
-                            </div>
-                        @endauth
-                    @endauth
-                    @guest
-                        <div class="col-12">
-                            <div class="mt-1 add-btn-container d-flex justify-content-center align-items-center">
-                                <button class="btn add-btn text-black px-4 py-2 rounded w-100 login">اضافة الى
-                                    السلة
+                            <div class="quantity-controls compact-controls">
+                                <button class="qty-btn minus-btn" onclick="decreaseQuantity({{ $item->id }}, event)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="qty-display" id="quantity{{ $item->id }}">0</span>
+                                <button class="qty-btn plus-btn"
+                                    onclick="increaseQuantity({{ $item->id }}, event, {{ $item->max_qty_for_order }})">
+                                    <i class="fas fa-plus"></i>
                                 </button>
                             </div>
+                            <button class="add-to-cart-btn add_to_cart" id="add_to_cart{{ $item->id }}"
+                                data-quantity="1" data-product-id="{{ $item->id }}">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="btn-text">أضف للسلة</span>
+                            </button>
+                        @elseif($item->state == 2)
+                            <div class="quantity-controls compact-controls">
+                                <button class="qty-btn minus-btn" onclick="decreaseQuantity({{ $item->id }}, event)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="qty-display" id="quantity{{ $item->id }}">0</span>
+                                <button class="qty-btn plus-btn"
+                                    onclick="increaseQuantity({{ $item->id }}, event, {{ $item->max_qty_for_order }})">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <button class="add-to-cart-btn booking-btn add_to_cart" id="add_to_cart{{ $item->id }}"
+                                data-quantity="1" data-product-id="{{ $item->id }}">
+                                <i class="fas fa-calendar-check"></i>
+                                <span class="btn-text">احجز الآن</span>
+                            </button>
+                        @elseif($item->state == 3)
+                            <button class="add-to-cart-btn coming-soon-btn" disabled>
+                                <i class="fas fa-clock"></i>
+                                <span class="btn-text">سيتوفر قريباً</span>
+                            </button>
+                        @endif
+                    @endauth
+
+                    @guest
+                        <div class="quantity-controls compact-controls">
+                            <button class="qty-btn minus-btn login">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span class="qty-display" id="quantity{{ $item->id }}">0</span>
+                            <button class="qty-btn plus-btn login">
+                                <i class="fas fa-plus"></i>
+                            </button>
                         </div>
+                        <button class="add-to-cart-btn login">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="btn-text">أضف للسلة</span>
+                        </button>
                     @endguest
+                </div>
             </div>
         </div>
     </div>
-</div>
+@endforeach
 
 <style>
-    .ribbon-wrapper {
-        z-index: 3;
-        position: absolute;
-        top: 0;
-        right: 0;
+    /* ============================================
+   Modern Product Card Styles - Compact Design
+   ============================================ */
+
+    .modern-product-card {
+        background: #fff;
+        border-radius: 12px;
         overflow: hidden;
-        width: 75px;
-        height: 75px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        position: relative;
     }
 
-    .ribbon {
-        font-size: 12px;
-        font-weight: bold;
+    .modern-product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Status Badge - Compact Design */
+    .status-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-badge.unavailable {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
         color: white;
-        text-align: center;
-        line-height: 20px;
-        transform: rotate(45deg);
-        position: absolute;
-        padding: 4px 0;
-        top: 10px;
-        right: -25px;
-        width: 100px;
-        background-color: red;
     }
 
-    .add-btn-container {
+    .status-badge.booking {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+    .status-badge.coming-soon {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        color: white;
+    }
+
+    /* Product Image - Compact */
+    .product-image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 180px;
         overflow: hidden;
+        background: #f8f9fa;
     }
 
-    .product-item:hover .add-btn {
-        transform: translateY(0);
+    .product-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
     }
 
-    .add-btn {
-        transform: translateY(180%);
-        background-color: #e99239;
-        color: #000 !important;
-        transition: background-color .3s, transform .5s;
-
-        &:hover {
-            background-color: #e67d15;
-        }
+    .modern-product-card:hover .product-img {
+        transform: scale(1.08);
     }
 
-    .product-item .add-btn:hover {
-        color: #fff !important;
-    }
-
-    @media (max-width: 991px) {
-        .product-item .add-btn {
-            transform: translateY(0);
-            font-size: 14px;
-        }
-    }
-
-    img.lazy {
-        filter: blur(10px);
+    .product-img.lazy {
+        filter: blur(8px);
         transition: filter 0.3s;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
     }
 
-    img.lazy:not([src]) {
-        background-color: #f0f0f0;
-        height: 300px;
+    .product-img.lazy:not([src]) {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
     }
 
-    .product-image {
-        max-height: 300px;
-    }
+    @keyframes loading {
+        0% {
+            background-position: 200% 0;
+        }
 
-    @media (min-width: 1200px) {
-        .product-image {
-            max-height: auto;
-            height: 500px;
+        100% {
+            background-position: -200% 0;
         }
     }
 
-    @media (min-width: 1600px) {
-        .product-image {
-            max-height: auto;
-            min-height: 500px;
+    /* Offer Badge - Sleek Design */
+    .offer-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1.2;
+        box-shadow: 0 3px 8px rgba(239, 68, 68, 0.4);
+        z-index: 2;
+    }
+
+    .discount-value {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .discount-label {
+        font-size: 9px;
+        font-weight: 500;
+        opacity: 0.95;
+    }
+
+    /* Product Info - Compact */
+    .product-info {
+        padding: 10px 12px 8px;
+    }
+
+    .product-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 4px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 40px;
+    }
+
+    .product-meta {
+        font-size: 11px;
+        color: #6b7280;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .meta-separator {
+        margin: 0 4px;
+        color: #d1d5db;
+    }
+
+    /* Commit Message - Compact */
+    .commit-message {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        padding: 6px 12px;
+        margin: 0 12px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+    }
+
+    /* WhatsApp Follow - Compact */
+    .whatsapp-follow {
+        padding: 0 12px 8px;
+    }
+
+    .whatsapp-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .whatsapp-btn:hover {
+        background: linear-gradient(135deg, #059669, #047857);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Card Footer - Compact Layout */
+    .card-footer {
+        padding: 10px 12px 12px;
+        border-top: 1px solid #f3f4f6;
+        margin-top: auto;
+    }
+
+    /* Price Section - Compact */
+    .price-section {
+        margin-bottom: 8px;
+    }
+
+    .price-wrapper {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .current-price {
+        font-size: 18px;
+        font-weight: 700;
+        color: #e67d15;
+    }
+
+    .current-price small {
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .old-price {
+        font-size: 13px;
+        color: #9ca3af;
+        text-decoration: line-through;
+    }
+
+    /* Action Section - Horizontal Compact Layout */
+    .action-section {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Quantity Controls - Extra Compact */
+    .compact-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #f9fafb;
+        padding: 4px;
+        border-radius: 8px;
+    }
+
+    .qty-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 11px;
+    }
+
+    .minus-btn {
+        background: #e5e7eb;
+        color: #6b7280;
+    }
+
+    .minus-btn:hover {
+        background: #d1d5db;
+    }
+
+    .plus-btn {
+        background: #1c2b30;
+        color: white;
+    }
+
+    .plus-btn:hover {
+        background: #0f1a1e;
+    }
+
+    .qty-display {
+        min-width: 24px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 13px;
+        color: #1f2937;
+    }
+
+    /* Add to Cart Button - Compact */
+    .add-to-cart-btn {
+        flex: 1;
+        background: linear-gradient(135deg, #e99239, #e67d15);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .add-to-cart-btn:hover {
+        background: linear-gradient(135deg, #e67d15, #d97006);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(233, 146, 57, 0.3);
+    }
+
+    .add-to-cart-btn.booking-btn {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .add-to-cart-btn.booking-btn:hover {
+        background: linear-gradient(135deg, #d97706, #b45309);
+    }
+
+    .add-to-cart-btn.coming-soon-btn {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .add-to-cart-btn.coming-soon-btn:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    /* Responsive Design */
+    @media (min-width: 576px) {
+        .product-image-wrapper {
+            height: 200px;
+        }
+
+        .product-title {
+            font-size: 15px;
+        }
+
+        .btn-text {
+            display: inline;
+        }
+
+        .add-to-cart-btn {
+            padding: 10px 14px;
+            font-size: 13px;
         }
     }
 
+    @media (min-width: 768px) {
+        .product-image-wrapper {
+            height: 220px;
+        }
+    }
 
-    /* Define the XXL breakpoint */
     @media (min-width: 1400px) {
-
-        /* Dynamic column widths for XXL screens */
-        .col-xxl-1 {
-            flex: 0 0 auto;
-            width: 8.333333%;
-            max-width: 8.333333%;
-        }
-
-        .col-xxl-2 {
-            flex: 0 0 auto;
-            width: 16.666667%;
-            max-width: 16.666667%;
-        }
-
-        .col-xxl-3 {
-            flex: 0 0 auto;
-            width: 25%;
-            max-width: 25%;
-        }
-
-        .col-xxl-4 {
-            flex: 0 0 auto;
-            width: 33.333333%;
-            max-width: 33.333333%;
-        }
-
-        .col-xxl-5 {
-            flex: 0 0 auto;
-            width: 41.666667%;
-            max-width: 41.666667%;
-        }
-
-        .col-xxl-6 {
-            flex: 0 0 auto;
-            width: 50%;
-            max-width: 50%;
-        }
-
-        .col-xxl-7 {
-            flex: 0 0 auto;
-            width: 58.333333%;
-            max-width: 58.333333%;
-        }
-
-        .col-xxl-8 {
-            flex: 0 0 auto;
-            width: 66.666667%;
-            max-width: 66.666667%;
-        }
-
-        .col-xxl-9 {
-            flex: 0 0 auto;
-            width: 75%;
-            max-width: 75%;
-        }
-
-        .col-xxl-10 {
-            flex: 0 0 auto;
-            width: 83.333333%;
-            max-width: 83.333333%;
-        }
-
-        .col-xxl-11 {
-            flex: 0 0 auto;
-            width: 91.666667%;
-            max-width: 91.666667%;
-        }
-
-        .col-xxl-12 {
-            flex: 0 0 auto;
-            width: 100%;
-            max-width: 100%;
-        }
-
         .col-xxl-5-cols {
             flex: 0 0 auto;
             width: 20%;
             max-width: 20%;
         }
 
-        .px-xxl-2 {
-            padding-left: 0.5rem !important;
-            /* Bootstrap's spacing scale: 2 = 0.5rem */
-            padding-right: 0.5rem !important;
-        }
-
-        .font-size {
-            font-size: 1.5rem !important;
+        .product-image-wrapper {
+            height: 200px;
         }
     }
 
-    /* Ensure it overrides Bootstrap */
-    .col-xxl- * {
-        box-sizing: border-box !important;
-        /* Override for specificity */
-    }
-
-    .font-size {
-        font-size: 1.2rem;
-    }
-
-    @media (max-width: 600px) {
-        .font-size {
-            font-size: 1rem;
+    /* XXL Columns */
+    @media (min-width: 1400px) {
+        .col-xxl-1 {
+            width: 8.333333%;
         }
 
-        .product-image {
-            max-height: 242px !important;
+        .col-xxl-2 {
+            width: 16.666667%;
         }
 
+        .col-xxl-3 {
+            width: 25%;
+        }
+
+        .col-xxl-4 {
+            width: 33.333333%;
+        }
+
+        .col-xxl-5 {
+            width: 41.666667%;
+        }
+
+        .col-xxl-6 {
+            width: 50%;
+        }
+
+        .col-xxl-7 {
+            width: 58.333333%;
+        }
+
+        .col-xxl-8 {
+            width: 66.666667%;
+        }
+
+        .col-xxl-9 {
+            width: 75%;
+        }
+
+        .col-xxl-10 {
+            width: 83.333333%;
+        }
+
+        .col-xxl-11 {
+            width: 91.666667%;
+        }
+
+        .col-xxl-12 {
+            width: 100%;
+        }
+    }
+
+    /* Card Link */
+    .card-link {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .card-link:hover {
+        color: inherit;
     }
 </style>
+
 <!-- Lazy Loading Script -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -518,11 +618,8 @@
                 });
             });
 
-            lazyImages.forEach(img => {
-                observer.observe(img);
-            });
+            lazyImages.forEach(img => observer.observe(img));
         } else {
-            // Fallback for older browsers
             lazyImages.forEach(img => {
                 img.src = img.dataset.src;
                 img.classList.remove("lazy");
@@ -530,16 +627,15 @@
         }
     });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function increaseQuantity(id, event, maxQty) {
-        event.stopPropagation(); // منع انتشار الحدث
+        event.stopPropagation();
 
         let quantityElement = $(`#quantity${id}`);
-        let quantity = parseInt(quantityElement.text()) || 0; // منع NaN
+        let quantity = parseInt(quantityElement.text()) || 0;
 
-        // التحقق من الحد الأقصى قبل الزيادة
         if (maxQty === 0) {
             Swal.fire({
                 icon: "error",
@@ -559,26 +655,26 @@
             });
             return;
         }
-        // زيادة الكمية
+
         quantity += 1;
         quantityElement.html(quantity);
-        // تحديث بيانات الزر الخاص بالسلة
+
         let cartButton = $(`#add_to_cart${id}`);
         cartButton.data("quantity", quantity);
-        cartButton.attr("data-quantity", quantity); // تحديث DOM أيضًا
+        cartButton.attr("data-quantity", quantity);
 
         console.log(`✅ المنتج ID: ${id} | الكمية الجديدة: ${quantity} | الحد الأقصى: ${maxQty}`);
     }
 
-
     function decreaseQuantity(id, event) {
-        event.stopPropagation(); // Prevent the click event from bubbling to the link
-        let quantity = parseInt($(`#quantity${id}`).text());
+        event.stopPropagation();
+        let quantityElement = $(`#quantity${id}`);
+        let quantity = parseInt(quantityElement.text());
+
         if (quantity > 0) {
             quantity -= 1;
-            $(`#quantity${id}`).html(quantity);
+            quantityElement.html(quantity);
             $(`#add_to_cart${id}`).data('quantity', quantity);
         }
     }
 </script>
-@endforeach
