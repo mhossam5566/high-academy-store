@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\Product;
+use App\Mail\successPaid;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Nafezly\Payments\Classes\TapPayment;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Nafezly\Payments\Classes\FawryPayment;
 use Nafezly\Payments\Classes\HyperPayPayment;
-use Carbon\Carbon;
-use Gloudemans\Shoppingcart\Facades\Cart;
-use App\Mail\successPaid;
-use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -261,7 +261,7 @@ class PaymentController extends Controller
             // إرسال الإيميل
             try {
                 $this->logToFile($logFile, "Sending success email to: " . $order->user->email);
-                Mail::to($order->user->email)->send(new successPaid($order));
+                Mail::to($order->user->email)->send(new SuccessPaid($order));
                 $this->logToFile($logFile, "Email sent successfully");
             } catch (\Exception $e) {
                 $this->logToFile($logFile, "ERROR sending email: " . $e->getMessage());
