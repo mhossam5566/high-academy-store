@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\Product;
-use App\Mail\successPaid;
+use App\Mail\SuccessPaid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
@@ -135,16 +135,16 @@ class PaymentController extends Controller
     public function fawry_webhook(Request $request)
     {
         $data = $request->all();
-        
+
         // إنشاء معرف فريد للعملية
         $processId = 'fawry_' . time() . '_' . uniqid();
         $logFile = storage_path("logs/fawry_webhooks/{$processId}.log");
-        
+
         // إنشاء المجلد إذا لم يكن موجود
         if (!file_exists(dirname($logFile))) {
             mkdir(dirname($logFile), 0755, true);
         }
-        
+
         // بداية التسجيل
         $this->logToFile($logFile, "=== FAWRY WEBHOOK PROCESS START ===");
         $this->logToFile($logFile, "Process ID: {$processId}");
@@ -158,15 +158,15 @@ class PaymentController extends Controller
 
         // التحقق من وجود orderStatus
         $this->logToFile($logFile, "STEP 1: Checking if orderStatus exists");
-        
+
         if (!isset($request->orderStatus)) {
             $this->logToFile($logFile, "ERROR: orderStatus not found in request");
             $this->logToFile($logFile, "=== PROCESS TERMINATED - NO ORDER STATUS ===");
             return;
         }
-        
+
         $this->logToFile($logFile, "SUCCESS: orderStatus found - " . $request->orderStatus);
-        
+
         // استخراج البيانات المطلوبة
         $this->logToFile($logFile, "STEP 2: Extracting required data");
 
@@ -203,7 +203,7 @@ class PaymentController extends Controller
             $this->logToFile($logFile, "=== PROCESS TERMINATED - INVALID SIGNATURE ===");
             return;
         }
-        
+
         $this->logToFile($logFile, "SUCCESS: Signature verified");
 
         // البحث عن الطلب
@@ -211,13 +211,13 @@ class PaymentController extends Controller
         $this->logToFile($logFile, "Searching for order with ID: {$merchantRefNumber} and user_id: " . $request->customerMerchantId);
 
         $order = Order::where("id", $request->merchantRefNumber)->where("user_id", $request->customerMerchantId)->first();
-        
+
         if (!$order) {
             $this->logToFile($logFile, "ERROR: Order not found!");
             $this->logToFile($logFile, "=== PROCESS TERMINATED - ORDER NOT FOUND ===");
             return;
         }
-        
+
         $this->logToFile($logFile, "SUCCESS: Order found - ID: {$order->id}");
         $this->logToFile($logFile, "Order current status: {$order->status}");
         $this->logToFile($logFile, "Order current is_paid: {$order->is_paid}");
@@ -228,20 +228,20 @@ class PaymentController extends Controller
 
         if ($request->orderStatus == "PAID") {
             $this->logToFile($logFile, "Processing PAID status");
-            
+
             $order->is_paid = 1;
             $this->logToFile($logFile, "Set is_paid to 1");
-            
+
             $hasReservedProduct = false;
             $this->logToFile($logFile, "Checking order details for reserved products");
-            
+
             foreach ($order->orderDetails as $detail) {
                 $this->logToFile($logFile, "Processing order detail ID: {$detail->id}, product_id: {$detail->product_id}");
-                
+
                 if (!empty($detail->products)) {
                     $this->logToFile($logFile, "Product found - ID: {$detail->product_id}, State: {$detail->products->state}, Quantity: {$detail->products->quantity}");
                     Log::info("Webhook (Before Update) - Order ID: {$order->id}, Product ID: {$detail->product_id}, State: {$detail->products->state}, Quantity: {$detail->products->quantity}");
-                    
+
                     if ($detail->products->state == 2) {
                         $hasReservedProduct = true;
                         $this->logToFile($logFile, "Reserved product detected");
@@ -250,11 +250,11 @@ class PaymentController extends Controller
                     $this->logToFile($logFile, "No product found for detail ID: {$detail->id}");
                 }
             }
-            
+
             $orderStatus = $hasReservedProduct ? "reserved" : "success";
             $order->status = $orderStatus;
             $order->tracker = "shipped"; // second stage
-            
+
             $this->logToFile($logFile, "Set order status to: {$orderStatus}");
             $this->logToFile($logFile, "Set tracker to: shipped");
 
@@ -272,7 +272,7 @@ class PaymentController extends Controller
 
         } elseif ($request->orderStatus == "UNPAID") {
             $this->logToFile($logFile, "Processing UNPAID status");
-            
+
             $order->is_paid = 2;
             $order->status = "cancelled";
             $order->response = $jsonText;
@@ -296,7 +296,7 @@ class PaymentController extends Controller
                 // Store original state before quantity restoration
                 $originalState = $product->state;
                 $originalQuantity = $product->quantity;
-                
+
                 $this->logToFile($logFile, "Product before update - State: {$originalState}, Quantity: {$originalQuantity}");
 
                 // Restore quantity
