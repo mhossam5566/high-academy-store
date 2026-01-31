@@ -114,3 +114,7 @@ Route::post("pay/fawry/wallet", [CheckoutController::class, "fawry_pay_wallet"])
 Route::post("fawry/webhook", [PaymentController::class, "fawry_webhook"])->name("fawry.webhook");
 
 Route::get("cronjob", [PaymentController::class, 'cronjob']);
+
+Route::get('test', function () {
+    return route('fawry.webhook');
+});
