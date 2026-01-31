@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use App\Models\City;
+use App\Models\Order;
 use App\Models\Discount;
 use App\Models\Governorate;
-use App\Models\Order;
 use App\Models\OrderDetail;
-use App\Models\ShippingMethod;
-use Carbon\Carbon;
-use Gloudemans\Shoppingcart\Facades\Cart;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\ShippingMethod;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
+use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\Validator;
 
 class CheckoutController extends Controller
 {
@@ -43,14 +43,14 @@ class CheckoutController extends Controller
     protected function validateCommon(Request $request)
     {
         $rules = [
-            'user_name'          => ['required', 'string', 'min:3'],
-            'mobile'             => ['required', 'string', 'regex:/^01[0125][0-9]{8}$/'],
-            'temp_mobile'        => ['required', 'string', 'regex:/^01[0125][0-9]{8}$/'],
+            'user_name' => ['required', 'string', 'min:3'],
+            'mobile' => ['required', 'string', 'regex:/^01[0125][0-9]{8}$/'],
+            'temp_mobile' => ['required', 'string', 'regex:/^01[0125][0-9]{8}$/'],
             'shipping_method_id' => ['required', 'exists:shipping_methods,id'],
-            'government'         => ['required', 'integer', 'exists:governorates,id'],
-            'city'               => ['required', 'integer', 'exists:cities,id'],
-            'address'            => ['required', 'string'],
-            'near_post'          => ['nullable', 'string'],  // optional
+            'government' => ['required', 'integer', 'exists:governorates,id'],
+            'city' => ['required', 'integer', 'exists:cities,id'],
+            'address' => ['required', 'string'],
+            'near_post' => ['nullable', 'string'],  // optional
         ];
         // 👉 fetch chosen method
         $method = ShippingMethod::find($request->shipping_method_id);
@@ -84,7 +84,7 @@ class CheckoutController extends Controller
             ->when($gov, fn($query) => $query->where('governorate_id', $gov->id))
             ->first();
 
-        if (! $gov || ! $city) {
+        if (!$gov || !$city) {
             throw new \Exception("Invalid governorate or city.");
         }
 
@@ -135,7 +135,7 @@ class CheckoutController extends Controller
 
         // cart totals
         $amount = floatval(str_replace(',', '', Cart::instance('shopping')->total()));
-        $total  = $amount + $delivery;
+        $total = $amount + $delivery;
         $method = ShippingMethod::findOrFail($request->shipping_method);
 
         // discount
@@ -146,34 +146,34 @@ class CheckoutController extends Controller
 
         // build order
         $order = new Order([
-            'user_id'        => auth()->id(),
-            'date'           => now(),
-            'status'         => 'new',
-            'method'         => $paymentMethod,
-            'code'           => '#' . Str::upper(Str::random(8)),
-            'amount'         => $amount,
-            'delivery_fee'   => $delivery,
-            'total'          => $total,
-            'name'           => $request->user_name,
-            'mobile'         => $request->mobile,
-            'temp_mobile'    => $request->temp_mobile,
+            'user_id' => auth()->id(),
+            'date' => now(),
+            'status' => 'new',
+            'method' => $paymentMethod,
+            'code' => '#' . Str::upper(Str::random(8)),
+            'amount' => $amount,
+            'delivery_fee' => $delivery,
+            'total' => $total,
+            'name' => $request->user_name,
+            'mobile' => $request->mobile,
+            'temp_mobile' => $request->temp_mobile,
             'shipping_method' => $request->shipping_method,
-            'near_post'      => $request->input('near_post', null),
-            'address'        => $address,
-            'address2'       => $request->input('address', ''),
-            'is_paid'        => 0,
+            'near_post' => $request->input('near_post', null),
+            'address' => $address,
+            'address2' => $request->input('address', ''),
+            'is_paid' => 0,
             'shipping_method_id' => $method->id,
-            'shipping_name'      => $method->name,
-            'shipping_address'   => $method->address,
+            'shipping_name' => $method->name,
+            'shipping_address' => $method->address,
         ]);
 
         // optional screenshot for manual/card
         if ($request->hasFile('image')) {
             $filename = time() . '_' . $request->file('image')->getClientOriginalName();
             $request->file('image')->storeAs('public/images/screens', $filename);
-            $order->image        = $filename;
-            $order->instapay     = $request->input('instapay');
-            $order->cash_number  = $request->input('cash_number');
+            $order->image = $filename;
+            $order->instapay = $request->input('instapay');
+            $order->cash_number = $request->input('cash_number');
         }
 
         $order->save();
@@ -181,13 +181,13 @@ class CheckoutController extends Controller
         // details
         foreach (Cart::instance('shopping')->content() as $item) {
             OrderDetail::create([
-                'order_id'    => $order->id,
-                'product_id'  => $item->id,
-                'amout'       => $item->qty,       // ← الآن يطابق عمود الـ DB
-                'price'       => $item->price,
+                'order_id' => $order->id,
+                'product_id' => $item->id,
+                'amout' => $item->qty,       // ← الآن يطابق عمود الـ DB
+                'price' => $item->price,
                 'total_price' => $item->total,
-                'size'        => $item->options->size  ?? null,
-                'color'       => $item->options->color ?? null,
+                'size' => $item->options->size ?? null,
+                'color' => $item->options->color ?? null,
             ]);
         }
 
@@ -208,29 +208,44 @@ class CheckoutController extends Controller
         // 1) نفس الـ validation من القديم:
         $validator = Validator::make($request->all(), [
             'shipping_method' => 'required|exists:shipping_methods,id',
-            'government'      => 'required|numeric',
-            'city'            => 'required|numeric',
-            'address'         => 'required|string',
-            'user_name'       => ['required', 'regex:/^[\p{Arabic}\s]+$/u', function ($attr, $val, $fail) {
-                preg_match_all('/\p{Arabic}+/u', $val, $m);
-                if (count($m[0]) < 3) $fail('ادخل الاسم ثلاثى كما فى البطاقه الشخصيه');
-            }],
-            'mobile'          => ['required', 'digits:11', function ($attr, $val, $fail) {
-                if (! preg_match('/^01[0125][0-9]{8}$/', $val)) $fail('رقم الهاتف غير صحيح');
-            }],
-            'temp_mobile'     => ['required', 'digits:11', function ($attr, $val, $fail) {
-                if (! preg_match('/^01[0125][0-9]{8}$/', $val)) $fail('رقم الهاتف الاحتياطي غير صحيح');
-            }],
+            'government' => 'required|numeric',
+            'city' => 'required|numeric',
+            'address' => 'required|string',
+            'user_name' => [
+                'required',
+                'regex:/^[\p{Arabic}\s]+$/u',
+                function ($attr, $val, $fail) {
+                    preg_match_all('/\p{Arabic}+/u', $val, $m);
+                    if (count($m[0]) < 3)
+                        $fail('ادخل الاسم ثلاثى كما فى البطاقه الشخصيه');
+                }
+            ],
+            'mobile' => [
+                'required',
+                'digits:11',
+                function ($attr, $val, $fail) {
+                    if (!preg_match('/^01[0125][0-9]{8}$/', $val))
+                        $fail('رقم الهاتف غير صحيح');
+                }
+            ],
+            'temp_mobile' => [
+                'required',
+                'digits:11',
+                function ($attr, $val, $fail) {
+                    if (!preg_match('/^01[0125][0-9]{8}$/', $val))
+                        $fail('رقم الهاتف الاحتياطي غير صحيح');
+                }
+            ],
         ], [
-            'government.required'  => 'برجاء اختيار المحافظة',
-            'city.required'        => 'برجاء اختيار المدينة',
-            'address.required'     => 'برجاء ادخال العنوان التفصيلي',
-            'user_name.required'   => 'برجاء ادخال الاسم',
-            'user_name.regex'      => 'يجب كتابة الاسم باللغة العربية',
-            'mobile.required'      => 'برجاء ادخال رقم الموبايل',
-            'mobile.digits'        => 'رقم الموبايل يجب أن يتكون من 11 رقمًا',
+            'government.required' => 'برجاء اختيار المحافظة',
+            'city.required' => 'برجاء اختيار المدينة',
+            'address.required' => 'برجاء ادخال العنوان التفصيلي',
+            'user_name.required' => 'برجاء ادخال الاسم',
+            'user_name.regex' => 'يجب كتابة الاسم باللغة العربية',
+            'mobile.required' => 'برجاء ادخال رقم الموبايل',
+            'mobile.digits' => 'رقم الموبايل يجب أن يتكون من 11 رقمًا',
             'temp_mobile.required' => 'برجاء ادخال رقم الموبايل الاحتياطي',
-            'temp_mobile.digits'   => 'رقم الموبايل الاحتياطي يجب أن يتكون من 11 رقمًا',
+            'temp_mobile.digits' => 'رقم الموبايل الاحتياطي يجب أن يتكون من 11 رقمًا',
         ]);
 
         if ($validator->fails()) {
@@ -249,8 +264,8 @@ class CheckoutController extends Controller
 
             // 3) احسب المبلغ الصافي وقيمة الدفع النهائية (مع 1% + 2.5 ثابت)
             $amount = array_sum(array_map(fn($v) => str_replace(',', '', $v), $request->total_price));
-            $total  = $amount + $delivery;
-            $total  = max($total - session('applied_discount.amount', 0), 0);
+            $total = $amount + $delivery;
+            $total = max($total - session('applied_discount.amount', 0), 0);
 
             // 4) أنشئ الـ Order بنفس حقول القديم
             $order = new Order();
@@ -275,12 +290,12 @@ class CheckoutController extends Controller
             // 5) تفاصيل الطلب
             foreach ($request->product_id as $i => $pid) {
                 OrderDetail::create([
-                    'order_id'    => $order->id,
-                    'product_id'  => $pid,
-                    'amout'       => $request->amount[$i],
-                    'size'        => $request->size[$i]  ?? null,
-                    'color'       => $request->color[$i] ?? null,
-                    'price'       => str_replace(',', '', $request->price[$i]),
+                    'order_id' => $order->id,
+                    'product_id' => $pid,
+                    'amout' => $request->amount[$i],
+                    'size' => $request->size[$i] ?? null,
+                    'color' => $request->color[$i] ?? null,
+                    'price' => str_replace(',', '', $request->price[$i]),
                     'total_price' => str_replace(',', '', $request->total_price[$i]),
                 ]);
             }
@@ -305,7 +320,7 @@ class CheckoutController extends Controller
 
             if (isset($response['code']) && $response['code'] === '200' && isset($response['link'])) {
                 $order->payment_id = $response['payment_id'];
-                $order->account    = $response['payment_id'];
+                $order->account = $response['payment_id'];
                 $order->save();
                 Cart::instance('shopping')->destroy();
                 session()->forget('applied_discount');
@@ -317,10 +332,12 @@ class CheckoutController extends Controller
                 ], 200);
             } else {
                 DB::rollBack();
+
                 return response()->json([
                     "success" => false,
                     "code" => 400,
                     "msg" => "خطأ اثناء الدفع",
+                    'dd' => $response
                 ], 400);
             }
         } catch (\Exception $e) {
@@ -369,8 +386,8 @@ class CheckoutController extends Controller
     {
         try {
             DB::beginTransaction();
-            $order      = $this->makeOrder($request, 'Credit Card');
-            $amountPay  = $order->total * 1.04; // +4%
+            $order = $this->makeOrder($request, 'Credit Card');
+            $amountPay = $order->total * 1.04; // +4%
             // you’d inject and call your TapPayment here...
             // $tap = new TapPayment();
             // $resp = $tap->pay( ... );
@@ -405,14 +422,14 @@ class CheckoutController extends Controller
             return back()->with('success', 'تمت إزالة الخصم');
         }
         $discount = Discount::where('code', $code)->first();
-        if (! $discount) {
+        if (!$discount) {
             return back()->with('error', 'الكود غير صحيح');
         }
         if ($discount->usage_limit && $discount->used >= $discount->usage_limit) {
             return back()->with('error', 'تم تجاوز الحد الأقصى');
         }
         session()->put('applied_discount', [
-            'code'   => $discount->code,
+            'code' => $discount->code,
             'amount' => $discount->discount,
         ]);
         return back()->with('success', 'تم تطبيق الخصم');
