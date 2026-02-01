@@ -1,6 +1,4 @@
 <?php
-
-
 namespace App\Mail;
 
 use App\Models\Order;
