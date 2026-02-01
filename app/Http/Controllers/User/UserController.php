@@ -2,31 +2,31 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use App\Models\City;
+use App\Models\User;
 use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Coupon;
-use App\Models\MainCategory;
 use App\Models\Offer;
 use App\Models\Order;
-use App\Models\Product;
-use App\Models\ShippingMethod;
-use App\Models\Slider;
 use App\Models\Stage;
-use App\Models\User;
-use App\Models\UserAddress;
+use App\Models\Coupon;
+use App\Models\Slider;
+use App\Models\Product;
 use App\Models\Voucher;
-use Gloudemans\Shoppingcart\Facades\Cart;
-use Illuminate\Http\Request;
+use App\Models\Category;
+use App\Models\Governorate;
+use App\Models\UserAddress;
 use Illuminate\Support\Arr;
+use App\Models\MainCategory;
+use Illuminate\Http\Request;
+use App\Models\ShippingMethod;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL; // Update Log facade import
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log; // Update Log facade import
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
-use App\Models\City;
-use App\Models\Governorate;
+use Illuminate\Support\Facades\Redirect;
+use Gloudemans\Shoppingcart\Facades\Cart;
 
 class UserController extends Controller
 {
@@ -258,7 +258,7 @@ class UserController extends Controller
     }
 
 
-      public function myorders()
+    public function myorders()
     {
         $user = auth()->user();
         $orders = Order::where("user_id", $user->id)->orderBy("created_at", "desc")->get();
@@ -363,40 +363,40 @@ class UserController extends Controller
     }
 
     public function loginSubmit(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-            'password' => 'required|min:6',
-        ], [
-            'email.exists' => 'البريد الإلكتروني الذي أدخلته غير مسجل لدينا.',
-            'password.min' => 'كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل.',
-        ]);
-        $credentials = $request->only('email', 'password');
+{
+    $request->validate([
+        'email' => 'required|email|exists:users,email',
+        'password' => 'required|min:6',
+    ], [
+        'email.exists' => 'البريد الإلكتروني الذي أدخلته غير مسجل لدينا.',
+        'password.min' => 'كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل.',
+    ]);
 
-        $remember = $request->has('remember');
+    $credentials = $request->only('email', 'password');
+    $remember = $request->has('remember');
 
-        if (Auth::attempt($credentials, $remember)) {
-            Session::put('user', $request->email);
-            if (Session::get('url.intended')) {
-                // toastr()->success('Successfuly Login');
-                return Redirect::to(Session::get('url.intended'));
-            } else {
-                // toastr()->success('Successfuly Login');
-                return redirect()->route('front.home');
-            }
-        } else {
-            // toastr()->error('Invaild Email & Password');
-            return redirect()->back();
-        }
+    if (!Auth::attempt($credentials, $remember)) {
+        return redirect()
+            ->back()
+            ->withErrors([
+                'general' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+            ])
+            ->withInput();
     }
+
+    if (Session::get('url.intended')) {
+        return Redirect::to(Session::get('url.intended'));
+    }
+
+    return redirect()->route('front.home');
+}
+
 
     public function registerSubmit(Request $request)
     {
         $validatedData = $request->validate([
             'name' => 'string|required',
             'email' => 'required|unique:users,email|regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
-            // 'phone' => 'required|numeric|regex:/^(01[0125])[0-9]{8}$/ ',
-            // 'address' => 'required',
             'password' => 'min:6|required|confirmed',
         ], [
             'name.required' => 'الاسم مطلوب.',
@@ -404,18 +404,15 @@ class UserController extends Controller
             'email.required' => 'البريد الإلكتروني مطلوب.',
             'email.unique' => 'البريد الإلكتروني مسجل لدينا مسبقاً.',
             'email.regex' => 'اتاكد ان البريد الإلكتروني صحيح ومفيش مسافات.',
-            // 'phone.required' => 'رقم الهاتف مطلوب.',
-            // 'address.required' => 'العنوان مطلوب.',
             'password.required' => 'كلمة المرور مطلوبة.',
             'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 حروف.',
             'password.confirmed' => 'كلمة المرور غير مطابقة.',
-            // 'phone.regex' => 'رقم الهاتف يجب أن يتكون من 11 رقم.',
-            // 'phone.numeric' => 'رقم الهاتف يجب أن يحتوي على ارقام فقط.',
         ]);
 
         $validatedData['password'] = bcrypt($request->password);
-        $validatedData['address'] = "";
-        $validatedData['phone'] = "";
+        $validatedData['address'] = '';
+        $validatedData['phone'] = '';
+
         $user = User::create($validatedData);
 
         Auth::login($user, true);

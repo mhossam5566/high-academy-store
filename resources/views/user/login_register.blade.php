@@ -260,7 +260,6 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-content">
-                <!-- Right Side - Welcome Message -->
                 <div class="login-side">
                     <div>
                         <h2>مرحباً بعودتك!</h2>
@@ -274,20 +273,15 @@
                     </div>
                 </div>
 
-                <!-- Left Side - Login Form -->
                 <div class="login-form-side">
                     <div class="login-header">
                         <h3>تسجيل الدخول</h3>
                         <p>أدخل بياناتك للوصول إلى حسابك</p>
                     </div>
 
-                    @if ($errors->any())
+                    @if ($errors->has('general'))
                         <div class="error-messages">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                            {{ $errors->first('general') }}
                         </div>
                     @endif
 
@@ -296,14 +290,28 @@
 
                         <div class="form-group">
                             <label for="email" class="form-label">البريد الإلكتروني</label>
-                            <input type="email" name="email" class="form-control" id="email"
-                                placeholder="example@email.com" value="{{ old('email') }}" required />
+                            <input type="email" name="email" id="email"
+                                class="form-control @error('email') is-invalid @enderror" placeholder="example@email.com"
+                                value="{{ old('email') }}" required />
+
+                            @error('email')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="password" class="form-label">كلمة المرور</label>
-                            <input type="password" name="password" class="form-control" id="password"
-                                placeholder="••••••••" required />
+                            <input type="password" name="password" id="password"
+                                class="form-control @error('password') is-invalid @enderror" placeholder="••••••••"
+                                required />
+
+                            @error('password')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
 
                         <div class="form-group d-flex justify-content-between align-items-center">
