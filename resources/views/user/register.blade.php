@@ -88,6 +88,8 @@
             background: white;
             max-height: 90vh;
             overflow-y: auto;
+            direction: rtl;
+            text-align: right;
         }
 
         .register-form-side::-webkit-scrollbar {
@@ -140,6 +142,8 @@
             transition: all 0.3s ease;
             width: 100%;
             background: #fafafa;
+            direction: rtl;
+            text-align: right;
         }
 
         .form-control:focus {
@@ -154,6 +158,14 @@
             font-size: 0.85rem;
             margin-top: 0.25rem;
             display: block;
+        }
+
+        .register-form-side .invalid-feedback,
+        .register-form-side .text-danger,
+        .register-form-side .error-messages,
+        .register-form-side .alert {
+            direction: rtl;
+            text-align: right;
         }
 
         .submit-btn {
@@ -251,18 +263,14 @@
                 </div>
 
                 <div class="register-form-side" dir="rtl">
-                    <div class="register-header" dir="rtl">
+                    <div class="register-header" >
                         <h3>إنشاء حساب جديد</h3>
                         <p>املأ البيانات التالية لإنشاء حسابك</p>
                     </div>
 
                     @if ($errors->any())
-                        <div class="error-messages">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                        <div class="alert alert-danger" role="alert">
+                            {{ $errors->first() }}
                         </div>
                     @endif
 
