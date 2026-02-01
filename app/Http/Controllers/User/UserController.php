@@ -392,33 +392,34 @@ class UserController extends Controller
 }
 
 
-    public function registerSubmit(Request $request)
-    {
-        $validatedData = $request->validate([
-            'name' => 'string|required',
-            'email' => 'required|unique:users,email|regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
-            'password' => 'min:6|required|confirmed',
-        ], [
-            'name.required' => 'الاسم مطلوب.',
-            'name.string' => 'الاسم مطلوب.',
-            'email.required' => 'البريد الإلكتروني مطلوب.',
-            'email.unique' => 'البريد الإلكتروني مسجل لدينا مسبقاً.',
-            'email.regex' => 'اتاكد ان البريد الإلكتروني صحيح ومفيش مسافات.',
-            'password.required' => 'كلمة المرور مطلوبة.',
-            'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 حروف.',
-            'password.confirmed' => 'كلمة المرور غير مطابقة.',
-        ]);
+   public function registerSubmit(Request $request)
+{
+    $validatedData = $request->validate([
+        'name' => 'required|string',
+        'email' => 'required|unique:users,email|regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
+        'password' => 'required|min:6|confirmed',
+    ], [
+        'name.required' => 'الاسم مطلوب.',
+        'name.string' => 'الاسم يجب أن يكون نص.',
+        'email.required' => 'البريد الإلكتروني مطلوب.',
+        'email.unique' => 'البريد الإلكتروني مسجل لدينا مسبقاً.',
+        'email.regex' => 'تأكد من صحة البريد الإلكتروني وعدم وجود مسافات.',
+        'password.required' => 'كلمة المرور مطلوبة.',
+        'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 حروف.',
+        'password.confirmed' => 'كلمة المرور غير متطابقة.',
+    ]);
 
-        $validatedData['password'] = bcrypt($request->password);
-        $validatedData['address'] = '';
-        $validatedData['phone'] = '';
+    $validatedData['password'] = bcrypt($request->password);
+    $validatedData['address'] = '';
+    $validatedData['phone'] = '';
 
-        $user = User::create($validatedData);
+    $user = User::create($validatedData);
 
-        Auth::login($user, true);
+    Auth::login($user, true);
 
-        return redirect()->route('user.home');
-    }
+    return redirect()->route('user.home');
+}
+
 
     public function register()
     {

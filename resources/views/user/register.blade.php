@@ -237,7 +237,6 @@
     <div class="register-container">
         <div class="register-card">
             <div class="register-content">
-                <!-- Right Side - Welcome Message -->
                 <div class="register-side">
                     <div>
                         <h2>انضم إلينا الآن!</h2>
@@ -251,47 +250,67 @@
                     </div>
                 </div>
 
-                <!-- Left Side - Register Form -->
                 <div class="register-form-side">
                     <div class="register-header">
                         <h3>إنشاء حساب جديد</h3>
                         <p>املأ البيانات التالية لإنشاء حسابك</p>
                     </div>
 
+                    @if ($errors->any())
+                        <div class="error-messages">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form action="{{ route('user.register.submit') }}" method="POST" novalidate>
                         @csrf
 
                         <div class="form-group">
                             <label for="name" class="form-label">الاسم</label>
-                            <input type="text" id="name" name="name" class="form-control"
-                                placeholder="أدخل اسمك الكامل" value="{{ old('name') }}" />
+                            <input type="text" id="name" name="name"
+                                class="form-control @error('name') is-invalid @enderror" placeholder="أدخل اسمك الكامل"
+                                value="{{ old('name') }}" />
+
                             @error('name')
-                                <span class="text-danger">{{ $message }}</span>
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
                             @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="email" class="form-label">البريد الإلكتروني</label>
-                            <input type="email" name="email" class="form-control" id="email"
-                                placeholder="example@email.com" value="{{ old('email') }}" />
+                            <input type="email" name="email" id="email"
+                                class="form-control @error('email') is-invalid @enderror" placeholder="example@email.com"
+                                value="{{ old('email') }}" />
+
                             @error('email')
-                                <span class="text-danger">{{ $message }}</span>
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
                             @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="password" class="form-label">كلمة المرور</label>
-                            <input type="password" name="password" class="form-control" id="password"
-                                placeholder="••••••••" />
+                            <input type="password" name="password" id="password"
+                                class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" />
+
                             @error('password')
-                                <span class="text-danger">{{ $message }}</span>
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
                             @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="password_confirmation" class="form-label">تأكيد كلمة المرور</label>
-                            <input type="password" name="password_confirmation" class="form-control"
-                                id="password_confirmation" placeholder="••••••••" />
+                            <input type="password" name="password_confirmation" id="password_confirmation"
+                                class="form-control" placeholder="••••••••" />
                         </div>
 
                         <button type="submit" class="submit-btn">
@@ -302,4 +321,5 @@
             </div>
         </div>
     </div>
+
 @endsection
