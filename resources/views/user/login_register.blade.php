@@ -41,7 +41,7 @@
         }
 
         .login-side {
-            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            background: linear-gradient(135deg, #34495e 0%, #e89238 100%);
             padding: 3rem;
             display: flex;
             flex-direction: column;
