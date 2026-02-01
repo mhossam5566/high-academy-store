@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\User;
 use App\Models\Admin;
 use App\Models\MiniAdmin;
-use App\Models\User;
 
 return [
 
@@ -117,7 +117,7 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'password_resets',
-            'expire' => 60,
+            'expire' => 300000,
             'throttle' => 60,
         ],
 
