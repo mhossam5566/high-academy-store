@@ -8,12 +8,12 @@
     <style>
         :root {
             --primary-color: #e89238;
-            --primary-hover: #e89238;
-            --accent-color: #3498db;
-            --text-dark: #e89238;
+            --primary-hover: #d67e1f;
+            --primary-light: #f5a957;
+            --text-dark: #2d3748;
             --text-muted: #718096;
             --border-color: #e2e8f0;
-            --bg-light: #f7fafc;
+            --bg-light: #fafafa;
         }
 
         .login-container {
@@ -21,14 +21,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #e0e7ef 0%, #f0f4f8 100%);
+            background: linear-gradient(135deg, #fff5eb 0%, #ffffff 100%);
             padding: 2rem 0;
         }
 
         .login-card {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 40px rgba(232, 146, 56, 0.1);
             overflow: hidden;
             max-width: 1000px;
             width: 90%;
@@ -41,7 +41,7 @@
         }
 
         .login-side {
-            background: linear-gradient(135deg, #34495e 0%, #e89238 100%);
+            background: linear-gradient(135deg, #f5a957 0%, #e89238 100%);
             padding: 3rem;
             display: flex;
             flex-direction: column;
@@ -59,14 +59,14 @@
 
         .login-side p {
             font-size: 1rem;
-            opacity: 0.9;
+            opacity: 0.95;
             margin-bottom: 2rem;
             line-height: 1.6;
         }
 
         .register-btn {
             background: white;
-            color: #2c3e50;
+            color: #e89238;
             padding: 0.75rem 2rem;
             border-radius: 50px;
             text-decoration: none;
@@ -78,11 +78,13 @@
         .register-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            color: #1a252f;
+            color: #d67e1f;
+            background: #fffbf7;
         }
 
         .login-form-side {
             padding: 3rem;
+            background: white;
         }
 
         .login-header {
@@ -124,8 +126,8 @@
         }
 
         .form-control:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            border-color: #e89238;
+            box-shadow: 0 0 0 3px rgba(232, 146, 56, 0.1);
             outline: none;
             background: white;
         }
@@ -140,6 +142,7 @@
             width: 18px;
             height: 18px;
             cursor: pointer;
+            accent-color: #e89238;
         }
 
         .form-check-label {
@@ -149,7 +152,7 @@
         }
 
         .forgot-password {
-            color: #3498db;
+            color: #e89238;
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
@@ -157,12 +160,12 @@
         }
 
         .forgot-password:hover {
-            color: #2980b9;
+            color: #d67e1f;
             text-decoration: underline;
         }
 
         .submit-btn {
-            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            background: linear-gradient(135deg, #f5a957 0%, #e89238 100%);
             color: white;
             border: none;
             padding: 0.875rem;
@@ -177,7 +180,8 @@
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(44, 62, 80, 0.3);
+            box-shadow: 0 10px 25px rgba(232, 146, 56, 0.3);
+            background: linear-gradient(135deg, #e89238 0%, #d67e1f 100%);
         }
 
         .divider {
@@ -192,12 +196,13 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: var(--border-color);
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .divider span {
-            color: var(--text-muted);
+            color: white;
             font-size: 0.85rem;
+            opacity: 0.9;
         }
 
         .error-messages {
