@@ -86,6 +86,8 @@
         .login-form-side {
             padding: 3rem;
             background: white;
+            direction: rtl;
+            text-align: right;
         }
 
         .login-header {
@@ -124,6 +126,8 @@
             transition: all 0.3s ease;
             width: 100%;
             background: #fafafa;
+            direction: rtl;
+            text-align: right;
         }
 
         .form-control:focus {
@@ -219,6 +223,13 @@
             padding-right: 1.25rem;
             color: #c53030;
             font-size: 0.9rem;
+        }
+
+        .login-form-side .invalid-feedback,
+        .login-form-side .error-messages,
+        .login-form-side .alert {
+            direction: rtl;
+            text-align: right;
         }
 
         @media (max-width: 768px) {
