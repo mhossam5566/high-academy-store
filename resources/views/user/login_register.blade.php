@@ -6,81 +6,128 @@
 
 @section('content')
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary-color: #2c3e50;
+            --primary-hover: #1a252f;
+            --accent-color: #3498db;
+            --text-dark: #2d3748;
+            --text-muted: #718096;
+            --border-color: #e2e8f0;
+            --bg-light: #f7fafc;
         }
 
-        .login-wrapper {
+        .login-container {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f5f5f5;
-            padding: 2rem 1rem;
+            background: linear-gradient(135deg, #e0e7ef 0%, #f0f4f8 100%);
+            padding: 2rem 0;
         }
 
-        .login-container {
+        .login-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            max-width: 450px;
-            width: 100%;
-            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 90%;
+        }
+
+        .login-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .login-side {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+
+        .login-side h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .login-side p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .register-btn {
+            background: white;
+            color: #2c3e50;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            color: #1a252f;
+        }
+
+        .login-form-side {
+            padding: 3rem;
         }
 
         .login-header {
-            text-align: center;
             margin-bottom: 2rem;
         }
 
-        .login-header h2 {
+        .login-header h3 {
             font-size: 1.75rem;
-            font-weight: 600;
-            color: #2d3748;
+            font-weight: 700;
+            color: var(--text-dark);
             margin-bottom: 0.5rem;
         }
 
         .login-header p {
-            color: #718096;
+            color: var(--text-muted);
             font-size: 0.95rem;
         }
 
         .form-group {
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-label {
-            display: block;
-            font-weight: 500;
-            color: #4a5568;
+            font-weight: 600;
+            color: #374151;
             margin-bottom: 0.5rem;
+            display: block;
             font-size: 0.9rem;
         }
 
         .form-control {
-            width: 100%;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
             padding: 0.75rem 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
             font-size: 0.95rem;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            width: 100%;
             background: #fafafa;
         }
 
         .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
             outline: none;
-            border-color: #cbd5e0;
             background: white;
-            box-shadow: 0 0 0 3px rgba(203, 213, 224, 0.1);
-        }
-
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
         }
 
         .form-check {
@@ -90,43 +137,47 @@
         }
 
         .form-check-input {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
         }
 
         .form-check-label {
-            color: #4a5568;
+            color: var(--text-muted);
             font-size: 0.9rem;
             cursor: pointer;
         }
 
-        .forgot-link {
-            color: #4a5568;
+        .forgot-password {
+            color: #3498db;
             text-decoration: none;
             font-size: 0.9rem;
-            transition: color 0.2s ease;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
 
-        .forgot-link:hover {
-            color: #2d3748;
+        .forgot-password:hover {
+            color: #2980b9;
+            text-decoration: underline;
         }
 
         .submit-btn {
-            width: 100%;
-            padding: 0.875rem;
-            background: #2d3748;
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            padding: 0.875rem;
+            border-radius: 10px;
+            font-weight: 600;
             font-size: 1rem;
-            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
         }
 
         .submit-btn:hover {
-            background: #1a202c;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(44, 62, 80, 0.3);
         }
 
         .divider {
@@ -141,44 +192,18 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: #e2e8f0;
+            background: var(--border-color);
         }
 
         .divider span {
-            color: #a0aec0;
+            color: var(--text-muted);
             font-size: 0.85rem;
-        }
-
-        .register-section {
-            text-align: center;
-        }
-
-        .register-section p {
-            color: #718096;
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .register-link {
-            display: inline-block;
-            color: #2d3748;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1.5rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .register-link:hover {
-            background: #f7fafc;
-            border-color: #cbd5e0;
         }
 
         .error-messages {
             background: #fff5f5;
             border: 1px solid #feb2b2;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 1rem;
             margin-bottom: 1.5rem;
         }
@@ -188,82 +213,110 @@
             padding-right: 1.25rem;
             color: #c53030;
             font-size: 0.9rem;
-            list-style: arabic-indic;
         }
 
-        .error-messages li {
-            margin-bottom: 0.25rem;
-        }
-
-        @media (max-width: 576px) {
-            .login-container {
-                padding: 2rem 1.5rem;
+        @media (max-width: 768px) {
+            .login-content {
+                grid-template-columns: 1fr;
             }
 
-            .login-header h2 {
+            .login-side {
+                padding: 2rem;
+            }
+
+            .login-form-side {
+                padding: 2rem;
+            }
+
+            .login-side h2 {
                 font-size: 1.5rem;
             }
         }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card {
+            animation: fadeInUp 0.6s ease;
+        }
     </style>
 
-    <div class="login-wrapper">
-        <div class="login-container">
-            <div class="login-header">
-                <h2>تسجيل الدخول</h2>
-                <p>أدخل بياناتك للوصول إلى حسابك</p>
-            </div>
-
-            @if ($errors->any())
-                <div class="error-messages">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form action="{{ route('user.login.submit') }}" method="post">
-                @csrf
-
-                <div class="form-group">
-                    <label for="email" class="form-label">البريد الإلكتروني</label>
-                    <input type="email" name="email" class="form-control" id="email" placeholder="example@email.com"
-                        value="{{ old('email') }}" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="password" class="form-label">كلمة المرور</label>
-                    <input type="password" name="password" class="form-control" id="password" placeholder="••••••••"
-                        required />
-                </div>
-
-                <div class="form-options">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="remember" id="remember" checked />
-                        <label class="form-check-label" for="remember">
-                            تذكرني
-                        </label>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-content">
+                <!-- Right Side - Welcome Message -->
+                <div class="login-side">
+                    <div>
+                        <h2>مرحباً بعودتك!</h2>
+                        <p>نحن سعداء برؤيتك مرة أخرى. قم بتسجيل الدخول للوصول إلى حسابك والاستمتاع بخدماتنا</p>
+                        <div class="divider">
+                            <span>ليس لديك حساب؟</span>
+                        </div>
+                        <a href="{{ route('user.register.user') }}" class="register-btn">
+                            إنشاء حساب جديد
+                        </a>
                     </div>
-                    <a href="{{ route('password.request') }}" class="forgot-link">
-                        نسيت كلمة المرور؟
-                    </a>
                 </div>
 
-                <button type="submit" class="submit-btn">
-                    تسجيل الدخول
-                </button>
-            </form>
+                <!-- Left Side - Login Form -->
+                <div class="login-form-side">
+                    <div class="login-header">
+                        <h3>تسجيل الدخول</h3>
+                        <p>أدخل بياناتك للوصول إلى حسابك</p>
+                    </div>
 
-            <div class="divider">
-                <span>أو</span>
-            </div>
+                    @if ($errors->any())
+                        <div class="error-messages">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-            <div class="register-section">
-                <p>ليس لديك حساب؟</p>
-                <a href="{{ route('user.register.user') }}" class="register-link">
-                    إنشاء حساب جديد
-                </a>
+                    <form action="{{ route('user.login.submit') }}" method="post">
+                        @csrf
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">البريد الإلكتروني</label>
+                            <input type="email" name="email" class="form-control" id="email"
+                                placeholder="example@email.com" value="{{ old('email') }}" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">كلمة المرور</label>
+                            <input type="password" name="password" class="form-control" id="password"
+                                placeholder="••••••••" required />
+                        </div>
+
+                        <div class="form-group d-flex justify-content-between align-items-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="remember" id="remember" checked />
+                                <label class="form-check-label" for="remember">
+                                    تذكرني
+                                </label>
+                            </div>
+                            <a href="{{ route('password.request') }}" class="forgot-password">
+                                نسيت كلمة المرور؟
+                            </a>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            تسجيل الدخول
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
