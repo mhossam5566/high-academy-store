@@ -7,10 +7,10 @@
 @section('content')
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --primary-hover: #1a252f;
+            --primary-color: #e89238;
+            --primary-hover: #e89238;
             --accent-color: #3498db;
-            --text-dark: #2d3748;
+            --text-dark: #e89238;
             --text-muted: #718096;
             --border-color: #e2e8f0;
             --bg-light: #f7fafc;
