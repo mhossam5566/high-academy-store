@@ -251,7 +251,7 @@
                 </div>
 
                 <div class="register-form-side" dir="rtl">
-                    <div class="register-header">
+                    <div class="register-header" dir="rtl">
                         <h3>إنشاء حساب جديد</h3>
                         <p>املأ البيانات التالية لإنشاء حسابك</p>
                     </div>
