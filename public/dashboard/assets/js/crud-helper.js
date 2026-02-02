@@ -26,7 +26,11 @@ window.CRUDHelper = {
                 ajax: this.config.ajaxUrl,
                 columns: this.config.columns,
                 responsive: false,
-                order: this.config.order || [[0, 'desc']]
+                scrollX: true,
+                order: this.config.order || [[0, 'desc']],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json'
+                }
             });
         },
 
