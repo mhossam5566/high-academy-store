@@ -73,10 +73,6 @@
                     name: 'details',
                     orderable: false,
                     searchable: false
-            datatableOptions: {
-                // order by first column (ID) desc to show newest first
-                order: [[0, 'desc']]
-            }
                 }
             ]
         });
