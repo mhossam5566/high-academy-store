@@ -45,6 +45,7 @@ class VoucherOrderController extends Controller
         // ترتيب النتائج حسب id
         $voucherOrders = $query->orderBy('created_at', 'DESC')->get();
 
+        return  $voucherOrders;
         logger($voucherOrders);
 
         return DataTables::of($voucherOrders)
