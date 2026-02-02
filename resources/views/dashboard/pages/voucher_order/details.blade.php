@@ -195,7 +195,7 @@
                                                 </td>
                                                 <td>
                                                     @if ($voucher->image)
-                                                        <img src="{{ $voucher->image_path }}" alt="صورة الكود"
+                                                        <img src="{{ $voucher->image_path  }}" alt="صورة الكود"
                                                             class="img-thumbnail" style="max-width: 100px;">
                                                     @else
                                                         <span class="text-muted">لا توجد صورة</span>
