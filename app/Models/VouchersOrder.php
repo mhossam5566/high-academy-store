@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class VouchersOrder extends Model
 {
     use HasFactory;
-    protected $fillable=[
+    protected $fillable = [
         "coupon_id",
         "user_id",
         "user_name",

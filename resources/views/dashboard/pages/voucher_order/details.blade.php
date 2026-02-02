@@ -27,20 +27,41 @@
             <div class="card mb-4">
                 <h5 class="card-header">الكوبون المطلوب</h5>
                 <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>الكوبون</th>
-                                <th>السعر</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ $coupon->name }}</td>
-                                <td>{{ $coupon->price }} جنيه</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="row">
+                        <div class="col-md-4">
+                            @if ($coupon->image)
+                                <img src="{{ asset('images/coupon/') . '/' . $coupon->image }}" alt="صورة الكوبون"
+                                    class="img-fluid rounded">
+                            @else
+                                <div class="bg-light p-4 text-center rounded">
+                                    <i class="ti ti-photo-x text-muted" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mt-2">لا توجد صورة</p>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="col-md-8">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th width="30%">اسم الكوبون</th>
+                                        <td>{{ $coupon->name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>سعر الكوبون</th>
+                                        <td>{{ $coupon->price }} جنيه</td>
+                                    </tr>
+                                    <tr>
+                                        <th>عدد الأكواد المتاحة</th>
+                                        <td>{{ $coupon->vouchers()->where('state', 'available')->count() }} كود</td>
+                                    </tr>
+                                    <tr>
+                                        <th>إجمالي الأكواد</th>
+                                        <td>{{ $coupon->vouchers()->count() }} كود</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -137,6 +158,61 @@
                     <div class="card-body text-center">
                         <button class="btn btn-success me-2 confirmorder">تأكيد الطلب</button>
                         <button class="btn btn-danger deleteorder">رفض الطلب</button>
+                    </div>
+                </div>
+            @endif
+
+            @if ($order->state == 'success')
+                <div class="card">
+                    <h5 class="card-header text-success">أكواد الكوبون المرسلة</h5>
+                    <div class="card-body">
+                        @php
+                            $userVouchers = App\Models\Voucher::where('coupon_id', $coupon->id)
+                                ->where('user_name', $order->user_name)
+                                ->where('user_phone', $order->user_phone)
+                                ->where('state', 'used')
+                                ->take($order->quantity)
+                                ->get();
+                        @endphp
+                        
+                        @if ($userVouchers->count() > 0)
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>الكود</th>
+                                            <th>صورة الكود</th>
+                                            <th>تاريخ الإرسال</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($userVouchers as $index => $voucher)
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>
+                                                    <code class="bg-primary text-white p-2 rounded">{{ $voucher->code }}</code>
+                                                </td>
+                                                <td>
+                                                    @if ($voucher->image)
+                                                        <img src="{{ asset('images/voucher/') . '/' . $voucher->image }}" 
+                                                            alt="صورة الكود" class="img-thumbnail" style="max-width: 100px;">
+                                                    @else
+                                                        <span class="text-muted">لا توجد صورة</span>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $voucher->updated_at }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="alert alert-warning">
+                                <i class="ti ti-alert-triangle me-2"></i>
+                                لم يتم العثور على أكواد مرسلة لهذا العميل
+                            </div>
+                        @endif
                     </div>
                 </div>
             @endif
