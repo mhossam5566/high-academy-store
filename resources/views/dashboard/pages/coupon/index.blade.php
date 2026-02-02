@@ -4,8 +4,6 @@
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('dashboard/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}">
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.css') }}">
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/toastr/toastr.css') }}">
 @endsection
@@ -26,7 +24,7 @@
 
     <div class="card">
         <div class="card-datatable table-responsive">
-            <table class="table" id="coupons-table">
+            <table class="table table-hover" id="voucher-orders-table" dir="rtl">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -46,6 +44,7 @@
     <script>
         CRUDHelper.init({
             tableSelector: '#coupons-table',
+
             ajaxUrl: '{{ route('dashboard.coupons.datatable') }}',
             columns: [{
                     data: 'id',
