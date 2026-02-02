@@ -43,7 +43,7 @@ class VoucherOrderController extends Controller
         }
 
         // ترتيب النتائج حسب id
-        $voucherOrders = $query->orderBy('id', 'ASC')->get();
+        $voucherOrders = $query->orderBy('created_at', 'DESC')->get();
 
         logger($voucherOrders);
 
