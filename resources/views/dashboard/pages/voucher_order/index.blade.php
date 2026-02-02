@@ -7,75 +7,54 @@
     <link rel="stylesheet"
         href="{{ asset('dashboard/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}">
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.css') }}">
-    <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/toastr/toastr.css') }}">
 @endsection
 
 @section('vendor-script')
     <script src="{{ asset('dashboard/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
-    <script src="{{ asset('dashboard/assets/vendor/libs/toastr/toastr.js') }}"></script>
 @endsection
 
 @section('page-script')
     <script>
-        CRUDHelper.init({
-            tableSelector: '#voucher-orders-table',
-            ajaxUrl: '{{ route('dashboard.voucher_order.datatable') }}',
-            ajaxData: function(d) {
-                d.state = "{{ request()->query('state') ?? '' }}";
-            },
-            order: [[0, 'desc']],
-            columns: [{
-                    data: 'id',
-                    name: 'id'
+        $(document).ready(function() {
+            let stateFilterValue = "{{ request()->query('state') ?? '' }}";
+
+            const table = $('#voucher-orders-table').DataTable({
+                lengthMenu: [
+                    [10, 25, 50, 100, 200, -1],
+                    [10, 25, 50, 100, 200, "الكل"]
+                ],
+                paging: true,
+                pageLength: 10,
+                stateSave: true,
+                stateDuration: -1,
+                scrollX: true,
+                processing: true,
+                serverSide: true,
+                order: [[0, 'desc']],
+                ajax: {
+                    url: "{{ route('dashboard.voucher_order.datatable') }}",
+                    data: d => {
+                        d.state = stateFilterValue;
+                    }
                 },
-                {
-                    data: 'customer_name',
-                    name: 'customer_name'
-                },
-                {
-                    data: 'customer_email',
-                    name: 'customer_email'
-                },
-                {
-                    data: 'customer_phone',
-                    name: 'customer_phone'
-                },
-                {
-                    data: 'coupon',
-                    name: 'coupon'
-                },
-                {
-                    data: 'quantity',
-                    name: 'quantity'
-                },
-                {
-                    data: 'method',
-                    name: 'method'
-                },
-                {
-                    data: 'account',
-                    name: 'account'
-                },
-                {
-                    data: 'image',
-                    name: 'image',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'state',
-                    name: 'state',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'details',
-                    name: 'details',
-                    orderable: false,
-                    searchable: false
+                columns: [
+                    { data: 'id', name: 'id' },
+                    { data: 'customer_name', name: 'customer_name' },
+                    { data: 'customer_email', name: 'customer_email' },
+                    { data: 'customer_phone', name: 'customer_phone' },
+                    { data: 'coupon', name: 'coupon' },
+                    { data: 'quantity', name: 'quantity' },
+                    { data: 'method', name: 'method' },
+                    { data: 'account', name: 'account' },
+                    { data: 'image', name: 'image', orderable: false, searchable: false },
+                    { data: 'state', name: 'state', orderable: false, searchable: false },
+                    { data: 'details', name: 'details', orderable: false, searchable: false }
+                ],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json'
                 }
-            ]
+            });
         });
     </script>
 @endsection
@@ -111,9 +90,8 @@
     </div>
 
     <div class="card">
-        <h5 class="card-header">جدول طلبات الكوبونات</h5>
-        <div class="card-datatable text-nowrap">
-            <table class="datatables-ajax table" id="voucher-orders-table">
+        <div class="card-datatable table-responsive">
+            <table class="table table-hover" id="voucher-orders-table" dir="rtl">
                 <thead>
                     <tr>
                         <th>#</th>
