@@ -73,13 +73,12 @@
                     name: 'details',
                     orderable: false,
                     searchable: false
+            datatableOptions: {
+                // order by first column (ID) desc to show newest first
+                order: [[0, 'desc']]
+            }
                 }
             ]
-            ,
-            datatableOptions: {
-                responsive: false,
-                scrollX: true
-            }
         });
     </script>
 @endsection
@@ -116,7 +115,7 @@
 
     <div class="card">
         <h5 class="card-header">جدول طلبات الكوبونات</h5>
-        <div class="card-datatable">
+        <div class="card-datatable table-responsive">
             <table class="datatables-ajax table dataTable" id="voucher-orders-table">
                 <thead>
                     <tr>
