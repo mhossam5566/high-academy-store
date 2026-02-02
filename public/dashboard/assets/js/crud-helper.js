@@ -25,7 +25,7 @@ window.CRUDHelper = {
                 serverSide: true,
                 ajax: this.config.ajaxUrl,
                 columns: this.config.columns,
-                responsive: true,
+                responsive: false,
             });
         },
 
