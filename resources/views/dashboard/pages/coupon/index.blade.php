@@ -24,7 +24,7 @@
 
     <div class="card">
         <div class="card-datatable table-responsive">
-            <table class="table table-hover" id="coupons-table" dir="rtl">
+            <table class="table table-hover" id="coupons-table" dir="rtl" style="width: 100%">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -53,19 +53,40 @@
                 stateSave: true,
                 stateDuration: -1,
                 scrollX: true,
+                autoWidth: false,
                 processing: true,
                 serverSide: true,
-                order: [[0, 'desc']],
+                order: [
+                    [0, 'desc']
+                ],
                 ajax: {
                     url: "{{ route('dashboard.coupons.datatable') }}"
                 },
-                columns: [
-                    { data: 'id', name: 'id' },
-                    { data: 'name', name: 'name' },
-                    { data: 'price', name: 'price' },
-                    { data: 'image', name: 'image' },
-                    { data: 'count', name: 'count' },
-                    { data: 'operation', name: 'operation', orderable: false }
+                columns: [{
+                        data: 'id',
+                        name: 'id'
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'price',
+                        name: 'price'
+                    },
+                    {
+                        data: 'image',
+                        name: 'image'
+                    },
+                    {
+                        data: 'count',
+                        name: 'count'
+                    },
+                    {
+                        data: 'operation',
+                        name: 'operation',
+                        orderable: false
+                    }
                 ],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json'
@@ -93,11 +114,16 @@
                         $btn.html('<span class="spinner-border spinner-border-sm"></span>');
 
                         $.ajax({
-                            url: "{{ route('dashboard.coupons.destroy') }}".replace(':id', id),
+                            url: "{{ route('dashboard.coupons.destroy') }}".replace(':id',
+                                id),
                             type: 'DELETE',
-                            data: { _token: $('meta[name="csrf-token"]').attr('content'), id: id },
+                            data: {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                id: id
+                            },
                             success: function() {
-                                Swal.fire('تم الحذف!', 'تم حذف العنصر بنجاح.', 'success');
+                                Swal.fire('تم الحذف!', 'تم حذف العنصر بنجاح.',
+                                    'success');
                                 table.ajax.reload();
                             },
                             error: function() {
