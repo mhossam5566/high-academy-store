@@ -24,7 +24,7 @@
 
     <div class="card">
         <div class="card-datatable table-responsive">
-            <table class="table table-hover" id="voucher-orders-table" dir="rtl">
+            <table class="table table-hover" id="coupons-table" dir="rtl">
                 <thead>
                     <tr>
                         <th>#</th>
