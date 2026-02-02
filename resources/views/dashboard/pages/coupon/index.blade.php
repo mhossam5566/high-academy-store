@@ -24,7 +24,7 @@
 
     <div class="card">
         <div class="card-datatable table-responsive">
-            <table class="table table-hover" id="coupons-table" dir="rtl" style="width: 100%">
+            <table class="table table-hover text-nowrap" id="coupons-table" dir="rtl" style="width: 100%">
                 <thead>
                     <tr>
                         <th>#</th>
