@@ -31,25 +31,65 @@
                 scrollX: true,
                 processing: true,
                 serverSide: true,
-                order: [[0, 'desc']],
+                order: [
+                    [0, 'desc']
+                ],
                 ajax: {
                     url: "{{ route('dashboard.voucher_order.datatable') }}",
                     data: d => {
                         d.state = stateFilterValue;
                     }
                 },
-                columns: [
-                    { data: 'id', name: 'id' },
-                    { data: 'customer_name', name: 'customer_name' },
-                    { data: 'customer_email', name: 'customer_email' },
-                    { data: 'customer_phone', name: 'customer_phone' },
-                    { data: 'coupon', name: 'coupon' },
-                    { data: 'quantity', name: 'quantity' },
-                    { data: 'method', name: 'method' },
-                    { data: 'account', name: 'account' },
-                    { data: 'image', name: 'image', orderable: false, searchable: false },
-                    { data: 'state', name: 'state', orderable: false, searchable: false },
-                    { data: 'details', name: 'details', orderable: false, searchable: false }
+                columns: [{
+                        data: 'id',
+                        name: 'id'
+                    },
+                    {
+                        data: 'customer_name',
+                        name: 'customer_name'
+                    },
+                    {
+                        data: 'customer_email',
+                        name: 'customer_email'
+                    },
+                    {
+                        data: 'customer_phone',
+                        name: 'customer_phone'
+                    },
+                    {
+                        data: 'coupon',
+                        name: 'coupon'
+                    },
+                    {
+                        data: 'quantity',
+                        name: 'quantity'
+                    },
+                    {
+                        data: 'method',
+                        name: 'method'
+                    },
+                    {
+                        data: 'account',
+                        name: 'account'
+                    },
+                    {
+                        data: 'image',
+                        name: 'image',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'state',
+                        name: 'state',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'details',
+                        name: 'details',
+                        orderable: false,
+                        searchable: false
+                    }
                 ],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json'
