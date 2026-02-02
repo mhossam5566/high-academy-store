@@ -1,4 +1,4 @@
-﻿@extends('dashboard.layouts.layoutMaster')
+@extends('dashboard.layouts.layoutMaster')
 
 @section('title', 'تفاصيل طلب الكوبون')
 
@@ -30,8 +30,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             @if ($coupon->image)
-                                <img src="{{ asset('images/coupon/') . '/' . $coupon->image }}" alt="صورة الكوبون"
-                                    class="img-fluid rounded">
+                                <img src="{{ $coupon->image_path }}" alt="صورة الكوبون" class="img-fluid rounded">
                             @else
                                 <div class="bg-light p-4 text-center rounded">
                                     <i class="ti ti-photo-x text-muted" style="font-size: 3rem;"></i>
@@ -195,7 +194,7 @@
                                                 </td>
                                                 <td>
                                                     @if ($voucher->image)
-                                                        <img src="{{ $voucher->image_path  }}" alt="صورة الكود"
+                                                        <img src="{{ $voucher->image_path }}" alt="صورة الكود"
                                                             class="img-thumbnail" style="max-width: 100px;">
                                                     @else
                                                         <span class="text-muted">لا توجد صورة</span>
