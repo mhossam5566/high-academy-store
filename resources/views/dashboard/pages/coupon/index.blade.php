@@ -42,40 +42,75 @@
 
 @section('page-script')
     <script>
-        CRUDHelper.init({
-            tableSelector: '#coupons-table',
-
-            ajaxUrl: '{{ route('dashboard.coupons.datatable') }}',
-            columns: [{
-                    data: 'id',
-                    name: 'id'
+        $(document).ready(function() {
+            const table = $('#coupons-table').DataTable({
+                lengthMenu: [
+                    [10, 25, 50, 100, 200, -1],
+                    [10, 25, 50, 100, 200, "الكل"]
+                ],
+                paging: true,
+                pageLength: 10,
+                stateSave: true,
+                stateDuration: -1,
+                scrollX: true,
+                processing: true,
+                serverSide: true,
+                order: [[0, 'desc']],
+                ajax: {
+                    url: "{{ route('dashboard.coupons.datatable') }}"
                 },
-                {
-                    data: 'name',
-                    name: 'name'
-                },
-                {
-                    data: 'price',
-                    name: 'price'
-                },
-                {
-                    data: 'image',
-                    name: 'image'
-                },
-                {
-                    data: 'count',
-                    name: 'count'
-                },
-                {
-                    data: 'operation',
-                    name: 'operation',
-                    orderable: false
+                columns: [
+                    { data: 'id', name: 'id' },
+                    { data: 'name', name: 'name' },
+                    { data: 'price', name: 'price' },
+                    { data: 'image', name: 'image' },
+                    { data: 'count', name: 'count' },
+                    { data: 'operation', name: 'operation', orderable: false }
+                ],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json'
                 }
-            ],
-            delete: {
-                selector: '.delete_btn',
-                url: '{{ route('dashboard.coupons.destroy') }}'
-            }
+            });
+
+            // Delete button handler
+            $(document).on('click', '.delete_btn', function(e) {
+                e.preventDefault();
+                let $btn = $(this);
+                let id = $btn.data('id');
+                let originalHtml = $btn.html();
+
+                Swal.fire({
+                    title: 'هل أنت متأكد؟',
+                    text: 'لن تتمكن من التراجع عن هذا!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'نعم، احذف!',
+                    cancelButtonText: 'إلغاء',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $btn.prop('disabled', true);
+                        $btn.html('<span class="spinner-border spinner-border-sm"></span>');
+
+                        $.ajax({
+                            url: "{{ route('dashboard.coupons.destroy') }}".replace(':id', id),
+                            type: 'DELETE',
+                            data: { _token: $('meta[name="csrf-token"]').attr('content'), id: id },
+                            success: function() {
+                                Swal.fire('تم الحذف!', 'تم حذف العنصر بنجاح.', 'success');
+                                table.ajax.reload();
+                            },
+                            error: function() {
+                                Swal.fire('خطأ!', 'حدث خطأ أثناء الحذف.', 'error');
+                            },
+                            complete: function() {
+                                $btn.prop('disabled', false);
+                                $btn.html(originalHtml);
+                            }
+                        });
+                    }
+                });
+            });
         });
     </script>
 @endsection
