@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Mail\successCoupon;
-use Illuminate\Support\Facades\Mail;
-use App\Models\Voucher;
-use App\Models\VouchersOrder;
-use App\Models\Coupon;
+use Mpdf\Mpdf;
 use App\Models\User;
+use App\Models\Coupon;
+use App\Models\Product;
+use App\Models\Voucher;
 use App\Traits\ImageTrait;
+use App\Mail\successCoupon;
 use App\Traits\DeleteTrait;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
+use App\Models\VouchersOrder;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Models\Product;
+use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\Facades\DataTables;
-use Mpdf\Mpdf;
 
 class VoucherOrderController extends Controller
 {
@@ -43,7 +43,7 @@ class VoucherOrderController extends Controller
         }
 
         // ترتيب النتائج حسب id
-        $voucherOrders = $query->orderBy('id', 'DESC')->get();
+        $voucherOrders = $query->orderBy('id', 'ASC')->get();
 
         logger($voucherOrders);
 
