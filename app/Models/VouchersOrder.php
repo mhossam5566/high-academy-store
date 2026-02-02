@@ -21,4 +21,9 @@ class VouchersOrder extends Model
         "image",
         "account"
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -57,18 +57,41 @@
                 autoWidth: false,
                 processing: true,
                 serverSide: true,
-                order: [[0, 'desc']],
+                order: [
+                    [0, 'desc']
+                ],
                 ajax: {
                     url: "{{ route('dashboard.vouchers.datatable', $coupon->id) }}"
                 },
-                columns: [
-                    { data: 'id', name: 'id' },
-                    { data: 'code', name: 'code' },
-                    { data: 'image', name: 'image' },
-                    { data: 'user_name', name: 'user_name' },
-                    { data: 'user_phone', name: 'user_phone' },
-                    { data: 'state', name: 'state' },
-                    { data: 'operation', name: 'operation', orderable: false }
+                columns: [{
+                        data: 'id',
+                        name: 'id'
+                    },
+                    {
+                        data: 'code',
+                        name: 'code'
+                    },
+                    {
+                        data: 'image',
+                        name: 'image'
+                    },
+                    {
+                        data: 'user_name',
+                        name: 'user_name'
+                    },
+                    {
+                        data: 'user_phone',
+                        name: 'user_phone'
+                    },
+                    {
+                        data: 'state',
+                        name: 'state'
+                    },
+                    {
+                        data: 'operation',
+                        name: 'operation',
+                        orderable: false
+                    }
                 ],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json'
@@ -103,7 +126,8 @@
                                 id: id
                             },
                             success: function() {
-                                Swal.fire('تم الحذف!', 'تم حذف العنصر بنجاح.', 'success');
+                                Swal.fire('تم الحذف!', 'تم حذف العنصر بنجاح.',
+                                    'success');
                                 table.ajax.reload();
                             },
                             error: function() {

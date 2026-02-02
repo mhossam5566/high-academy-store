@@ -58,7 +58,13 @@ class VoucherOrderController extends Controller
                 return $row->user_email ?? $row->user->email ?? 'غير متوفر';
             })
             ->addColumn('customer_phone', function ($row) {
-                return $row->user_phone ?? $row->user->phone ?? 'غير متوفر';
+                if (!empty($row->user_phone)) {
+                    return $row->user_phone;
+                }
+                if ($row->user && !empty($row->user->phone)) {
+                    return $row->user->phone;
+                }
+                return 'غير متوفر';
             })
             ->addColumn('details', function ($row) {
                 $details = '<a href="' . route('dashboard.voucher_order.details', $row->id) . '" type="button" class="btn btn-lg btn-block btn-success lift text-uppercase p-3 ">تفاصيل</a>';
