@@ -52,7 +52,7 @@
                                     </tr>
                                     <tr>
                                         <th>عدد الأكواد المتاحة</th>
-                                        <td>{{ $coupon->vouchers()->where('state', 'available')->count() }} كود</td>
+                                        <td>{{ $coupon->vouchers()->where('is_used', 0)->count() }} كود</td>
                                     </tr>
                                     <tr>
                                         <th>إجمالي الأكواد</th>
@@ -168,9 +168,8 @@
                     <div class="card-body">
                         @php
                             $userVouchers = App\Models\Voucher::where('coupon_id', $coupon->id)
-                                ->where('user_name', $order->user_name)
-                                ->where('user_phone', $order->user_phone)
-                                ->where('state', 'used')
+                                ->where('user_id', $order->user_id)
+                                ->where('is_used', 1)
                                 ->take($order->quantity)
                                 ->get();
                         @endphp
