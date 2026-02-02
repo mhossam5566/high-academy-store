@@ -75,6 +75,11 @@
                     searchable: false
                 }
             ]
+            ,
+            datatableOptions: {
+                responsive: false,
+                scrollX: true
+            }
         });
     </script>
 @endsection
@@ -111,7 +116,7 @@
 
     <div class="card">
         <h5 class="card-header">جدول طلبات الكوبونات</h5>
-        <div class="card-datatable table-responsive">
+        <div class="card-datatable">
             <table class="datatables-ajax table dataTable" id="voucher-orders-table">
                 <thead>
                     <tr>

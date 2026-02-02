@@ -20,13 +20,17 @@ window.CRUDHelper = {
 
     prototype: {
         initDataTable: function () {
-            $(this.config.tableSelector).DataTable({
+            const defaultOptions = {
                 processing: true,
                 serverSide: true,
                 ajax: this.config.ajaxUrl,
                 columns: this.config.columns,
                 responsive: true,
-            });
+            };
+
+            const dtOptions = Object.assign({}, defaultOptions, this.config.datatableOptions || {});
+
+            $(this.config.tableSelector).DataTable(dtOptions);
         },
 
         initDeleteBtn: function () {
