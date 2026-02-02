@@ -21,41 +21,49 @@
         CRUDHelper.init({
             tableSelector: '#voucher-orders-table',
             ajaxUrl: '{{ route('dashboard.voucher_order.datatable') }}',
-            order: [],
             ajaxData: function(d) {
                 d.state = "{{ request()->query('state') ?? '' }}";
             },
-            columns: [{
+            columns: [
+                {
                     data: 'id',
-                    name: 'id'
+                    name: 'id',
+                    orderable: true // تعديل: السماح بالترتيب
                 },
                 {
                     data: 'customer_name',
-                    name: 'customer_name'
+                    name: 'customer_name',
+                    orderable: true // تعديل: السماح بالترتيب
                 },
                 {
                     data: 'customer_email',
-                    name: 'customer_email'
+                    name: 'customer_email',
+                    orderable: true // تعديل: السماح بالترتيب
                 },
                 {
                     data: 'customer_phone',
-                    name: 'customer_phone'
+                    name: 'customer_phone',
+                    orderable: true // تعديل: السماح بالترتيب
                 },
                 {
                     data: 'coupon',
-                    name: 'coupon'
+                    name: 'coupon',
+                    orderable: true // تعديل: السماح بالترتيب
                 },
                 {
                     data: 'quantity',
-                    name: 'quantity'
+                    name: 'quantity',
+                    orderable: true // تعديل: السماح بالترتيب
                 },
                 {
                     data: 'method',
-                    name: 'method'
+                    name: 'method',
+                    orderable: true // تعديل: السماح بالترتيب
                 },
                 {
                     data: 'account',
-                    name: 'account'
+                    name: 'account',
+                    orderable: true // تعديل: السماح بالترتيب
                 },
                 {
                     data: 'image',
