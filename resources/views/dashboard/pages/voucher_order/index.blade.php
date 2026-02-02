@@ -24,6 +24,7 @@
             ajaxData: function(d) {
                 d.state = "{{ request()->query('state') ?? '' }}";
             },
+            order: [[0, 'desc']],
             columns: [{
                     data: 'id',
                     name: 'id'
