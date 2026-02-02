@@ -173,7 +173,7 @@
                                 ->take($order->quantity)
                                 ->get();
                         @endphp
-                        
+
                         @if ($userVouchers->count() > 0)
                             <div class="table-responsive">
                                 <table class="table table-striped">
@@ -190,12 +190,13 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>
-                                                    <code class="bg-primary text-white p-2 rounded">{{ $voucher->code }}</code>
+                                                    <code
+                                                        class="bg-primary text-white p-2 rounded">{{ $voucher->code }}</code>
                                                 </td>
                                                 <td>
                                                     @if ($voucher->image)
-                                                        <img src="{{ asset('images/voucher/') . '/' . $voucher->image }}" 
-                                                            alt="صورة الكود" class="img-thumbnail" style="max-width: 100px;">
+                                                        <img src="{{ $voucher->image_path }}" alt="صورة الكود"
+                                                            class="img-thumbnail" style="max-width: 100px;">
                                                     @else
                                                         <span class="text-muted">لا توجد صورة</span>
                                                     @endif
