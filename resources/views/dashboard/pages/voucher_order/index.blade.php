@@ -21,6 +21,7 @@
         CRUDHelper.init({
             tableSelector: '#voucher-orders-table',
             ajaxUrl: '{{ route('dashboard.voucher_order.datatable') }}',
+            order: [],
             ajaxData: function(d) {
                 d.state = "{{ request()->query('state') ?? '' }}";
             },
