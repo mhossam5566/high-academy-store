@@ -26,7 +26,7 @@ window.CRUDHelper = {
                 ajax: this.config.ajaxUrl,
                 columns: this.config.columns,
                 responsive: false,
-                order: []
+                order: this.config.order || [[0, 'desc']]
             });
         },
 
