@@ -49,6 +49,7 @@ Route::get('/', function () {
 })->name('dashboard.root');
 
 Route::middleware('auth:admin')->name('dashboard.')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('/home', [AdminController::class, 'index'])->name('index');
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
     Route::post('/change-password', [AdminController::class, 'changePass'])->name('change.password');

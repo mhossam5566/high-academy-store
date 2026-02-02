@@ -112,7 +112,7 @@
     <div class="card">
         <h5 class="card-header">جدول طلبات الكوبونات</h5>
         <div class="card-datatable table-responsive">
-            <table class="dt-responsive table" id="voucher-orders-table">
+            <table class="dt table" id="voucher-orders-table">
                 <thead>
                     <tr>
                         <th>#</th>
