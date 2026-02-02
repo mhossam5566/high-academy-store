@@ -345,6 +345,10 @@ class PaymentController extends Controller
     {
         $fawry_orders = Order::where("status", "new")->where("method", "Fawry Pay")->where('created_at', '<', Carbon::now()->subHours(4))->get();
         $fawryWallet_orders = Order::where("status", "new")->where("method", "Fawry WALLET")->where('created_at', '<', Carbon::now()->subHours(4))->get();
+        
+        // إلغاء طلبات الكوبونات المنتظرة بعد 4 ساعات
+        $voucher_orders = \App\Models\VouchersOrder::where("state", "pending")->where('created_at', '<', Carbon::now()->subHours(4))->get();
+        
         $orders = Order::where("tracker", "delivered")->where('updated_at', '<', Carbon::now()->subHours(48))->get();
         $cart = Cart::instance('shopping')->content();
         $expired_cart_items = $cart->filter(function ($item) {
@@ -474,6 +478,12 @@ class PaymentController extends Controller
 
                 $product->save();
             }
+        }
+
+        // إلغاء طلبات الكوبونات المنتظرة بعد 4 ساعات
+        foreach ($voucher_orders as $voucherOrder) {
+            $voucherOrder->state = "cancelled";
+            $voucherOrder->save();
         }
     }
 }
