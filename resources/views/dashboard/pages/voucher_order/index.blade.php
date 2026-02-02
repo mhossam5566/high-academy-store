@@ -24,46 +24,37 @@
             ajaxData: function(d) {
                 d.state = "{{ request()->query('state') ?? '' }}";
             },
-            columns: [
-                {
+            columns: [{
                     data: 'id',
-                    name: 'id',
-                    orderable: true // تعديل: السماح بالترتيب
+                    name: 'id'
                 },
                 {
                     data: 'customer_name',
-                    name: 'customer_name',
-                    orderable: true // تعديل: السماح بالترتيب
+                    name: 'customer_name'
                 },
                 {
                     data: 'customer_email',
-                    name: 'customer_email',
-                    orderable: true // تعديل: السماح بالترتيب
+                    name: 'customer_email'
                 },
                 {
                     data: 'customer_phone',
-                    name: 'customer_phone',
-                    orderable: true // تعديل: السماح بالترتيب
+                    name: 'customer_phone'
                 },
                 {
                     data: 'coupon',
-                    name: 'coupon',
-                    orderable: true // تعديل: السماح بالترتيب
+                    name: 'coupon'
                 },
                 {
                     data: 'quantity',
-                    name: 'quantity',
-                    orderable: true // تعديل: السماح بالترتيب
+                    name: 'quantity'
                 },
                 {
                     data: 'method',
-                    name: 'method',
-                    orderable: true // تعديل: السماح بالترتيب
+                    name: 'method'
                 },
                 {
                     data: 'account',
-                    name: 'account',
-                    orderable: true // تعديل: السماح بالترتيب
+                    name: 'account'
                 },
                 {
                     data: 'image',
@@ -120,8 +111,8 @@
 
     <div class="card">
         <h5 class="card-header">جدول طلبات الكوبونات</h5>
-        <div class="card-datatable table-responsive">
-            <table class="datatables-ajax table dataTable" id="voucher-orders-table">
+        <div class="card-datatable text-nowrap">
+            <table class="datatables-ajax table" id="voucher-orders-table">
                 <thead>
                     <tr>
                         <th>#</th>
