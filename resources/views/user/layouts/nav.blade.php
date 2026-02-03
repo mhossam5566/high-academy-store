@@ -102,19 +102,20 @@
     .nav-item {
         cursor: pointer;
     }
-      .bg-warning,
-        .btn-primary {
-            background-color: #e99239 !important;
-        }
 
-        .text-primary,
-        text-warning {
-            color: #e99239 !important;
-        }
+    .bg-warning,
+    .btn-primary {
+        background-color: #e99239 !important;
+    }
 
-        .btn-primary {
-            border: none;
-        }
+    .text-primary,
+    text-warning {
+        color: #e99239 !important;
+    }
+
+    .btn-primary {
+        border: none;
+    }
 </style>
 @php
     $lastSegment = request()->segment(count(request()->segments()));
@@ -258,7 +259,8 @@
     <hr class="divider my-1">
 </li>
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle text-white d-flex align-items-center justify-content-center" href="#" id="contactDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <a class="nav-link dropdown-toggle text-white d-flex align-items-center justify-content-center" href="#"
+        id="contactDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         تواصل معنا
         <i class="fa-solid fa-envelope ms-1"></i>
     </a>
@@ -274,7 +276,8 @@
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23" target="_blank">
+            <a class="dropdown-item" href="https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23"
+                target="_blank">
                 <i class="fab fa-whatsapp me-2"></i>قناة واتساب
             </a>
         </li>
@@ -340,7 +343,7 @@
                     $("#searchId").fadeIn();
                 }
             } else {
-                 $('.search').show();
+                $('.search').show();
                 $("#searchId").show(); // Ensure it's visible on larger screens
             }
         }
