@@ -330,7 +330,7 @@
                         <div class="form-group d-flex justify-content-between align-items-center">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="remember" id="remember" checked />
-                                <label class="form-check-label" style='margin-left: 0.5rem;' for="remember">
+                                <label class="form-check-label" style='margin-right: 15px;' for="remember">
                                     تذكرني
                                 </label>
                             </div>
