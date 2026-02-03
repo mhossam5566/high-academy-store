@@ -156,18 +156,19 @@ class VoucherOrderController extends Controller
             DB::commit();
 
             return response()->json([
-                "success" => false,
+                "success" => true,
                 'code' => 200,
-                'msg' => "تنفيذ الاجراء"
+                'msg' => "تم تنفيذ الإجراء بنجاح"
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            logger($e->getMessage());
+            logger('VoucherOrder changestate error: ' . $e->getMessage());
+            logger('VoucherOrder changestate trace: ' . $e->getTraceAsString());
 
             return response()->json([
                 "success" => false,
                 'code' => 400,
-                'msg' => "خطأ اثناء التنفيذ"
+                'msg' => "خطأ أثناء التنفيذ: " . $e->getMessage()
             ], 400);
         }
     }
