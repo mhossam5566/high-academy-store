@@ -200,7 +200,7 @@
                     context.fillStyle = "#666";
                     context.font = "20px Arial";
                     context.textAlign = "center";
-                    context.fillText("اكشط هنا", canvas.width / 2, canvas.height / 2);
+                    context.fillText("خربش هنا", canvas.width / 2, canvas.height / 2);
                 };
 
                 const voucherUpdatedAt = new Date(voucher.updated_at);
