@@ -4,12 +4,15 @@ RewriteEngine On
 
 RewriteCond %{REQUEST_URI} !^/public/ 
 
+# Dashboard root must hit Laravel (public/dashboard exists as a directory and can cause 403)
+RewriteRule ^dashboard/?$ /public/index.php [L,QSA]
+
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 
 
 
-RewriteRule ^(.*)$ /public/$1 
+RewriteRule ^(.*)$ /public/$1 [L,QSA]
 #RewriteRule ^ index.php [L]
 RewriteRule ^(/)?$ public/index.php [L] 
 RewriteRule ^storage/(.*)$ storage/app/public/$1 [L]
