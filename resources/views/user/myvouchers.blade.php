@@ -183,7 +183,7 @@
 
                 const img = new Image();
                 img.crossOrigin = "anonymous";
-                img.src = voucher.coupon.image ? `/${voucher.coupon.image}` : "";
+                img.src = voucher.coupon.image_path ? `/${voucher.coupon.image_path}` : "";
 
                 img.onload = () => {
                     context.drawImage(img, 0, 0, canvas.width, canvas.height);
