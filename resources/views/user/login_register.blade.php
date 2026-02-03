@@ -42,7 +42,7 @@
         }
 
         .login-side {
-            background: linear-gradient(135deg, #f8c291 0%, #e8a87c 50%, #d4a574 100%);
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 50%, #1a202c 100%);
             padding: 3rem;
             display: flex;
             flex-direction: column;
@@ -185,8 +185,8 @@
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(212, 165, 116, 0.3);
-            background: linear-gradient(135deg, #e8a87c 0%, #d4a574 100%);
+            box-shadow: 0 10px 25px rgba(45, 55, 72, 0.3);
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
         }
 
         .divider {
