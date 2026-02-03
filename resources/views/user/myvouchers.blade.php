@@ -46,11 +46,13 @@
             justify-content: center;
             align-items: center;
         }
-    @media screen and (max-width: 600px) {
-       .scratch-area {
-           height: 150px;
-       }
-    }
+
+        @media screen and (max-width: 600px) {
+            .scratch-area {
+                height: 150px;
+            }
+        }
+
         .scratch-canvas {
             position: absolute;
             top: 0;
@@ -130,7 +132,7 @@
                                 <div class="scratch-area" id="scratch-area-{{ $voucher->id }}">
                                     <center>
                                         <h1 class="voucher-code unselectable fw-bold" id="code-{{ $voucher->id }}">
-                                           {{ $voucher->code }}
+                                            {{ $voucher->code }}
                                         </h1>
                                     </center>
                                     <canvas class="scratch-canvas" id="canvas-{{ $voucher->id }}"></canvas>
@@ -142,7 +144,7 @@
                             <div class="card-footer text-muted">
                                 <center>
                                     <h6>{{ $voucher->updated_at }}</h6>
-                                    {{ $voucher->coupon->image_path }}
+
                                 </center>
                             </div>
                         </div>
@@ -255,8 +257,8 @@
                             setTimeout(() => {
                                 card.classList.remove("bounce");
                             }, 1000);
-                              codeElement.classList.remove("unselectable");
-                    codeElement.classList.add("selectable");
+                            codeElement.classList.remove("unselectable");
+                            codeElement.classList.add("selectable");
                         }
                     }
                 };
