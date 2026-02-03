@@ -115,3 +115,11 @@ Route::post("fawry/webhook", [PaymentController::class, "fawry_webhook"])->name(
 
 Route::get("cronjob", [PaymentController::class, 'cronjob']);
 
+
+Route::get('/clear-all', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    return 'All caches cleared!';
+});
