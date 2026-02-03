@@ -142,6 +142,7 @@
                             <div class="card-footer text-muted">
                                 <center>
                                     <h6>{{ $voucher->updated_at }}</h6>
+                                    {{ $voucher->coupon->image_path }}
                                 </center>
                             </div>
                         </div>
