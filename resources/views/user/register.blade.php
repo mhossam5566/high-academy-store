@@ -42,7 +42,7 @@
         }
 
         .register-side {
-            background: linear-gradient(135deg, #4a5568 0%, #2d3748 50%, #1a202c 100%);
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 50%, #a0aec0 100%);
             padding: 3rem;
             display: flex;
             flex-direction: column;
@@ -56,6 +56,7 @@
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 1rem;
+            color: #2d3748;
         }
 
         .register-side p {
@@ -63,11 +64,12 @@
             opacity: 0.95;
             margin-bottom: 2rem;
             line-height: 1.6;
+            color: #4a5568;
         }
 
         .login-btn {
-            background: white;
-            color: #e89238;
+            background: #4a5568;
+            color: white;
             padding: 0.75rem 2rem;
             border-radius: 50px;
             text-decoration: none;
@@ -79,8 +81,8 @@
         .login-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            color: #d67e1f;
-            background: #fffbf7;
+            color: white;
+            background: #2d3748;
         }
 
         .register-form-side {
@@ -169,7 +171,7 @@
         }
 
         .submit-btn {
-            background: linear-gradient(135deg, #f5a957 0%, #e89238 100%);
+            background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
             color: white;
             border: none;
             padding: 0.875rem;
@@ -184,7 +186,7 @@
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(45, 55, 72, 0.3);
+            box-shadow: 0 10px 25px rgba(74, 85, 104, 0.3);
             background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
         }
 
@@ -200,11 +202,11 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(45, 55, 72, 0.3);
         }
 
         .divider span {
-            color: white;
+            color: #4a5568;
             font-size: 0.85rem;
             opacity: 0.9;
         }
