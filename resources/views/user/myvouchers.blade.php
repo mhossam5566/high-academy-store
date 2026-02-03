@@ -182,16 +182,22 @@
                 canvas.height = scratchArea.clientHeight;
 
                 const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.src = voucher.coupon.image_path ? `/${voucher.coupon.image_path}` : "";
+                // إزالة crossOrigin لتجنب مشاكل CORS
+                // img.crossOrigin = "anonymous";
+                img.src = voucher.coupon.image_path || "";
 
                 img.onload = () => {
                     context.drawImage(img, 0, 0, canvas.width, canvas.height);
                 };
 
                 img.onerror = () => {
+                    console.error('Failed to load image:', voucher.coupon.image_path);
                     context.fillStyle = "#add8e6";
                     context.fillRect(0, 0, canvas.width, canvas.height);
+                    context.fillStyle = "#666";
+                    context.font = "20px Arial";
+                    context.textAlign = "center";
+                    context.fillText("اكشط هنا", canvas.width / 2, canvas.height / 2);
                 };
 
                 const voucherUpdatedAt = new Date(voucher.updated_at);
