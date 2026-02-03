@@ -41,15 +41,9 @@ Route::post('/signup', [AdminController::class, 'signup'])->name('admin.signup')
 
 Route::get('/logout', [AdminController::class, 'adminLogout'])->name('admin.logout');
 
-Route::get('/', function () {
-    if (auth()->guard('admin')->check()) {
-        return redirect()->route('dashboard.index');
-    }
-    return redirect()->route('login');
-})->name('dashboard.root');
 
 Route::middleware('auth:admin')->name('dashboard.')->group(function () {
-    Route::get('/home', [AdminController::class, 'index'])->name('index');
+    Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
     Route::post('/change-password', [AdminController::class, 'changePass'])->name('change.password');
     Route::Post('/update/my-account', [AdminController::class, 'AccountUpdate'])->name('update.account');
