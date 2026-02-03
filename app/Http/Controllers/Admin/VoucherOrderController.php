@@ -128,13 +128,20 @@ class VoucherOrderController extends Controller
                 $order->state = "success";
                 $coupon = Coupon::findOrFail($order->coupon_id);
                 $users = User::findOrFail($order->user_id);
-                $details = [
-                    'id' => $order->id,
-                    'name' => $users->name,
-                    'coupon' => $coupon->name,
-                    "email" => $users->email
-                ];
-                Mail::to($users->email)->send(new successCoupon($details));
+                
+                // محاولة إرسال الإيميل، لكن لا نوقف العملية لو فشل
+                try {
+                    $details = [
+                        'id' => $order->id,
+                        'name' => $users->name,
+                        'coupon' => $coupon->name,
+                        "email" => $users->email
+                    ];
+                    Mail::to($users->email)->send(new successCoupon($details));
+                } catch (\Exception $mailException) {
+                    // تسجيل الخطأ لكن الاستمرار في العملية
+                    logger('فشل إرسال البريد الإلكتروني: ' . $mailException->getMessage());
+                }
 
                 $qty = $order->quantity;
 
@@ -162,13 +169,12 @@ class VoucherOrderController extends Controller
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            logger('VoucherOrder changestate error: ' . $e->getMessage());
-            logger('VoucherOrder changestate trace: ' . $e->getTraceAsString());
+            logger($e->getMessage());
 
             return response()->json([
                 "success" => false,
                 'code' => 400,
-                'msg' => "خطأ أثناء التنفيذ: " . $e->getMessage()
+                'msg' => "خطأ اثناء التنفيذ"
             ], 400);
         }
     }
