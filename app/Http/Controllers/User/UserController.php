@@ -363,62 +363,72 @@ class UserController extends Controller
     }
 
     public function loginSubmit(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email|exists:users,email',
-        'password' => 'required|min:6',
-    ], [
-        'email.exists' => 'البريد الإلكتروني الذي أدخلته غير مسجل لدينا.',
-        'password.min' => 'كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل.',
-    ]);
+    {
+        $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|min:6',
+        ], [
+            'email.required' => 'البريد الإلكتروني أو رقم الموبايل مطلوب.',
+            'password.required' => 'كلمة المرور مطلوبة.',
+            'password.min' => 'كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل.',
+        ]);
 
-    $credentials = $request->only('email', 'password');
-    $remember = $request->has('remember');
+        $loginField = $request->input('email');
+        $password = $request->input('password');
+        $remember = $request->has('remember');
 
-    if (!Auth::attempt($credentials, $remember)) {
-        return redirect()
-            ->back()
-            ->withErrors([
-                'general' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-            ])
-            ->withInput();
+        // تحديد نوع الحقل (إيميل أو رقم موبايل)
+        $fieldType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        $credentials = [
+            $fieldType => $loginField,
+            'password' => $password
+        ];
+
+        if (!Auth::attempt($credentials, $remember)) {
+            return redirect()
+                ->back()
+                ->withErrors([
+                    'general' => 'البيانات التي أدخلتها غير صحيحة',
+                ])
+                ->withInput();
+        }
+
+        if (Session::get('url.intended')) {
+            return Redirect::to(Session::get('url.intended'));
+        }
+
+        return redirect()->route('front.home');
     }
 
-    if (Session::get('url.intended')) {
-        return Redirect::to(Session::get('url.intended'));
+
+    public function registerSubmit(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|unique:users,email|regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
+            'password' => 'required|min:6|confirmed',
+        ], [
+            'name.required' => 'الاسم مطلوب.',
+            'name.string' => 'الاسم يجب أن يكون نص.',
+            'email.required' => 'البريد الإلكتروني مطلوب.',
+            'email.unique' => 'البريد الإلكتروني مسجل لدينا مسبقاً.',
+            'email.regex' => 'تأكد من صحة البريد الإلكتروني وعدم وجود مسافات.',
+            'password.required' => 'كلمة المرور مطلوبة.',
+            'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 حروف.',
+            'password.confirmed' => 'كلمة المرور غير متطابقة.',
+        ]);
+
+        $validatedData['password'] = bcrypt($request->password);
+        $validatedData['address'] = '';
+        $validatedData['phone'] = '';
+
+        $user = User::create($validatedData);
+
+        Auth::login($user, true);
+
+        return redirect()->route('user.home');
     }
-
-    return redirect()->route('front.home');
-}
-
-
-   public function registerSubmit(Request $request)
-{
-    $validatedData = $request->validate([
-        'name' => 'required|string',
-        'email' => 'required|unique:users,email|regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
-        'password' => 'required|min:6|confirmed',
-    ], [
-        'name.required' => 'الاسم مطلوب.',
-        'name.string' => 'الاسم يجب أن يكون نص.',
-        'email.required' => 'البريد الإلكتروني مطلوب.',
-        'email.unique' => 'البريد الإلكتروني مسجل لدينا مسبقاً.',
-        'email.regex' => 'تأكد من صحة البريد الإلكتروني وعدم وجود مسافات.',
-        'password.required' => 'كلمة المرور مطلوبة.',
-        'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 حروف.',
-        'password.confirmed' => 'كلمة المرور غير متطابقة.',
-    ]);
-
-    $validatedData['password'] = bcrypt($request->password);
-    $validatedData['address'] = '';
-    $validatedData['phone'] = '';
-
-    $user = User::create($validatedData);
-
-    Auth::login($user, true);
-
-    return redirect()->route('user.home');
-}
 
 
     public function register()

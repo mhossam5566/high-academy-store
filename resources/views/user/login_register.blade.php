@@ -302,10 +302,10 @@
                         @csrf
 
                         <div class="form-group">
-                            <label for="email" class="form-label">البريد الإلكتروني</label>
-                            <input type="email" name="email" id="email"
-                                class="form-control @error('email') is-invalid @enderror" placeholder="example@email.com"
-                                value="{{ old('email') }}" required />
+                            <label for="email" class="form-label">البريد الإلكتروني او رقم الموبايل</label>
+                            <input type="text" name="email" id="email"
+                                class="form-control @error('email') is-invalid @enderror"
+                                placeholder="الايميل او رقم الموبايل" value="{{ old('email') }}" required />
 
                             @error('email')
                                 <div class="invalid-feedback">
