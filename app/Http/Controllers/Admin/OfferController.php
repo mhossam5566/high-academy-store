@@ -24,87 +24,26 @@ class OfferController extends Controller
 
     public function datatable()
     {
-        try {
-            // Log the incoming request
-            Log::info('=== DATATABLE REQUEST ===');
-
-            // Get the draw parameter (required by DataTables)
-            $draw = request()->input('draw', 1);
-
-            // Get all offers
-            $offers = $this->offerService->getAllOffers();
-
-            // Log the count of offers
-            Log::info('Number of offers found: ' . $offers->count());
-
-            // Prepare the data array for DataTables
-            $data = [];
-
-            foreach ($offers as $offer) {
-                // Create the image URL
-                $imageUrl = $offer->image ? $offer->image_path : null;
-
-                // Create the image HTML
-                $imageHtml = $imageUrl
-                    ? '<img src="' . $imageUrl . '" alt="offer-image" style="height:120px;width:150px" class="avatar rounded me-2">'
-                    : 'No Image';
-
-                // Create the action buttons
-                $actionButtons =
-                    '<a href="' . route('dashboard.offers.edit', $offer->id) . '" class="btn btn-success btn-sm">Edit</a> ' .
-                    '<button type="button" class="btn btn-danger btn-sm delete_btn" data-id="' . $offer->id . '">Delete</button>';
-
-                // Add the offer data to the data array
-                $data[] = [
-                    'id' => $offer->id,
-                    'image' => $imageHtml,
-                    'operation' => $actionButtons
-                ];
-            }
-
-            // Prepare the response
-            $response = [
-                'draw' => (int) $draw,
-                'recordsTotal' => $offers->count(),
-                'recordsFiltered' => $offers->count(),
-                'data' => $data
-            ];
-
-            Log::info('Sending DataTables response', [
-                'draw' => $draw,
-                'records' => $offers->count(),
-                'data_count' => count($data)
-            ]);
-
-            return response()->json($response);
-
-        } catch (\Exception $e) {
-            $authUser = auth('admin')->user();
-            $errorData = [
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
-                'request' => request()->all(),
-                'auth_user' => $authUser ? [
-                    'id' => $authUser->id,
-                    'name' => $authUser->name,
-                    'email' => $authUser->email,
-                    // Add other relevant user fields as needed
-                ] : null
-            ];
-
-            Log::error('DATATABLE ERROR:', $errorData);
-
-            return response()->json([
-                'draw' => (int) request()->input('draw', 1),
-                'recordsTotal' => 0,
-                'recordsFiltered' => 0,
-                'data' => [],
-                'error' => 'An error occurred while loading the data.',
-                'debug' => config('app.debug') ? $errorData : null
-            ], 500);
-        }
+        $offers = $this->offerService->getAllOffers();
+        return DataTables::of($offers)
+            ->addColumn('image', function ($row) {
+                $imageUrl = $row->image ? $row->image_path : null;
+                if ($imageUrl) {
+                    return '<img src="' . $imageUrl . '" alt="offer-image" style="height:120px;width:150px" class="avatar rounded me-2">';
+                }
+                return '<span class="text-muted">لا توجد صورة</span>';
+            })
+            ->addColumn('operation', function ($row) {
+                $edit = '<a href="' . route('dashboard.offers.edit', $row->id) . '" class="btn btn-sm btn-primary me-1">
+                    <i class="ti ti-edit me-1"></i>تعديل
+                </a>';
+                $delete = '<a offer_id="' . $row->id . '" class="btn btn-sm btn-danger delete_btn">
+                    <i class="ti ti-trash me-1"></i>حذف
+                </a>';
+                return $edit . ' ' . $delete;
+            })
+            ->rawColumns(['image', 'operation'])
+            ->toJson();
     }
 
     public function create()
