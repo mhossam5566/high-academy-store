@@ -24,7 +24,7 @@ class Brand extends Model implements TranslatableContract
 
     public function getImagePathAttribute()
     {
-        return asset('storage/images/brands/'. $this->photo);
+        return asset('storage/'. $this->photo);
     } //end of image path attribute
 
     public function products()
