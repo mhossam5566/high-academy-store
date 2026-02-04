@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Services\OfferService;
 use Illuminate\Http\Request;
+use App\Services\OfferService;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 
 class OfferController extends Controller
@@ -42,7 +42,7 @@ class OfferController extends Controller
 
             foreach ($offers as $offer) {
                 // Create the image URL
-                $imageUrl = $offer->image ? asset('storage/images/offers/' . $offer->image) : null;
+                $imageUrl = $offer->image ? $offer->image_path : null;
 
                 // Create the image HTML
                 $imageHtml = $imageUrl
