@@ -27,7 +27,7 @@
                                     <div class="carousel-item d-flex justify-content-center position-relative {{ $index === 0 ? 'active' : '' }}"
                                         style="height: 350px;">
                                         <img class="position-absolute"
-                                            src="{{ asset('storage/images/offers/' . $offer->image) }}" alt="carousel image"
+                                            src="{{ $offer->image_path }}" alt="carousel image"
                                             style="object-fit: cover;max-width:400px;">
                                         <div class="carousel-caption d-flex flex-column align-items-center justify-content-end mb-4"
                                             style="background-color: rgba(0, 0, 0, 0);">
