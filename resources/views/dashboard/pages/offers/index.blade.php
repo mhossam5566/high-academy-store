@@ -58,8 +58,7 @@
         CRUDHelper.init({
             tableSelector: '#offersTable',
             ajaxUrl: '{{ route('dashboard.offers.datatable') }}',
-            columns: [
-                {
+            columns: [{
                     data: 'id',
                     name: 'id'
                 },

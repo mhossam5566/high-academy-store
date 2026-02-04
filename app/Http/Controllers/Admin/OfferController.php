@@ -27,7 +27,7 @@ class OfferController extends Controller
         $offers = $this->offerService->getAllOffers();
         return DataTables::of($offers)
             ->addColumn('image', function ($row) {
-                $imageUrl = $row->image ? $row->image_path : null;
+                $imageUrl = $row->image_path ?? null;
                 if ($imageUrl) {
                     return '<img src="' . $imageUrl . '" alt="offer-image" style="height:120px;width:150px" class="avatar rounded me-2">';
                 }

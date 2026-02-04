@@ -14,6 +14,6 @@ class Offer extends Model
     // Accessor for image URL
     public function getImagePathAttribute()
     {
-        return $this->image ? ('storage/' . $this->image) : null;
+        return $this->image ? url('storage/' . $this->image) : null;
     }
 }
