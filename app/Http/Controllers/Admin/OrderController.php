@@ -6,7 +6,7 @@ use Mpdf\Mpdf;
 use App\Models\Order;
 use App\Mail\delivery;
 use App\Models\Product;
-use App\Mail\successPaid;
+use App\Mail\SuccessPaid;
 use App\Traits\ImageTrait;
 use App\Traits\DeleteTrait;
 use App\Traits\GeneralTrait;
@@ -268,7 +268,7 @@ class OrderController extends Controller
                 // Send success email only if customer email exists
                 if ($order->user && !empty($order->user->email)) {
                     try {
-                        Mail::to($order->user->email)->send(new successPaid($order));
+                        Mail::to($order->user->email)->send(new SuccessPaid($order));
                     } catch (\Exception $mailEx) {
                         // Do not fail the whole state change due to mail issues
                         // Optionally log if needed
