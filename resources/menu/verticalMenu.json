@@ -1,7 +1,7 @@
 {
     "menu": [
         {
-            "url": "/dashboard/home",
+            "url": "/dashboard",
             "name": "لوحة التحكم",
             "icon": "menu-icon tf-icons ti ti-home",
             "slug": "dashboard.index"
