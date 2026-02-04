@@ -163,7 +163,7 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::post('/store/offers', [OfferController::class, 'store'])->name('store.offers');
     Route::get('offers/edit/{id}', [OfferController::class, 'edit'])->name('offers.edit');
     Route::put('offers/update/{id}', [OfferController::class, 'update'])->name('offers.update');
-    Route::post('offers/destroy', [OfferController::class, 'destroy'])->name('offers.destroy');
+    Route::delete('offers/destroy/{id}', [OfferController::class, 'destroy'])->name('offers.destroy');
     // User Route to view offers
 
     // Coupons (Discounts) Routes

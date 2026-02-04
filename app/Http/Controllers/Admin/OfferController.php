@@ -26,6 +26,9 @@ class OfferController extends Controller
     {
         $offers = $this->offerService->getAllOffers();
         return DataTables::of($offers)
+            ->addColumn('id', function ($row) {
+                return $row->id;
+            })
             ->addColumn('image', function ($row) {
                 $imageUrl = $row->image_path ?? null;
                 if ($imageUrl) {
@@ -37,7 +40,7 @@ class OfferController extends Controller
                 $edit = '<a href="' . route('dashboard.offers.edit', $row->id) . '" class="btn btn-sm btn-primary me-1">
                     <i class="ti ti-edit me-1"></i>تعديل
                 </a>';
-                $delete = '<a offer_id="' . $row->id . '" class="btn btn-sm btn-danger delete_btn">
+                $delete = '<a data-id="' . $row->id . '" class="btn btn-sm btn-danger delete_btn">
                     <i class="ti ti-trash me-1"></i>حذف
                 </a>';
                 return $edit . ' ' . $delete;
@@ -90,12 +93,11 @@ class OfferController extends Controller
         }
     }
 
-    public function destroy(Request $request)
+    public function destroy($id)
     {
         try {
-            $id = $request->id;
             $this->offerService->deleteOffer($id);
-            return response()->json(['success' => 'Offer deleted successfully!'], 200);
+            return response()->json(['success' => 'تم حذف العرض بنجاح'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
