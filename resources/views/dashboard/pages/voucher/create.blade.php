@@ -20,7 +20,7 @@
 
     <div class="card">
         <div class="card-body">
-            <form id="voucherForm" data-ajax data-redirect="{{ route('dashboard.vouchers', $coupon->id) }}"
+            <form id="voucherForm" data-ajax 
                 action="{{ route('dashboard.vouchers.store', $coupon->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
