@@ -89,31 +89,15 @@ class OrderController extends Controller
             ->addColumn('change_status', function ($row) {
                 $dropdown = '<select class="form-control change-status" data-order-id="' . $row->id . '" onchange="handleStatusChange(this)">';
                 $dropdown .= '<option value="" disabled selected>تغيير الحالة</option>';
-                $statuses = ['pending', 'success', 'cancelled', 'reserved'];
-                if ($row->status == 'new') {
-                    $statuses = ['pending'];
-                }
-                foreach ($statuses as $status) {
-                    if ($row->status != $status) {
-                        $statusText = '';
-                        switch ($status) {
-                            case 'pending':
-                                $statusText = 'طلب معلق';
-                                break;
-                            case 'success':
-                                $statusText = 'طلب ناجح';
-                                break;
-                            case 'cancelled':
-                                $statusText = 'طلب ملغي';
-                                break;
-                            case 'reserved':
-                                $statusText = 'طلب محجوز';
-                                break;
-                        }
-                        if ($statusText) {
-                            $dropdown .= '<option value="' . route('dashboard.changeStatus', ['id' => $row->id, 'status' => $status]) . '">' . $statusText . '</option>';
-                        }
-                    }
+                $statuses = [
+                    'new' => 'طلب جديد',
+                    'pending' => 'طلب معلق',
+                    'success' => 'طلب ناجح',
+                    'cancelled' => 'طلب ملغي',
+                    'reserved' => 'طلب محجوز'
+                ];
+                foreach ($statuses as $status => $statusText) {
+                    $dropdown .= '<option value="' . route('dashboard.changeStatus', ['id' => $row->id, 'status' => $status]) . '">' . $statusText . '</option>';
                 }
                 $dropdown .= '</select>';
                 return $dropdown;
