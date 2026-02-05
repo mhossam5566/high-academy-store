@@ -105,7 +105,7 @@ class VoucherController extends Controller
         $request->validate([
             'code' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'remove_image' => 'nullable|boolean' // حقل اختياري لإزالة الصورة
+            'delete_image' => 'nullable|boolean' // حقل اختياري لإزالة الصورة
         ]);
 
         $voucher = Voucher::findOrFail($id);
@@ -115,8 +115,8 @@ class VoucherController extends Controller
             $voucher->code = $request->code;
         }
 
-        // إزالة الصورة إذا تم إرسال remove_image = true
-        if ($request->remove_image) {
+        // إزالة الصورة إذا تم إرسال delete_image = true
+        if ($request->delete_image) {
             if ($voucher->image) {
                 self::deleteMedia($voucher->image);
             }

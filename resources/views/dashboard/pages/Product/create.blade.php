@@ -3,12 +3,14 @@
 @section('title', 'إضافة منتج جديد')
 
 @section('vendor-style')
-    <link rel="stylesheet" href="{{ asset('admin/assets/cssbundle/dropify.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css">
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/select2/select2.css') }}">
 @endsection
 
 @section('vendor-script')
-    <script src="{{ asset('admin/assets/js/bundle/dropify.bundle.js') }}"></script>
+    <script src="{{ asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"></script>
     <script src="{{ asset('dashboard/assets/vendor/libs/select2/select2.js') }}"></script>
 @endsection
 
@@ -293,14 +295,18 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">الصورة الرئيسية</label>
-                        <input type="file" name="photo" accept="image/*" class="dropify">
+                        <label class="form-label">
+                            <i class="ti ti-photo me-1"></i>الصورة الرئيسية
+                        </label>
+                        <input type="file" name="photo" accept="image/*" class="dropify" data-height="300">
                         <small class="text-muted">صورة واحدة فقط</small>
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">الصور الإضافية</label>
-                        <input type="file" name="images[]" accept="image/*" class="dropify" multiple>
+                        <label class="form-label">
+                            <i class="ti ti-photos me-1"></i>الصور الإضافية
+                        </label>
+                        <input type="file" name="images[]" accept="image/*" class="dropify" data-height="300" multiple>
                         <small class="text-muted">يمكن رفع أكثر من صورة</small>
                     </div>
                 </div>
@@ -321,8 +327,19 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
-            // Initialize plugins
-            $('.dropify').dropify();
+            // Initialize Dropify
+            $('.dropify').dropify({
+                messages: {
+                    default: 'اسحب الصورة هنا أو انقر للاختيار',
+                    replace: 'اسحب الصورة أو انقر لاستبدالها',
+                    remove: 'حذف',
+                    error: 'حدث خطأ في تحميل الصورة'
+                },
+                error: {
+                    fileSize: 'حجم الملف كبير جداً (الحد الأقصى 2 MB).'
+                }
+            });
+            
             $('.select2').select2({
                 theme: 'bootstrap-5',
                 placeholder: 'اختر...'
@@ -349,6 +366,56 @@
             }
 
             $('#offer_type, #price, #offer_value').on('change input', calculateFinalPrice);
+
+            // AJAX Form Submit
+            $('#productForm').submit(function(e) {
+                e.preventDefault();
+                let formData = new FormData(this);
+                let submitBtn = $(this).find('button[type="submit"]');
+
+                submitBtn.prop('disabled', true).html(
+                    '<span class="spinner-border spinner-border-sm me-1"></span>جاري الحفظ...');
+
+                $.ajax({
+                    url: '{{ route('dashboard.store.product') }}',
+                    type: "POST",
+                    dataType: "json",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'تم الحفظ',
+                            text: 'تم حفظ المنتج بنجاح',
+                            confirmButtonText: 'موافق'
+                        }).then(() => {
+                            window.location.href = "{{ route('dashboard.product') }}";
+                        });
+                    },
+                    error: function(xhr) {
+                        submitBtn.prop('disabled', false).html(
+                            '<i class="ti ti-device-floppy me-2"></i>حفظ المنتج');
+
+                        let errorMessage = '';
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            let errors = xhr.responseJSON.errors;
+                            $.each(errors, function(key, value) {
+                                errorMessage += value[0] + '<br>';
+                            });
+                        } else {
+                            errorMessage = xhr.responseJSON?.error || xhr.responseText || 'حدث خطأ ما!';
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ',
+                            html: errorMessage,
+                            confirmButtonText: 'موافق'
+                        });
+                    }
+                });
+            });
         });
     </script>
 @endsection

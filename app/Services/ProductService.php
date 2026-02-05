@@ -33,6 +33,14 @@ class ProductService
     # Edit
     public function update($request, $product, $data)
     {
+        // حذف الصورة الرئيسية إذا تم طلب ذلك
+        if ($request->delete_main_image) {
+            if ($product->photo && $product->photo != 'default.png') {
+                self::deleteMedia($product->photo);
+            }
+            $data['photo'] = null;
+        }
+
         if ($request->hasFile('photo')) {
             if ($product->photo && $product->photo != 'default.png') {
                 self::deleteMedia($product->photo);

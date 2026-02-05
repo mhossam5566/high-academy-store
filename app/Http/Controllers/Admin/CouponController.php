@@ -101,9 +101,18 @@ class CouponController extends Controller
             'price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'type' => 'required|in:weekly,monthly,package',
+            'delete_image' => 'nullable|boolean' // حقل اختياري لإزالة الصورة
         ]);
 
         $coupon = Coupon::findOrFail($id);
+
+        // إزالة الصورة إذا تم إرسال delete_image = true
+        if ($request->delete_image) {
+            if ($coupon->image) {
+                self::deleteMedia($coupon->image);
+            }
+            $coupon->image = null;
+        }
 
         if ($request->hasFile('image')) {
             if ($coupon->image) {
