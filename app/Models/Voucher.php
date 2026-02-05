@@ -29,7 +29,7 @@ class Voucher extends Model
    if($this->image == null){
        return null;
    }else{
-       return url('storage'.$this->image);
+       return url('storage/'.$this->image);
    }
 }
 }
