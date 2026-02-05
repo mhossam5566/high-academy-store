@@ -17,16 +17,23 @@
                <div class="col-12 pb-1 card p-2">
     <form action="{{ route('user.evouchers') }}" method="GET">
     <div class="row g-2">
-        <div class="col-lg-4 col-md-4 col-12">
+        <div class="col-lg-3 col-md-3 col-12">
             <input name="name" class="form-control" placeholder="ابحث عن كوبون" value="{{ request('name') }}">
         </div>
-        <div class="col-lg-4 col-md-4 col-12">
+        <div class="col-lg-3 col-md-3 col-12">
             <select name="type" class="form-control">
-
                 <option value="">كل الكوبونات</option>
                 <option value="weekly" {{ request('type') == 'weekly' ? 'selected' : '' }}>اسبوعي</option>
                 <option value="monthly" {{ request('type') == 'monthly' ? 'selected' : '' }}>شهري</option>
                 <option value="package" {{ request('type') == 'package' ? 'selected' : '' }}>باقة</option>
+            </select>
+        </div>
+        <div class="col-lg-3 col-md-3 col-12">
+            <select name="brand_id" class="form-control">
+                <option value="">كل المدرسين</option>
+                @foreach($brands as $brand)
+                    <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->title }}</option>
+                @endforeach
             </select>
         </div>
         <div class="col-lg-2 col-md-2 col-12">

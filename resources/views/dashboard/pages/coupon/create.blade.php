@@ -85,7 +85,7 @@
                                     </label>
                                     <select name="brand_id" class="form-select @error('brand_id') is-invalid @enderror">
                                         <option value="">بدون مدرس</option>
-                                        @foreach($brands as $brand)
+                                        @foreach ($brands as $brand)
                                             <option value="{{ $brand->id }}">{{ $brand->title }}</option>
                                         @endforeach
                                     </select>

@@ -110,14 +110,19 @@ class UserController extends Controller
     {
         $name = $request->query('name', '');
         $type = $request->query('type', '');
+        $brand_id = $request->query('brand_id', '');
 
         $coupons = Coupon::when($name, function ($query, $name) {
             $query->where('name', 'LIKE', '%' . e($name) . '%');
         })->when($type, function ($query, $type) {
             $query->where('type', $type);
+        })->when($brand_id, function ($query, $brand_id) {
+            $query->where('brand_id', $brand_id);
         })->orderBy('created_at', 'desc')->get();
 
-        return view('user.vouchers', compact('coupons'));
+        $brands = Brand::orderBy('id', 'DESC')->get();
+
+        return view('user.vouchers', compact('coupons', 'brands'));
     }
 
 
