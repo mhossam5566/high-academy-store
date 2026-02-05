@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Coupon;
+use App\Models\Brand;
 use Illuminate\Support\Str;
 use App\Traits\MediaHandler;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class CouponController extends Controller
 
     public function datatable()
     {
-        $coupons = Coupon::all();
+        $coupons = Coupon::with('brand')->get();
         $coupons = $coupons->reverse();
         return DataTables::of($coupons)
             ->addColumn('name', function ($row) {
@@ -28,6 +29,9 @@ class CouponController extends Controller
             })
             ->addColumn('price', function ($row) {
                 return $row->price;
+            })
+            ->addColumn('brand', function ($row) {
+                return $row->brand ? $row->brand->title : '<span class="text-muted">-</span>';
             })
             ->addColumn('image', function ($row) {
                 if ($row->image !== null) {
@@ -52,13 +56,14 @@ class CouponController extends Controller
             </a>';
                 return $edit . $delete . $add;
             })
-            ->rawColumns(['operation' => 'operation', 'image' => 'image', 'count' => 'count'])
+            ->rawColumns(['operation' => 'operation', 'image' => 'image', 'count' => 'count', 'brand' => 'brand'])
             ->toJson();
     }
 
     public function add()
     {
-        return view('dashboard.pages.coupon.create');
+        $brands = Brand::orderBy('id', 'DESC')->get();
+        return view('dashboard.pages.coupon.create', compact('brands'));
     }
 
     public function store(Request $request)
@@ -68,6 +73,7 @@ class CouponController extends Controller
             'price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'type' => 'required|in:weekly,monthly,package',
+            'brand_id' => 'nullable|exists:brands,id',
         ]);
 
         $imagePath = null;
@@ -79,7 +85,8 @@ class CouponController extends Controller
             'name' => $request->name,
             'price' => $request->price,
             'image' => $imagePath,
-            'type' => $request->type
+            'type' => $request->type,
+            'brand_id' => $request->brand_id
         ]);
 
         return response()->json([
@@ -91,7 +98,8 @@ class CouponController extends Controller
 
     public function edit(Coupon $coupon)
     {
-        return view('dashboard.pages.coupon.edit', compact('coupon'));
+        $brands = Brand::orderBy('id', 'DESC')->get();
+        return view('dashboard.pages.coupon.edit', compact('coupon', 'brands'));
     }
 
     public function update(Request $request, $id)
@@ -101,6 +109,7 @@ class CouponController extends Controller
             'price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'type' => 'required|in:weekly,monthly,package',
+            'brand_id' => 'nullable|exists:brands,id',
             'delete_image' => 'nullable|boolean' // حقل اختياري لإزالة الصورة
         ]);
 
@@ -124,6 +133,7 @@ class CouponController extends Controller
         $coupon->name = $request->name;
         $coupon->price = $request->price;
         $coupon->type = $request->type;
+        $coupon->brand_id = $request->brand_id;
         $coupon->save();
 
         return response()->json([

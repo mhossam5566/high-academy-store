@@ -9,27 +9,29 @@ class Voucher extends Model
 {
     use HasFactory;
 
-    protected $fillable= [
+    protected $fillable = [
         'coupon_id',
         'code',
         'image',
         'is_used',
         'user_id'
-        ];
+    ];
 
-    public function coupon(){
+    public function coupon()
+    {
         return $this->belongsTo(Coupon::class);
     }
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
-     public function getImagePathAttribute()
-{
-   if($this->image == null){
-       return null;
-   }else{
-       return url('storage/'.$this->image);
-   }
-}
+    public function getImagePathAttribute()
+    {
+        if ($this->image == null) {
+            return null;
+        } else {
+            return url('storage/' . $this->image);
+        }
+    }
 }

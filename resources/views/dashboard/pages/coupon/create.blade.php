@@ -42,7 +42,8 @@
                                         <i class="ti ti-tag me-1"></i>اسم الكوبون
                                         <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                                    <input type="text" name="name"
+                                        class="form-control @error('name') is-invalid @enderror"
                                         placeholder="أدخل اسم الكوبون" required>
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -55,8 +56,8 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input type="number" name="price" step="0.01"
-                                        class="form-control @error('price') is-invalid @enderror"
-                                        placeholder="أدخل السعر" required>
+                                        class="form-control @error('price') is-invalid @enderror" placeholder="أدخل السعر"
+                                        required>
                                     @error('price')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -76,6 +77,22 @@
                                     @error('type')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                </div>
+
+                                <div class="col-12 mb-4">
+                                    <label class="form-label">
+                                        <i class="ti ti-user me-1"></i>المدرس
+                                    </label>
+                                    <select name="brand_id" class="form-select @error('brand_id') is-invalid @enderror">
+                                        <option value="">بدون مدرس</option>
+                                        @foreach($brands as $brand)
+                                            <option value="{{ $brand->id }}">{{ $brand->title }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('brand_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">اختر المدرس المرتبط بالكوبون (اختياري)</small>
                                 </div>
 
                                 <div class="col-12 mb-4">
@@ -156,7 +173,8 @@
                                 errorMessage += value[0] + '<br>';
                             });
                         } else {
-                            errorMessage = xhr.responseJSON?.error || xhr.responseText || 'حدث خطأ ما!';
+                            errorMessage = xhr.responseJSON?.error || xhr.responseText ||
+                                'حدث خطأ ما!';
                         }
 
                         Swal.fire({

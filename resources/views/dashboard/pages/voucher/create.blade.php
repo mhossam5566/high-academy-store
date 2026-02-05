@@ -41,8 +41,9 @@
                                     <i class="ti ti-code me-1"></i>كود الكوبون
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="code" class="form-control @error('code') is-invalid @enderror"
-                                    placeholder="أدخل كود الاشتراك" required>
+                                <input type="text" name="code"
+                                    class="form-control @error('code') is-invalid @enderror" placeholder="أدخل كود الاشتراك"
+                                    required>
                                 @error('code')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -111,7 +112,8 @@
                             text: 'تم حفظ الكود بنجاح',
                             confirmButtonText: 'موافق'
                         }).then(() => {
-                            window.location.href = "{{ route('dashboard.vouchers', $coupon->id) }}";
+                            window.location.href =
+                                "{{ route('dashboard.vouchers', $coupon->id) }}";
                         });
                     },
                     error: function(xhr) {
@@ -125,7 +127,8 @@
                                 errorMessage += value[0] + '<br>';
                             });
                         } else {
-                            errorMessage = xhr.responseJSON?.error || xhr.responseText || 'حدث خطأ ما!';
+                            errorMessage = xhr.responseJSON?.error || xhr.responseText ||
+                                'حدث خطأ ما!';
                         }
 
                         Swal.fire({

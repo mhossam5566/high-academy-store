@@ -41,8 +41,9 @@
                                     <label class="form-label">
                                         <i class="ti ti-tag me-1"></i>اسم الكوبون
                                     </label>
-                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                                        value="{{ $coupon->name }}" placeholder="أدخل اسم الكوبون">
+                                    <input type="text" name="name"
+                                        class="form-control @error('name') is-invalid @enderror" value="{{ $coupon->name }}"
+                                        placeholder="أدخل اسم الكوبون">
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -53,8 +54,8 @@
                                         <i class="ti ti-currency-dollar me-1"></i>السعر
                                     </label>
                                     <input type="number" name="price" step="0.01"
-                                        class="form-control @error('price') is-invalid @enderror" value="{{ $coupon->price }}"
-                                        placeholder="أدخل السعر">
+                                        class="form-control @error('price') is-invalid @enderror"
+                                        value="{{ $coupon->price }}" placeholder="أدخل السعر">
                                     @error('price')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -66,36 +67,57 @@
                                     </label>
                                     <select name="type" class="form-select @error('type') is-invalid @enderror">
                                         <option value="">اختر النوع</option>
-                                        <option value="weekly" {{ $coupon->type == 'weekly' ? 'selected' : '' }}>أسبوعي</option>
-                                        <option value="monthly" {{ $coupon->type == 'monthly' ? 'selected' : '' }}>شهري</option>
-                                        <option value="package" {{ $coupon->type == 'package' ? 'selected' : '' }}>باقة</option>
+                                        <option value="weekly" {{ $coupon->type == 'weekly' ? 'selected' : '' }}>أسبوعي
+                                        </option>
+                                        <option value="monthly" {{ $coupon->type == 'monthly' ? 'selected' : '' }}>شهري
+                                        </option>
+                                        <option value="package" {{ $coupon->type == 'package' ? 'selected' : '' }}>باقة
+                                        </option>
                                     </select>
                                     @error('type')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-                                @if($coupon->image)
-                                <!-- Current Image Preview -->
                                 <div class="col-12 mb-4">
-                                    <label class="form-label">الصورة الحالية</label>
-                                    <div class="text-center p-3 bg-light rounded" id="currentImageContainer">
-                                        <img src="{{ $coupon->image_path }}" alt="Coupon Image"
-                                            class="img-fluid rounded shadow-sm" style="max-width: 300px;">
-                                        <div class="mt-2">
-                                            <label class="form-check-label text-danger">
-                                                <input type="checkbox" name="delete_image" value="1" class="form-check-input">
-                                                حذف الصورة الحالية
-                                            </label>
+                                    <label class="form-label">
+                                        <i class="ti ti-user me-1"></i>المدرس
+                                    </label>
+                                    <select name="brand_id" class="form-select @error('brand_id') is-invalid @enderror">
+                                        <option value="">بدون مدرس</option>
+                                        @foreach($brands as $brand)
+                                            <option value="{{ $brand->id }}" {{ $coupon->brand_id == $brand->id ? 'selected' : '' }}>{{ $brand->title }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('brand_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">اختر المدرس المرتبط بالكوبون (اختياري)</small>
+                                </div>
+
+                                @if ($coupon->image)
+                                    <!-- Current Image Preview -->
+                                    <div class="col-12 mb-4">
+                                        <label class="form-label">الصورة الحالية</label>
+                                        <div class="text-center p-3 bg-light rounded" id="currentImageContainer">
+                                            <img src="{{ $coupon->image_path }}" alt="Coupon Image"
+                                                class="img-fluid rounded shadow-sm" style="max-width: 300px;">
+                                            <div class="mt-2">
+                                                <label class="form-check-label text-danger">
+                                                    <input type="checkbox" name="delete_image" value="1"
+                                                        class="form-check-input">
+                                                    حذف الصورة الحالية
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 @endif
 
                                 <!-- New Image Upload -->
                                 <div class="col-12 mb-4">
                                     <label class="form-label">
-                                        <i class="ti ti-photo me-1"></i>{{ $coupon->image ? 'استبدال الصورة' : 'إضافة صورة' }}
+                                        <i
+                                            class="ti ti-photo me-1"></i>{{ $coupon->image ? 'استبدال الصورة' : 'إضافة صورة' }}
                                         <small class="text-muted">(اختياري)</small>
                                     </label>
                                     <input type="file" name="image" accept="image/*"
@@ -172,7 +194,8 @@
                                 errorMessage += value[0] + '<br>';
                             });
                         } else {
-                            errorMessage = xhr.responseJSON?.error || xhr.responseText || 'حدث خطأ ما!';
+                            errorMessage = xhr.responseJSON?.error || xhr.responseText ||
+                                'حدث خطأ ما!';
                         }
 
                         Swal.fire({

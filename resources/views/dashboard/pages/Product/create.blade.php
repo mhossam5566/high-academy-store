@@ -306,7 +306,8 @@
                         <label class="form-label">
                             <i class="ti ti-photos me-1"></i>الصور الإضافية
                         </label>
-                        <input type="file" name="images[]" accept="image/*" class="dropify" data-height="300" multiple>
+                        <input type="file" name="images[]" accept="image/*" class="dropify" data-height="300"
+                            multiple>
                         <small class="text-muted">يمكن رفع أكثر من صورة</small>
                     </div>
                 </div>
@@ -339,7 +340,7 @@
                     fileSize: 'حجم الملف كبير جداً (الحد الأقصى 2 MB).'
                 }
             });
-            
+
             $('.select2').select2({
                 theme: 'bootstrap-5',
                 placeholder: 'اختر...'
@@ -404,7 +405,8 @@
                                 errorMessage += value[0] + '<br>';
                             });
                         } else {
-                            errorMessage = xhr.responseJSON?.error || xhr.responseText || 'حدث خطأ ما!';
+                            errorMessage = xhr.responseJSON?.error || xhr.responseText ||
+                                'حدث خطأ ما!';
                         }
 
                         Swal.fire({

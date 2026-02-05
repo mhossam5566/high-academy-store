@@ -349,26 +349,28 @@
             </div>
             <div class="card-body">
                 <div class="row g-3">
-                    @if($product->photo)
-                    <!-- Current Main Image Preview -->
-                    <div class="col-12 mb-3">
-                        <label class="form-label">الصورة الرئيسية الحالية</label>
-                        <div class="text-center p-3 bg-light rounded">
-                            <img src="{{ $product->image_path }}" alt="Product Image"
-                                class="img-fluid rounded shadow-sm" style="max-width: 300px;">
-                            <div class="mt-2">
-                                <label class="form-check-label text-danger">
-                                    <input type="checkbox" name="delete_main_image" value="1" class="form-check-input">
-                                    حذف الصورة الرئيسية
-                                </label>
+                    @if ($product->photo)
+                        <!-- Current Main Image Preview -->
+                        <div class="col-12 mb-3">
+                            <label class="form-label">الصورة الرئيسية الحالية</label>
+                            <div class="text-center p-3 bg-light rounded">
+                                <img src="{{ $product->image_path }}" alt="Product Image"
+                                    class="img-fluid rounded shadow-sm" style="max-width: 300px;">
+                                <div class="mt-2">
+                                    <label class="form-check-label text-danger">
+                                        <input type="checkbox" name="delete_main_image" value="1"
+                                            class="form-check-input">
+                                        حذف الصورة الرئيسية
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     @endif
 
                     <div class="col-md-6">
                         <label class="form-label">
-                            <i class="ti ti-photo me-1"></i>{{ $product->photo ? 'استبدال الصورة الرئيسية' : 'الصورة الرئيسية' }}
+                            <i
+                                class="ti ti-photo me-1"></i>{{ $product->photo ? 'استبدال الصورة الرئيسية' : 'الصورة الرئيسية' }}
                             <small class="text-muted">(اختياري)</small>
                         </label>
                         <input type="file" name="photo" accept="image/*" class="dropify" data-height="300">
@@ -380,7 +382,8 @@
                             <i class="ti ti-photos me-1"></i>الصور الإضافية
                             <small class="text-muted">(اختياري)</small>
                         </label>
-                        <input type="file" name="images[]" accept="image/*" class="dropify" data-height="300" multiple>
+                        <input type="file" name="images[]" accept="image/*" class="dropify" data-height="300"
+                            multiple>
                         <small class="text-muted">يمكن رفع أكثر من صورة</small>
                     </div>
 
@@ -398,7 +401,8 @@
                                                     <input class="form-check-input" type="checkbox"
                                                         id="img_{{ $image->id }}" name="delete_images[]"
                                                         value="{{ $image->id }}">
-                                                    <label class="form-check-label text-danger" for="img_{{ $image->id }}">
+                                                    <label class="form-check-label text-danger"
+                                                        for="img_{{ $image->id }}">
                                                         حذف هذه الصورة
                                                     </label>
                                                 </div>
@@ -439,7 +443,7 @@
                     fileSize: 'حجم الملف كبير جداً (الحد الأقصى 2 MB).'
                 }
             });
-            
+
             $('.select2').select2({
                 theme: 'bootstrap-5',
                 placeholder: 'اختر...'
@@ -526,7 +530,8 @@
                                 errorMessage += value[0] + '<br>';
                             });
                         } else {
-                            errorMessage = xhr.responseJSON?.error || xhr.responseText || 'حدث خطأ ما!';
+                            errorMessage = xhr.responseJSON?.error || xhr.responseText ||
+                                'حدث خطأ ما!';
                         }
 
                         Swal.fire({

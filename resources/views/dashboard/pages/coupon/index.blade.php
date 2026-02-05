@@ -30,6 +30,7 @@
                         <th>#</th>
                         <th>الاسم</th>
                         <th>السعر</th>
+                        <th>المدرس</th>
                         <th>الصورة</th>
                         <th>الأكواد المتاحة</th>
                         <th>العمليات</th>
@@ -73,6 +74,10 @@
                     {
                         data: 'price',
                         name: 'price'
+                    },
+                    {
+                        data: 'brand',
+                        name: 'brand'
                     },
                     {
                         data: 'image',

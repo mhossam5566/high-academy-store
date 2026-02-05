@@ -13,7 +13,8 @@ class Coupon extends Model
         'name',
         'image',
         'price',
-        'type'
+        'type',
+        'brand_id'
     ];
 
     protected $appends = [
@@ -23,6 +24,11 @@ class Coupon extends Model
     public function vouchers()
     {
         return $this->HasMany(Voucher::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
     }
 
     public function getImagePathAttribute()
