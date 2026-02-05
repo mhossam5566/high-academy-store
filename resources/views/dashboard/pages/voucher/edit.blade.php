@@ -35,18 +35,15 @@
                         @enderror
                     </div>
 
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title">الصورة</h6>
-                                <input type="file" name="image" accept="image/*"
-                                    data-default-file="{{ $voucher->image_path }}"
-                                    class="dropify @error('image') is-invalid @enderror">
-                                @error('image')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label">الصورة</label>
+                        <input type="file" name="image" accept="image/*"
+                            data-default-file="{{ $voucher->image_path }}"
+                            class="dropify @error('image') is-invalid @enderror">
+                        <small class="text-muted">صورة الكوبون</small>
+                        @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-12 text-center mt-4">
