@@ -17,12 +17,12 @@
         <div class="modern-product-card position-relative" style="height: 100%;">
 
             {{-- Debug state value --}}
-            @if (config('app.debug'))
+            {{-- @if (config('app.debug'))
                 <div
                     style="position: absolute; top: 5px; left: 5px; background: red; color: white; padding: 2px 5px; font-size: 10px; z-index: 10;">
                     State: {{ $item->state }}
                 </div>
-            @endif
+            @endif --}}
 
             {{-- Status Ribbon - Redesigned --}}
             @if ($item->state == 0)
