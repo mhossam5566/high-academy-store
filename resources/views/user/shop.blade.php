@@ -3,274 +3,272 @@
     High Academy Store - المتجر
 @endsection
 
-@section('css')
-<style>
-    /* Search & Filter Section */
-    .search-filter-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 20px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
-    }
-    
-    .search-filter-section.books-theme {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-    
-    .search-filter-section.products-theme {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-    
-    .search-title {
-        color: #fff;
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-    
-    .search-title i {
-        margin-left: 10px;
-    }
-    
-    /* Search Input */
-    .search-input-wrapper {
-        position: relative;
-        margin-bottom: 20px;
-    }
-    
-    .search-input-wrapper input {
-        width: 100%;
-        padding: 18px 25px 18px 60px;
-        border: none;
-        border-radius: 50px;
-        font-size: 1.1rem;
-        background: rgba(255, 255, 255, 0.95);
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .search-input-wrapper input:focus {
-        outline: none;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-    }
-    
-    .search-input-wrapper .search-icon {
-        position: absolute;
-        left: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #667eea;
-        font-size: 1.3rem;
-    }
-    
-    /* Filter Grid */
-    .filter-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    
-    @media (max-width: 768px) {
-        .filter-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-    
-    /* Custom Select */
-    .custom-select-wrapper {
-        position: relative;
-    }
-    
-    .custom-select-wrapper select {
-        width: 100%;
-        padding: 14px 20px;
-        border: none;
-        border-radius: 15px;
-        font-size: 1rem;
-        background: rgba(255, 255, 255, 0.95);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        padding-left: 40px;
-    }
-    
-    .custom-select-wrapper select:focus {
-        outline: none;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-        transform: translateY(-2px);
-    }
-    
-    .custom-select-wrapper select:disabled {
-        background: rgba(255, 255, 255, 0.5);
-        cursor: not-allowed;
-    }
-    
-    .custom-select-wrapper::after {
-        content: '\f107';
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #667eea;
-        pointer-events: none;
-    }
-    
-    .custom-select-wrapper .select-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #999;
-        font-size: 0.9rem;
-    }
-    
-    /* Search Button */
-    .search-btn {
-        background: #fff;
-        color: #667eea;
-        border: none;
-        padding: 15px 50px;
-        border-radius: 50px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .search-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-    }
-    
-    .search-btn i {
-        transition: transform 0.3s ease;
-    }
-    
-    .search-btn:hover i {
-        transform: translateX(-5px);
-    }
-    
-    /* Reset Button */
-    .reset-btn {
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        padding: 15px 30px;
-        border-radius: 50px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-    }
-    
-    .reset-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        border-color: #fff;
-        color: #fff;
-        text-decoration: none;
-    }
-    
-    /* Active Filters */
-    .active-filters {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 15px;
-        justify-content: center;
-    }
-    
-    .filter-tag {
-        background: rgba(255, 255, 255, 0.25);
-        color: #fff;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        backdrop-filter: blur(5px);
-    }
-    
-    .filter-tag i {
-        cursor: pointer;
-        opacity: 0.8;
-        transition: opacity 0.2s;
-    }
-    
-    .filter-tag i:hover {
-        opacity: 1;
-    }
-    
-    /* Results Count */
-    .results-info {
-        background: #fff;
-        padding: 15px 25px;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        margin-bottom: 25px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 15px;
-    }
-    
-    .results-count {
-        font-size: 1.1rem;
-        color: #333;
-    }
-    
-    .results-count strong {
-        color: #667eea;
-    }
-    
-    /* Animations */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .search-filter-section {
-        animation: fadeInUp 0.5s ease;
-    }
-    
-    .filter-grid > div {
-        animation: fadeInUp 0.5s ease;
-        animation-fill-mode: both;
-    }
-    
-    .filter-grid > div:nth-child(1) { animation-delay: 0.1s; }
-    .filter-grid > div:nth-child(2) { animation-delay: 0.15s; }
-    .filter-grid > div:nth-child(3) { animation-delay: 0.2s; }
-    .filter-grid > div:nth-child(4) { animation-delay: 0.25s; }
-    .filter-grid > div:nth-child(5) { animation-delay: 0.3s; }
-</style>
-@endsection
-
 @section('content')
+    <style>
+        /* Search & Filter Section */
+        .search-filter-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        }
+        
+        .search-filter-section.books-theme {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .search-filter-section.products-theme {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .search-title {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .search-title i {
+            margin-left: 10px;
+        }
+        
+        /* Search Input */
+        .search-input-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 18px 25px 18px 60px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input-wrapper input:focus {
+            outline: none;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .search-input-wrapper .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.3rem;
+        }
+        
+        /* Filter Grid */
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Custom Select */
+        .custom-select-wrapper {
+            position: relative;
+        }
+        
+        .custom-select-wrapper select {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-left: 40px;
+        }
+        
+        .custom-select-wrapper select:focus {
+            outline: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+        
+        .custom-select-wrapper select:disabled {
+            background: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+        
+        .custom-select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            pointer-events: none;
+        }
+        
+        .custom-select-wrapper .select-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        /* Search Button */
+        .search-btn {
+            background: #fff;
+            color: #667eea;
+            border: none;
+            padding: 15px 50px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .search-btn i {
+            transition: transform 0.3s ease;
+        }
+        
+        .search-btn:hover i {
+            transform: translateX(-5px);
+        }
+        
+        /* Reset Button */
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: #fff;
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        /* Active Filters */
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .filter-tag {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .filter-tag i {
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        
+        .filter-tag i:hover {
+            opacity: 1;
+        }
+        
+        /* Results Count */
+        .results-info {
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .results-count {
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .results-count strong {
+            color: #667eea;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .search-filter-section {
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        .filter-grid > div {
+            animation: fadeInUp 0.5s ease;
+            animation-fill-mode: both;
+        }
+        
+        .filter-grid > div:nth-child(1) { animation-delay: 0.1s; }
+        .filter-grid > div:nth-child(2) { animation-delay: 0.15s; }
+        .filter-grid > div:nth-child(3) { animation-delay: 0.2s; }
+        .filter-grid > div:nth-child(4) { animation-delay: 0.25s; }
+        .filter-grid > div:nth-child(5) { animation-delay: 0.3s; }
+    </style>
+
     <!-- Shop Start -->
     <div class="container-fluid pt-5">
         <div class="row px-xl-5 pt-5">
