@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL; // Update Log facade import
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
@@ -384,20 +385,29 @@ class UserController extends Controller
 
         // تحديد نوع الحقل (إيميل أو رقم موبايل)
         $fieldType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        $user = User::where($fieldType, $loginField)->first();
 
-        $credentials = [
-            $fieldType => $loginField,
-            'password' => $password
-        ];
-
-        if (!Auth::attempt($credentials, $remember)) {
+        if (!$user) {
             return redirect()
                 ->back()
                 ->withErrors([
-                    'general' => 'البيانات التي أدخلتها غير صحيحة',
+                    'general' => $fieldType === 'email'
+                        ? 'البريد الإلكتروني غير موجود.'
+                        : 'رقم الموبايل غير موجود.',
                 ])
                 ->withInput();
         }
+
+        if (!Hash::check($password, $user->password)) {
+            return redirect()
+                ->back()
+                ->withErrors([
+                    'general' => 'كلمة المرور غير صحيحة.',
+                ])
+                ->withInput();
+        }
+
+        Auth::login($user, $remember);
 
         if (Session::get('url.intended')) {
             return Redirect::to(Session::get('url.intended'));
