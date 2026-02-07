@@ -372,11 +372,10 @@ class UserController extends Controller
     {
         $request->validate([
             'email' => 'required|string',
-            'password' => 'required|min:6',
+            'password' => 'required',
         ], [
             'email.required' => 'البريد الإلكتروني أو رقم الموبايل مطلوب.',
             'password.required' => 'كلمة المرور مطلوبة.',
-            'password.min' => 'كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل.',
         ]);
 
         $loginField = $request->input('email');

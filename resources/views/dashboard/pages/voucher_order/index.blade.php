@@ -15,6 +15,14 @@
 @endsection
 
 @section('page-script')
+    <style>
+        #voucher-orders-table .coupon-column {
+            max-width: 220px;
+            white-space: normal;
+            word-break: break-word;
+        }
+    </style>
+
     <script>
         $(document).ready(function() {
             let stateFilterValue = "{{ request()->query('state') ?? '' }}";
@@ -29,6 +37,7 @@
                 stateSave: true,
                 stateDuration: -1,
                 scrollX: true,
+                autoWidth: false,
                 processing: true,
                 serverSide: true,
                 order: [
@@ -58,7 +67,9 @@
                     },
                     {
                         data: 'coupon',
-                        name: 'coupon'
+                        name: 'coupon',
+                        width: '220px',
+                        className: 'coupon-column'
                     },
                     {
                         data: 'quantity',
