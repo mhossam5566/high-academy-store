@@ -125,7 +125,7 @@
                                         <span class="is-complete"></span>
                                         <p>قيد التجهيز<br><span>{{ $order->status === 'reserved' || $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                     </div>
-                                    <div class="order-tracking {{ $order->status === 'new' || $order->status === 'success' ? 'completed' : '' }}">
+                                    <div class="order-tracking {{ $order->status === 'new' || $order->status === 'success' || $order->status === 'reserved' ? 'completed' : '' }}">
                                         <span class="is-complete"></span>
                                         <p>قيد المراجعة<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
                                     </div>
