@@ -7,25 +7,31 @@
             crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" />
         <style>
-            .bg-warning{
+            .bg-warning {
                 background-color: #e99239 !important;
             }
+
             /* … your existing styles … */
-            
+
             /* Order Tracker Styles */
             .hh-grayBox {
                 margin-bottom: 20px;
                 padding: 35px;
                 margin-top: 20px;
             }
-            .pt45{padding-top:45px;}
-            .order-tracking{
+
+            .pt45 {
+                padding-top: 45px;
+            }
+
+            .order-tracking {
                 text-align: center;
                 width: 33.33%;
                 position: relative;
                 display: block;
             }
-            .order-tracking .is-complete{
+
+            .order-tracking .is-complete {
                 display: block;
                 position: relative;
                 border-radius: 50%;
@@ -38,6 +44,7 @@
                 -webkit-transition: background 0.25s linear;
                 z-index: 2;
             }
+
             .order-tracking .is-complete:after {
                 display: block;
                 position: absolute;
@@ -53,11 +60,13 @@
                 transform: rotate(45deg);
                 opacity: 0;
             }
-            .order-tracking.completed .is-complete{
+
+            .order-tracking.completed .is-complete {
                 border-color: #1C8555;
                 border-width: 0px;
                 background-color: #1C8555;
             }
+
             .order-tracking.completed .is-complete:after {
                 border-color: #fff;
                 border-width: 0px 3px 3px 0;
@@ -65,6 +74,7 @@
                 left: 11px;
                 opacity: 1;
             }
+
             .order-tracking p {
                 color: #A4A4A4;
                 font-size: 16px;
@@ -72,8 +82,15 @@
                 margin-bottom: 0;
                 line-height: 20px;
             }
-            .order-tracking p span{font-size: 14px;}
-            .order-tracking.completed p{color: #000;}
+
+            .order-tracking p span {
+                font-size: 14px;
+            }
+
+            .order-tracking.completed p {
+                color: #000;
+            }
+
             .order-tracking::before {
                 content: '';
                 display: block;
@@ -85,23 +102,54 @@
                 left: calc(-50% + 10px);
                 z-index: 0;
             }
-            .order-tracking:first-child:before{display: none;}
-            .order-tracking.completed:before{background-color: #1C8555;}
+
+            .order-tracking:first-child:before {
+                display: none;
+            }
+
+            .order-tracking.completed:before {
+                background-color: #1C8555;
+            }
 
             /* Barcode Section adjustments */
-            .barcode-section h4 { font-weight: 700; }
-            .barcode-note { color: #333; font-size: 15px; margin: 6px 0 2px; }
-            .barcode-link { color: #0d6efd; font-weight: 700; text-decoration: underline; }
-            .hl-underline { position: relative; display: inline-block; }
-            .hl-underline::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2px; height: 8px; background: rgba(40,167,69,.25); border-radius: 4px; z-index: -1; }
-
-@media screen and (max-width: 600px) {
-    .order-tracking p {
-                font-size: 14px;
+            .barcode-section h4 {
+                font-weight: 700;
             }
-}
-    
 
+            .barcode-note {
+                color: #333;
+                font-size: 15px;
+                margin: 6px 0 2px;
+            }
+
+            .barcode-link {
+                color: #0d6efd;
+                font-weight: 700;
+                text-decoration: underline;
+            }
+
+            .hl-underline {
+                position: relative;
+                display: inline-block;
+            }
+
+            .hl-underline::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -2px;
+                height: 8px;
+                background: rgba(40, 167, 69, .25);
+                border-radius: 4px;
+                z-index: -1;
+            }
+
+            @media screen and (max-width: 600px) {
+                .order-tracking p {
+                    font-size: 14px;
+                }
+            }
         </style>
 
         <div class="container">
@@ -114,23 +162,28 @@
 
                 {{-- Tracking Steps --}}
                 @if ($order->status !== 'cancelled')
-
-                            <div class="col-12 hh-grayBox pt45 pb20 card shadow-sm">
-                                <div class="row justify-content-between">
-                                    <div class="order-tracking {{ $order->barcode ? 'completed' : '' }}">
-                                        <span class="is-complete"></span>
-                                        <p>قيد التوصيل<br><span>{{ $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
-                                    </div>
-                                    <div class="order-tracking {{ $order->status === 'reserved' || $order->status === 'success' ? 'completed' : '' }}">
-                                        <span class="is-complete"></span>
-                                        <p>قيد التجهيز<br><span>{{ $order->status === 'reserved' || $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
-                                    </div>
-                                    <div class="order-tracking {{ $order->status === 'new' || $order->status === 'success' || $order->status === 'reserved' ? 'completed' : '' }}">
-                                        <span class="is-complete"></span>
-                                        <p>قيد المراجعة<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
-                                    </div>
-                                </div>
+                    <div class="col-12 hh-grayBox pt45 pb20 card shadow-sm">
+                        <div class="row justify-content-between">
+                            <div class="order-tracking {{ $order->barcode ? 'completed' : '' }}">
+                                <span class="is-complete"></span>
+                                <p>قيد
+                                    التوصيل<br><span>{{ $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                </p>
                             </div>
+                            <div
+                                class="order-tracking {{ $order->status === 'reserved' || $order->status === 'success' ? 'completed' : '' }}">
+                                <span class="is-complete"></span>
+                                <p>قيد
+                                    التجهيز<br><span>{{ $order->status === 'reserved' || $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                </p>
+                            </div>
+                            <div
+                                class="order-tracking {{ $order->status === 'new' || $order->status === 'success' || $order->status === 'reserved' ? 'completed' : '' }}">
+                                <span class="is-complete"></span>
+                                <p>قيد المراجعة<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
+                            </div>
+                        </div>
+                    </div>
                 @endif
 
                 {{-- Barcode --}}
@@ -144,7 +197,9 @@
                                     <strong class="fs-5">
                                         {{ $order->barcode }}
                                     </strong>
-                                    <a class="barcode-link" href="https://egyptpost.gov.eg/ar-eg/home/eservices/track-and-trace/" target="_blank">واضغط هنا</a>
+                                    <a class="barcode-link"
+                                        href="https://egyptpost.gov.eg/ar-eg/home/eservices/track-and-trace/"
+                                        target="_blank">واضغط هنا</a>
                                 </div>
                                 <div class="mt-2">
                                     <span class="hl-underline">عشان تشوف شحنتك بقت فين 🛵</span>
@@ -177,15 +232,16 @@
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         @if ($detail->products && $detail->products->image)
-                                                            <img src="{{ asset('storage/images/products/' . $detail->products->image) }}" 
-                                                                 alt="{{ $detail->products->name }}" 
-                                                                 class="me-3" 
-                                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                                            <img src="{{ asset('storage/images/products/' . $detail->products->image) }}"
+                                                                alt="{{ $detail->products->name }}" class="me-3"
+                                                                style="width: 50px; height: 50px; object-fit: cover;">
                                                         @endif
                                                         <div>
-                                                            <h6 class="mb-0">{{ $detail->products->name ?? 'منتج محذوف' }}</h6>
+                                                            <h6 class="mb-0">{{ $detail->products->name ?? 'منتج محذوف' }}
+                                                            </h6>
                                                             @if ($detail->products && $detail->products->short_name)
-                                                                <small class="text-muted">{{ $detail->products->short_name }}</small>
+                                                                <small
+                                                                    class="text-muted">{{ $detail->products->short_name }}</small>
                                                             @endif
                                                         </div>
                                                     </div>
@@ -301,6 +357,7 @@
                                     @case('reserved')
                                         <span class="badge bg-info">طلب محجوز</span>
                                     @break
+
                                     @case('pending')
                                         <span class="badge bg-info">طلب معلق</span>
                                     @break
