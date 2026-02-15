@@ -17,9 +17,8 @@
 @section('page-script')
     <style>
         #voucher-orders-table .coupon-column {
-            max-width: 220px;
-            white-space: normal;
-            word-break: break-word;
+            min-width: 300px;
+            white-space: nowrap;
         }
     </style>
 
@@ -68,7 +67,7 @@
                     {
                         data: 'coupon',
                         name: 'coupon',
-                        width: '220px',
+                        width: '300px',
                         className: 'coupon-column'
                     },
                     {
