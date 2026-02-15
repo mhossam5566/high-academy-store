@@ -120,7 +120,7 @@
 
                         $.ajax({
                             url: "{{ route('dashboard.vouchers.destroy') }}",
-                            type: 'DELETE',
+                            type: 'POST',
                             data: {
                                 _token: $('meta[name="csrf-token"]').attr('content'),
                                 id: id

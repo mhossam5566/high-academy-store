@@ -54,7 +54,7 @@ class VoucherController extends Controller
                 $edit = '<a href="' . route('dashboard.vouchers.edit', $row->id) . '" class="btn btn-sm btn-primary me-1">
                 <i class="ti ti-edit me-1"></i>تعديل
             </a>';
-                $delete = '<a voucher_id="' . $row->id . '" class="btn btn-sm btn-danger delete_btn">
+                $delete = '<a data-id="' . $row->id . '" class="btn btn-sm btn-danger delete_btn">
                 <i class="ti ti-trash me-1"></i>حذف
             </a>';
                 return $edit . $delete;
