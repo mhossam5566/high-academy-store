@@ -584,7 +584,7 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($order_id);
         $shippingMethods = ShippingMethod::all();
-        $products = Product::where('quantity', '>', 0)->get();
+        $products = Product::all();
         return $products;
         return view('dashboard.pages.order.edit', compact('order', 'shippingMethods', 'products'));
     }
