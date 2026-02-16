@@ -212,7 +212,7 @@ class OrderController extends Controller
                         break;
                 }
 
-                $notifyBtn = '<button class="btn btn-sm ' . $notifyBtnClass . ' send-notification" 
+                $notifyBtn = '<button class="btn btn-sm ' . $notifyBtnClass . ' send-notification"
                     data-order-id="' . $row->id . '" ' . $disabled . '>
                     ' . $notifyText . '
                 </button>';
@@ -581,6 +581,7 @@ class OrderController extends Controller
 
     public function editOrder($order_id)
     {
+
         $order = Order::findOrFail($order_id);
         $shippingMethods = ShippingMethod::all();
         $products = Product::where('quantity', '>', 0)->get();
