@@ -312,7 +312,7 @@
 
                             {{-- Total Paid --}}
                             <li class="list-group-item d-flex justify-content-between">
-                                <strong>إجمالي المدفوع</strong>
+                                <strong>إجمالي المبلغ</strong>
                                 <span>{{ number_format($order->total, 2) }} جنيه</span>
                             </li>
 
