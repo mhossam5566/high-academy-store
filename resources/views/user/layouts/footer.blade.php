@@ -87,7 +87,7 @@
                         <a class="btn btn-primary btn-square mr-2"
                             href="https://www.facebook.com/highacademy2?mibextid=ZbWKwL"><i
                                 class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-primary btn-square mr-2" href="https://wsend.co/201060683708"><i
+                        <a class="btn btn-primary btn-square mr-2" href="https://wsend.co/201550234324"><i
                                 class="fab fa-whatsapp"></i></a>
 
                     </section>
