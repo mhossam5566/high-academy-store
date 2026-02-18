@@ -102,6 +102,7 @@
                                     <th>حالة التتبع</th>
                                     <th>الإجراءات</th>
                                 @endif
+                                <th></th>التفاصيل</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -166,6 +167,10 @@
                     {
                         data: 'admin_addbarcode',
                         name: 'admin_addbarcode',
+                    },
+                    {
+                        data: 'details',
+                        name: 'details',
                     },
                     @if (request('shipping') === 'branch')
                         {
