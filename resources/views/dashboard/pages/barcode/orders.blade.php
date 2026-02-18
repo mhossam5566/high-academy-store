@@ -94,8 +94,7 @@
                             <tr>
                                 <th>رقم الطلب</th>
                                 <th>الاسم</th>
-                                <th>رقم الموبايل</th>
-                                <th>العنوان</th>
+
                                 <th>الباركود</th>
                                 <th>أضافه الباركود</th>
                                 <th>تفاصيل</th>
@@ -150,15 +149,6 @@
                     {
                         data: 'name',
                         name: 'name',
-                        className: 'text-nowrap'
-                    },
-                    {
-                        data: 'mobile',
-                        name: 'mobile'
-                    },
-                    {
-                        data: 'address',
-                        name: 'address',
                         className: 'text-nowrap'
                     },
 
