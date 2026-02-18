@@ -169,24 +169,21 @@
                                 {{-- تم التوصيل --}}
                                 <div class="order-tracking {{ $order->barcode || $order->status === 'delivered' ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>تم التوصيل<br><span>{{ $order->barcode || $order->status === 'delivered' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
-                                    </p>
+                                    <p>تم التوصيل<br><span>{{ $order->barcode || $order->status === 'delivered' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                 </div>
-                                
+
                                 {{-- قيد التجهيز --}}
                                 <div class="order-tracking {{ in_array($order->status, ['preparing', 'delivered']) || $order->barcode ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>قيد التجهيز<br><span>{{ in_array($order->status, ['preparing', 'delivered']) || $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
-                                    </p>
+                                    <p>قيد التجهيز<br><span>{{ in_array($order->status, ['preparing', 'delivered']) || $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                 </div>
-                                
+
                                 {{-- تم الحجز --}}
                                 <div class="order-tracking {{ $order->is_paid ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>تم الحجز<br><span>{{ $order->is_paid ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
-                                    </p>
+                                    <p>تم الحجز<br><span>{{ $order->is_paid ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                 </div>
-                                
+
                                 {{-- في انتظار الدفع --}}
                                 <div class="order-tracking completed">
                                     <span class="is-complete"></span>
@@ -199,24 +196,21 @@
                                 {{-- تم التوصيل --}}
                                 <div class="order-tracking {{ $order->barcode || $order->status === 'delivered' ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>تم التوصيل<br><span>{{ $order->barcode || $order->status === 'delivered' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
-                                    </p>
+                                    <p>تم التوصيل<br><span>{{ $order->barcode || $order->status === 'delivered' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                 </div>
-                                
+
                                 {{-- قيد التجهيز --}}
                                 <div class="order-tracking {{ in_array($order->status, ['preparing', 'success', 'delivered']) || $order->barcode ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>قيد التجهيز<br><span>{{ in_array($order->status, ['preparing', 'success', 'delivered']) || $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
-                                    </p>
+                                    <p>قيد التجهيز<br><span>{{ in_array($order->status, ['preparing', 'success', 'delivered']) || $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                 </div>
-                                
+
                                 {{-- تم الدفع --}}
                                 <div class="order-tracking {{ $order->is_paid || $order->status === 'success' ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>تم الدفع<br><span>{{ $order->is_paid || $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
-                                    </p>
+                                    <p>تم الدفع<br><span>{{ $order->is_paid || $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                 </div>
-                                
+
                                 {{-- في انتظار الدفع --}}
                                 <div class="order-tracking completed">
                                     <span class="is-complete"></span>
@@ -278,7 +272,8 @@
                                                                 style="width: 50px; height: 50px; object-fit: cover;">
                                                         @endif
                                                         <div>
-                                                            <h6 class="mb-0">{{ $detail->products->name ?? 'منتج محذوف' }}
+                                                            <h6 class="mb-0">
+                                                                {{ $detail->products->name ?? 'منتج محذوف' }}
                                                             </h6>
                                                             @if ($detail->products && $detail->products->short_name)
                                                                 <small
@@ -397,7 +392,7 @@
                                     @break
 
                                     @case('reserved')
-                                        @if($order->is_paid)
+                                        @if ($order->is_paid)
                                             <span class="badge bg-info">تم الحجز</span>
                                         @else
                                             <span class="badge bg-warning text-dark">في انتظار الدفع</span>
