@@ -163,61 +163,26 @@
                 {{-- Tracking Steps --}}
                 @if ($order->status !== 'cancelled')
                     <div class="col-12 hh-grayBox pt45 pb20 card shadow-sm">
-                        @if ($order->status === 'reserved')
-                            {{-- نظام الكتب المحجوزة --}}
-                            <div class="row justify-content-between">
-                                {{-- تم التوصيل --}}
-                                <div class="order-tracking {{ $order->barcode || $order->status === 'delivered' ? 'completed' : '' }}">
-                                    <span class="is-complete"></span>
-                                    <p>تم التوصيل<br><span>{{ $order->barcode || $order->status === 'delivered' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
-                                </div>
-
-                                {{-- قيد التجهيز --}}
-                                <div class="order-tracking {{ in_array($order->status, ['preparing', 'delivered']) || $order->barcode ? 'completed' : '' }}">
-                                    <span class="is-complete"></span>
-                                    <p>قيد التجهيز<br><span>{{ in_array($order->status, ['preparing', 'delivered']) || $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
-                                </div>
-
-                                {{-- تم الحجز --}}
-                                <div class="order-tracking {{ $order->is_paid ? 'completed' : '' }}">
-                                    <span class="is-complete"></span>
-                                    <p>تم الحجز<br><span>{{ $order->is_paid ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
-                                </div>
-
-                                {{-- في انتظار الدفع --}}
-                                <div class="order-tracking completed">
-                                    <span class="is-complete"></span>
-                                    <p>في انتظار الدفع<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
-                                </div>
+                        <div class="row justify-content-between">
+                            <div class="order-tracking {{ $order->barcode ? 'completed' : '' }}">
+                                <span class="is-complete"></span>
+                                <p>قيد
+                                    التوصيل<br><span>{{ $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                </p>
                             </div>
-                        @else
-                            {{-- نظام الطلبات العادية --}}
-                            <div class="row justify-content-between">
-                                {{-- تم التوصيل --}}
-                                <div class="order-tracking {{ $order->barcode || $order->status === 'delivered' ? 'completed' : '' }}">
-                                    <span class="is-complete"></span>
-                                    <p>تم التوصيل<br><span>{{ $order->barcode || $order->status === 'delivered' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
-                                </div>
-
-                                {{-- قيد التجهيز --}}
-                                <div class="order-tracking {{ in_array($order->status, ['preparing', 'success', 'delivered']) || $order->barcode ? 'completed' : '' }}">
-                                    <span class="is-complete"></span>
-                                    <p>قيد التجهيز<br><span>{{ in_array($order->status, ['preparing', 'success', 'delivered']) || $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
-                                </div>
-
-                                {{-- تم الدفع --}}
-                                <div class="order-tracking {{ $order->is_paid || $order->status === 'success' ? 'completed' : '' }}">
-                                    <span class="is-complete"></span>
-                                    <p>تم الدفع<br><span>{{ $order->is_paid || $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
-                                </div>
-
-                                {{-- في انتظار الدفع --}}
-                                <div class="order-tracking completed">
-                                    <span class="is-complete"></span>
-                                    <p>في انتظار الدفع<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
-                                </div>
+                            <div
+                                class="order-tracking {{ $order->status === 'reserved' || $order->status === 'success' ? 'completed' : '' }}">
+                                <span class="is-complete"></span>
+                                <p>قيد
+                                    التجهيز<br><span>{{ $order->status === 'reserved' || $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                </p>
                             </div>
-                        @endif
+                            <div
+                                class="order-tracking {{ $order->status === 'new' || $order->status === 'success' || $order->status === 'reserved' ? 'completed' : '' }}">
+                                <span class="is-complete"></span>
+                                <p>قيد المراجعة<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
+                            </div>
+                        </div>
                     </div>
                 @endif
 
@@ -272,8 +237,7 @@
                                                                 style="width: 50px; height: 50px; object-fit: cover;">
                                                         @endif
                                                         <div>
-                                                            <h6 class="mb-0">
-                                                                {{ $detail->products->name ?? 'منتج محذوف' }}
+                                                            <h6 class="mb-0">{{ $detail->products->name ?? 'منتج محذوف' }}
                                                             </h6>
                                                             @if ($detail->products && $detail->products->short_name)
                                                                 <small
@@ -379,12 +343,11 @@
                                 <strong>حالة الطلب</strong>
                                 @switch($order->status)
                                     @case('new')
-                                    @case('pending')
-                                        <span class="badge bg-warning text-dark">في انتظار الدفع</span>
+                                        <span class="badge bg-warning text-dark">طلب جديد</span>
                                     @break
 
                                     @case('success')
-                                        <span class="badge bg-success">تم الدفع</span>
+                                        <span class="badge bg-success">طلب ناجح</span>
                                     @break
 
                                     @case('cancelled')
@@ -392,19 +355,11 @@
                                     @break
 
                                     @case('reserved')
-                                        @if ($order->is_paid)
-                                            <span class="badge bg-info">تم الحجز</span>
-                                        @else
-                                            <span class="badge bg-warning text-dark">في انتظار الدفع</span>
-                                        @endif
+                                        <span class="badge bg-info">طلب محجوز</span>
                                     @break
 
-                                    @case('preparing')
-                                        <span class="badge bg-primary">قيد التجهيز</span>
-                                    @break
-
-                                    @case('delivered')
-                                        <span class="badge bg-success">تم التوصيل</span>
+                                    @case('pending')
+                                        <span class="badge bg-info">طلب معلق</span>
                                     @break
 
                                     @default
