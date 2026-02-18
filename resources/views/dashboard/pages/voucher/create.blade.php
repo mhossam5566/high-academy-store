@@ -3,13 +3,12 @@
 @section('title', 'إضافة كود جديد')
 
 @section('vendor-style')
-    <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css">
 @endsection
 
 @section('vendor-script')
-    <script src="{{ asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"></script>
+    <script src="{{ asset('dashboard/assets/js/form-ajax.js') }}"></script>
 @endsection
 
 @section('content')
@@ -32,8 +31,10 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <form id="voucherForm" method="POST" action="{{ route('dashboard.vouchers.store', $coupon->id) }}"
-                            enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('dashboard.vouchers.store', $coupon->id) }}"
+                            enctype="multipart/form-data"
+                            data-ajax
+                            data-redirect="{{ route('dashboard.vouchers', $coupon->id) }}">
                             @csrf
 
                             <div class="mb-4">
@@ -77,7 +78,6 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
-            // Initialize Dropify
             $('.dropify').dropify({
                 messages: {
                     default: 'اسحب الصورة هنا أو انقر للاختيار',
@@ -88,57 +88,6 @@
                 error: {
                     fileSize: 'حجم الملف كبير جداً (الحد الأقصى 2 MB).'
                 }
-            });
-
-            $('#voucherForm').submit(function(e) {
-                e.preventDefault();
-                let formData = new FormData(this);
-                let submitBtn = $(this).find('button[type="submit"]');
-
-                submitBtn.prop('disabled', true).html(
-                    '<span class="spinner-border spinner-border-sm me-1"></span>جاري الحفظ...');
-
-                $.ajax({
-                    url: '{{ route('dashboard.vouchers.store', $coupon->id) }}',
-                    type: "POST",
-                    dataType: "json",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم الحفظ',
-                            text: 'تم حفظ الكود بنجاح',
-                            confirmButtonText: 'موافق'
-                        }).then(() => {
-                            window.location.href =
-                                "{{ route('dashboard.vouchers', $coupon->id) }}";
-                        });
-                    },
-                    error: function(xhr) {
-                        submitBtn.prop('disabled', false).html(
-                            '<i class="ti ti-device-floppy me-1"></i>حفظ الكود');
-
-                        let errorMessage = '';
-                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                            let errors = xhr.responseJSON.errors;
-                            $.each(errors, function(key, value) {
-                                errorMessage += value[0] + '<br>';
-                            });
-                        } else {
-                            errorMessage = xhr.responseJSON?.error || xhr.responseText ||
-                                'حدث خطأ ما!';
-                        }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'خطأ',
-                            html: errorMessage,
-                            confirmButtonText: 'موافق'
-                        });
-                    }
-                });
             });
         });
     </script>
