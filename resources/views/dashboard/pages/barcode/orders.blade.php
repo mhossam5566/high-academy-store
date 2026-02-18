@@ -95,6 +95,7 @@
                                 <th>رقم الطلب</th>
                                 <th>الاسم</th>
                                 <th>رقم الموبايل</th>
+                                <th>العنوان</th>
                                 <th>الباركود</th>
                                 <th>أضافه الباركود</th>
                                 @if (request('shipping') === 'branch')
@@ -152,6 +153,10 @@
                     {
                         data: 'mobile',
                         name: 'mobile'
+                    },
+                    {
+                        data: 'address',
+                        name: 'address'
                     },
 
                     {
