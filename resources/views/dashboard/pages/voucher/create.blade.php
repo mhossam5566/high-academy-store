@@ -8,7 +8,6 @@
 
 @section('vendor-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"></script>
-    <script src="{{ asset('dashboard/assets/js/form-ajax.js') }}"></script>
 @endsection
 
 @section('content')
