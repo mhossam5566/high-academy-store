@@ -32,9 +32,7 @@
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ route('dashboard.vouchers.store', $coupon->id) }}"
-                            enctype="multipart/form-data"
-                            data-ajax
-                            data-redirect="{{ route('dashboard.vouchers', $coupon->id) }}">
+                            enctype="multipart/form-data" data-ajax>
                             @csrf
 
                             <div class="mb-4">
