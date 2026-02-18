@@ -171,7 +171,7 @@
                             @if ($order->status === 'reserved')
                                 {{-- Reserved books flow: 4 steps --}}
                                 @php
-                                    $paidDone     = $order->is_paid;
+                                    $paidDone     = true;
                                     $reservedDone = true;
                                     $prepDone     = in_array($order->tracker, ['shipped', 'processing', 'delivered']);
                                     $delivDone    = $order->tracker === 'delivered';
