@@ -17,9 +17,14 @@
             <h4 class="mb-0">
                 <span class="text-muted fw-light">الباركود /</span> إضافة باركود للطلب #{{ $order->id }}
             </h4>
-            <a href="{{ route('dashboard.orders.barcode.list') }}" class="btn btn-secondary">
-                <i class="ti ti-arrow-right me-1"></i>العودة
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('dashboard.orders.details', $order->id) }}" class="btn btn-info">
+                    <i class="ti ti-eye me-1"></i>تفاصيل الطلب
+                </a>
+                <a href="{{ route('dashboard.orders.barcode.list') }}" class="btn btn-secondary">
+                    <i class="ti ti-arrow-right me-1"></i>العودة
+                </a>
+            </div>
         </div>
 
         <!-- Barcode Card -->
