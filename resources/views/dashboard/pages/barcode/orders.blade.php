@@ -98,6 +98,7 @@
                                 <th>العنوان</th>
                                 <th>الباركود</th>
                                 <th>أضافه الباركود</th>
+                                <th>تفاصيل</th>
                                 @if (request('shipping') === 'branch')
                                     <th>حالة التتبع</th>
                                     <th>الإجراءات</th>
@@ -124,8 +125,7 @@
                 ],
                 "paging": true,
                 "pageLength": 10,
-                "stateSave": true,
-                "stateDuration": -1,
+                "stateSave": false,
                 'scrollX': true,
                 "processing": true,
                 "serverSide": true,
