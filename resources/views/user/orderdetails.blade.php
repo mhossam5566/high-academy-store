@@ -31,6 +31,10 @@
                 display: block;
             }
 
+            .order-tracking.step-4 {
+                width: 25%;
+            }
+
             .order-tracking .is-complete {
                 display: block;
                 position: relative;
@@ -164,24 +168,52 @@
                 @if ($order->status !== 'cancelled')
                     <div class="col-12 hh-grayBox pt45 pb20 card shadow-sm">
                         <div class="row justify-content-between">
-                            <div class="order-tracking {{ $order->barcode ? 'completed' : '' }}">
-                                <span class="is-complete"></span>
-                                <p>قيد
-                                    التوصيل<br><span>{{ $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
-                                </p>
-                            </div>
-                            <div
-                                class="order-tracking {{ $order->status === 'reserved' || $order->status === 'success' ? 'completed' : '' }}">
-                                <span class="is-complete"></span>
-                                <p>قيد
-                                    التجهيز<br><span>{{ $order->status === 'reserved' || $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
-                                </p>
-                            </div>
-                            <div
-                                class="order-tracking {{ $order->status === 'new' || $order->status === 'success' || $order->status === 'reserved' ? 'completed' : '' }}">
-                                <span class="is-complete"></span>
-                                <p>قيد المراجعة<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
-                            </div>
+                            @if ($order->status === 'reserved')
+                                {{-- Reserved books flow: 4 steps --}}
+                                @php
+                                    $paidDone     = $order->is_paid;
+                                    $reservedDone = true;
+                                    $prepDone     = in_array($order->tracker, ['shipped', 'processing', 'delivered']);
+                                    $delivDone    = $order->tracker === 'delivered';
+                                @endphp
+
+                                <div class="order-tracking step-4 {{ $delivDone ? 'completed' : '' }}">
+                                    <span class="is-complete"></span>
+                                    <p>تم التوصيل<br><span>{{ $delivDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
+                                </div>
+                                <div class="order-tracking step-4 {{ $prepDone ? 'completed' : '' }}">
+                                    <span class="is-complete"></span>
+                                    <p>قيد التجهيز<br><span>{{ $prepDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
+                                </div>
+                                <div class="order-tracking step-4 {{ $reservedDone ? 'completed' : '' }}">
+                                    <span class="is-complete"></span>
+                                    <p>تم الحجز<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
+                                </div>
+                                <div class="order-tracking step-4 {{ $paidDone ? 'completed' : '' }}">
+                                    <span class="is-complete"></span>
+                                    <p>في انتظار الدفع<br><span>{{ $paidDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
+                                </div>
+                            @else
+                                {{-- Normal orders flow: 3 steps --}}
+                                @php
+                                    $paidDone  = $order->is_paid || $order->status === 'success';
+                                    $prepDone  = $order->status === 'success';
+                                    $delivDone = $order->tracker === 'delivered';
+                                @endphp
+
+                                <div class="order-tracking {{ $delivDone ? 'completed' : '' }}">
+                                    <span class="is-complete"></span>
+                                    <p>تم التوصيل<br><span>{{ $delivDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
+                                </div>
+                                <div class="order-tracking {{ $prepDone ? 'completed' : '' }}">
+                                    <span class="is-complete"></span>
+                                    <p>قيد التجهيز<br><span>{{ $prepDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
+                                </div>
+                                <div class="order-tracking {{ $paidDone ? 'completed' : '' }}">
+                                    <span class="is-complete"></span>
+                                    <p>في انتظار الدفع<br><span>{{ $paidDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @endif
