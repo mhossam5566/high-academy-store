@@ -94,6 +94,7 @@
                             <tr>
                                 <th>رقم الطلب</th>
                                 <th>الاسم</th>
+                                <th>رقم الموبايل</th>
                                 <th>الباركود</th>
                                 <th>أضافه الباركود</th>
                                 @if (request('shipping') === 'branch')
@@ -148,6 +149,11 @@
                         data: 'name',
                         name: 'name'
                     },
+                    {
+                        data: 'mobile',
+                        name: 'mobile'
+                    },
+
                     {
                         data: 'barcode',
                         name: 'barcode'
