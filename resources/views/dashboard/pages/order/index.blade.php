@@ -275,7 +275,8 @@
                     },
                     {
                         data: 'shipping_method',
-                        name: 'shipping_method'
+                        name: 'shipping_method',
+                        className: 'text-nowrap'
                     },
                     {
                         data: 'total',
