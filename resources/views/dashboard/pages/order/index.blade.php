@@ -261,7 +261,8 @@
                     },
                     {
                         data: 'name',
-                        name: 'name'
+                        name: 'name',
+                        className: 'text-nowrap'
                     },
                     {
                         data: 'phone',
@@ -269,7 +270,8 @@
                     },
                     {
                         data: 'address',
-                        name: 'address'
+                        name: 'address',
+                        className: 'text-nowrap'
                     },
                     {
                         data: 'shipping_method',
