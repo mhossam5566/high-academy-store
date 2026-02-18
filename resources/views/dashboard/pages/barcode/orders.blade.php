@@ -97,7 +97,6 @@
 
                                 <th>الباركود</th>
                                 <th>أضافه الباركود</th>
-                                <th>تفاصيل</th>
                                 @if (request('shipping') === 'branch')
                                     <th>حالة التتبع</th>
                                     <th>الإجراءات</th>
@@ -159,10 +158,6 @@
                     {
                         data: 'admin_addbarcode',
                         name: 'admin_addbarcode',
-                    },
-                    {
-                        data: 'details',
-                        name: 'details',
                     },
                     @if (request('shipping') === 'branch')
                         {
