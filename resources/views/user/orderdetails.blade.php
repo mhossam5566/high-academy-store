@@ -191,7 +191,7 @@
                                 </div>
                                 <div class="order-tracking step-4 {{ $paidDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>في انتظار الدفع<br><span>{{ $paidDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
+                                    <p>{{ $paidDone ? 'تم الدفع' : 'في انتظار الدفع' }}<br><span>{{ $paidDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                 </div>
                             @else
                                 {{-- Normal orders flow: 3 steps --}}
@@ -211,7 +211,7 @@
                                 </div>
                                 <div class="order-tracking {{ $paidDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>في انتظار الدفع<br><span>{{ $paidDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
+                                    <p>{{ $paidDone ? 'تم الدفع' : 'في انتظار الدفع' }}<br><span>{{ $paidDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                 </div>
                             @endif
                         </div>
