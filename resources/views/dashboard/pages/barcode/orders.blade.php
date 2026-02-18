@@ -149,7 +149,8 @@
                     },
                     {
                         data: 'name',
-                        name: 'name'
+                        name: 'name',
+                        className: 'text-nowrap'
                     },
                     {
                         data: 'mobile',
@@ -157,7 +158,8 @@
                     },
                     {
                         data: 'address',
-                        name: 'address'
+                        name: 'address',
+                        className: 'text-nowrap'
                     },
 
                     {
