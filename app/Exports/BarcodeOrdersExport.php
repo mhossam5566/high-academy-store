@@ -3,10 +3,10 @@
 namespace App\Exports;
 
 use App\Models\Order;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, WithStyles
@@ -26,7 +26,7 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
 
     public function collection()
     {
-        $query = Order::with(['orderDetails.products'])
+        $query = Order::where('shipping_method', "2")->with(['orderDetails.products'])
             ->latest();
 
         if ($this->status) {
