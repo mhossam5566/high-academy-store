@@ -112,6 +112,7 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::get('orders/export/success', [OrderController::class, 'successExport'])->name('orders.export.success');
     Route::get('orders/export/branch', [OrderController::class, 'branchExport'])->name('orders.export.branch');
     Route::get('orders/export/grouped', [OrderController::class, 'groupedExport'])->name('orders.export.grouped');
+    Route::get('orders/export/excel', [OrderController::class, 'excelExport'])->name('orders.export.excel');
     Route::get("orders/edit-barcode/{id}", [OrderController::class, "admineditbarcode"])->name("orders.editbarcode");
     Route::get("orders/barcode", [OrderController::class, "orderbarcode"])->name("orders.barcode");
     Route::get("orders/barcode/list", [OrderController::class, "barcodeOrders"])->name("orders.barcode.list");

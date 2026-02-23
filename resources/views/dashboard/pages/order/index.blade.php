@@ -160,6 +160,18 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Export Excel (Shipping Company Format) -->
+                <div class="col-md-6">
+                    <label class="form-label">تصدير Excel (ملف شركة الشحن)</label>
+                    <div class="input-group">
+                        <input type="number" id="orderExcelLimit" class="form-control" placeholder="عدد الطلبات"
+                            min="1" oninput="validateInput(this)">
+                        <button class="btn btn-warning" onclick="exportOrdersExcel()">
+                            <i class="ti ti-file-spreadsheet me-1"></i>تصدير Excel
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Convert Reserved to Success -->
@@ -501,6 +513,35 @@
 
             window.location.href = url.toString();
             document.getElementById("orderBranchLimit").value = '';
+        }
+
+        function exportOrdersExcel() {
+            let limit = document.getElementById("orderExcelLimit").value || 10;
+            let status = $('#orderStatus').val();
+
+            if (!status) {
+                Swal.fire({
+                    title: 'خطأ',
+                    text: 'يرجى تحديد نوع الطلب أولاً.',
+                    icon: 'error',
+                    confirmButtonText: 'حسنًا'
+                });
+                return;
+            }
+
+            let url = new URL("{{ route('dashboard.orders.export.excel') }}");
+            url.searchParams.append('limit', limit);
+            url.searchParams.append('status', status);
+
+            if (status === 'reserved') {
+                let bookId = $('#bookSelect').val();
+                if (bookId) {
+                    url.searchParams.append('book_id', bookId);
+                }
+            }
+
+            window.location.href = url.toString();
+            document.getElementById("orderExcelLimit").value = '';
         }
 
         function validateInput(input) {

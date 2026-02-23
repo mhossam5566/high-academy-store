@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\Facades\DataTables;
+use App\Exports\BarcodeOrdersExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
@@ -40,6 +42,20 @@ class OrderController extends Controller
     public function barcodeOrders()
     {
         return view('dashboard.pages.barcode.orders');
+    }
+
+    public function excelExport(Request $request)
+    {
+        $status   = $request->query('status');
+        $limit    = $request->query('limit');
+        $shipping = $request->query('shipping');
+        $bookId   = $request->query('book_id');
+        $filename = 'orders-' . now()->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(
+            new BarcodeOrdersExport($status, $limit, $shipping, $bookId),
+            $filename
+        );
     }
 
     public function orderbarcode()

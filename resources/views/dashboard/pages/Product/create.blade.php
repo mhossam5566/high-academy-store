@@ -144,7 +144,8 @@
 
                     <div class="col-md-4">
                         <label class="form-label">الوزن (جرام)</label>
-                        <input type="number" name="weight" value="200" min="0" class="form-control" placeholder="200">
+                        <input type="number" name="weight" value="200" min="0" class="form-control"
+                            placeholder="200">
                     </div>
                 </div>
             </div>
