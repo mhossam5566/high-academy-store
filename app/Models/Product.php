@@ -44,6 +44,7 @@ class Product extends Model implements TranslatableContract
         'sizes',
         'colors',
         'max_qty_for_order',
+        'weight',
     ];
 
     protected $casts = [

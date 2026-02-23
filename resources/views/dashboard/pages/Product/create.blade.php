@@ -141,6 +141,11 @@
                         <label class="form-label">ضريبة التوصيل البطيء</label>
                         <input type="number" name="slowTax" step="0.01" class="form-control" placeholder="0.00">
                     </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">الوزن (جرام)</label>
+                        <input type="number" name="weight" value="200" min="0" class="form-control" placeholder="200">
+                    </div>
                 </div>
             </div>
         </div>

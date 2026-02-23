@@ -159,6 +159,11 @@
                         <input type="number" name="slowTax" value="{{ $product->slowTax }}" step="0.01"
                             class="form-control">
                     </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">الوزن (جرام)</label>
+                        <input type="number" name="weight" value="{{ $product->weight ?? 200 }}" min="0" class="form-control" placeholder="200">
+                    </div>
                 </div>
             </div>
         </div>

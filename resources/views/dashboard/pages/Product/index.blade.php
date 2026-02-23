@@ -90,6 +90,7 @@
                         <th>الاسم المختصر</th>
                         <th>السعر</th>
                         <th>الكمية</th>
+                        <th>الوزن (جرام)</th>
                         <th>القسم</th>
                         <th>المادة</th>
                         <th>الصف</th>
@@ -151,6 +152,10 @@
                     {
                         data: 'quantity',
                         name: 'quantity'
+                    },
+                    {
+                        data: 'weight',
+                        name: 'weight'
                     },
                     {
                         data: 'main_category_id',

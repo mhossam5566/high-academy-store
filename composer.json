@@ -16,6 +16,7 @@
         "laravel/framework": "^12.42",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10",
+        "maatwebsite/excel": "*",
         "mcamara/laravel-localization": "^2.3",
         "mpdf/mpdf": "^8.2",
         "nafezly/payments": "dev-master",
