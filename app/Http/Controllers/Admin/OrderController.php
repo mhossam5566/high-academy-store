@@ -46,10 +46,10 @@ class OrderController extends Controller
 
     public function excelExport(Request $request)
     {
-        $status   = $request->query('status');
-        $limit    = $request->query('limit');
+        $status = $request->query('status');
+        $limit = $request->query('limit');
         $shipping = $request->query('shipping');
-        $bookId   = $request->query('book_id');
+        $bookId = $request->query('book_id');
         $filename = 'orders-' . now()->format('Y-m-d') . '.xlsx';
 
         return Excel::download(

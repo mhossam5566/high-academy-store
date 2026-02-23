@@ -18,10 +18,10 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
 
     public function __construct($status = null, $limit = null, $shipping = null, $bookId = null)
     {
-        $this->status   = $status;
-        $this->limit    = $limit;
+        $this->status = $status;
+        $this->limit = $limit;
         $this->shipping = $shipping;
-        $this->bookId   = $bookId;
+        $this->bookId = $bookId;
     }
 
     public function collection()
@@ -81,7 +81,7 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
         });
 
         // Extract governorate from address (format: "محافظة - مدينة - ...")
-        $parts       = explode(' - ', $order->address ?? '');
+        $parts = explode(' - ', $order->address ?? '');
         $governorate = $parts[0] ?? '';
 
         // Phone numbers (primary + backup)
