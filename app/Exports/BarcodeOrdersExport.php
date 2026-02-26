@@ -84,10 +84,16 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
         $parts = explode(' - ', $order->address ?? '');
         $governorate = $parts[0] ?? '';
 
-        // Phone numbers (primary + backup)
-        $phones = $order->mobile ?? '';
+        // Primary phone: ensure starts with 0
+        $mobile = $order->mobile ?? '';
+        if (!empty($mobile) && !str_starts_with($mobile, '0')) {
+            $mobile = '0' . $mobile;
+        }
+
+        // Notes: base note + backup number if exists
+        $notes = 'يسلم لاي شخص دون الرجوع للرقم القومي \ او يتم الاتصال بالراسل في حال تعذر التسليم';
         if (!empty($order->temp_mobile)) {
-            $phones .= ' / ' . $order->temp_mobile;
+            $notes .= ' / رقم احتياطي: ' . $order->temp_mobile;
         }
 
         return [
@@ -96,9 +102,9 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
             $totalWeight, // الوزن
             'صغير',       // حجم الشحنة
             'لا يوجد',    // المبلغ المراد تحصيله
-            'يسلم لاي شخص دون الرجوع للرقم القومي \ او يتم الاتصال بالراسل في حال تعذر التسليم', // ملاحظات
+            $notes,       // ملاحظات
             $order->name ?? '',    // اسم العميل
-            $phones,               // رقم المحمول
+            $mobile,               // رقم المحمول
             $order->address ?? '', // العنوان بالتفصيل
             $governorate,          // المحافظة
             '',   // الرقم المرجعي
