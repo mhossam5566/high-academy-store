@@ -55,20 +55,22 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
     public function headings(): array
     {
         return [
-            'سيريال نمبر',
-            'وصف المحتوي',
-            'الوزن',
-            'حجم الشحنة',
-            'المبلغ المراد تحصيله',
-            'ملاحظات',
-            'اسم العميل',
-            'رقم المحمول',
-            'العنوان بالتفصيل',
-            'المحافظة',
-            'الرقم المرجعي',
-            'اسم المستودع',
-            'الرغبة في علم الوصول',
-            'اسم البائع',
+            'Package_Serial',
+            'Description',
+            'Total_Weight',
+            'Package_volume',
+            'COD_Value',
+            'Item_Special_Notes',
+            'Customer_Name',
+            'Mobile_No',
+            'Street',
+            'City',
+            'Package_Ref_Number',
+            'Merchant_Name',
+            'Warehouse_Name',
+            'HasPOD',
+            'SellerName',
+            'Post_Id',
         ];
     }
 
@@ -97,20 +99,22 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
         }
 
         return [
-            '',           // سيريال نمبر
-            'كتب',        // وصف المحتوي
-            $totalWeight, // الوزن
-            'صغير',       // حجم الشحنة
-            'لا يوجد',    // المبلغ المراد تحصيله
-            $notes,       // ملاحظات
-            $order->name ?? '',    // اسم العميل
-            $mobile,               // رقم المحمول
-            $order->address ?? '', // العنوان بالتفصيل
-            $governorate,          // المحافظة
-            '',   // الرقم المرجعي
-            '',   // اسم المستودع
-            'لا', // الرغبة في علم الوصول
-            '',   // اسم البائع
+            '',           // Package_Serial
+            'books',      // Description
+            $totalWeight, // Total_Weight
+            'small',      // Package_volume
+            '',           // COD_Value
+            $notes,       // Item_Special_Notes
+            $order->name ?? '',    // Customer_Name
+            $mobile,               // Mobile_No
+            $order->address ?? '', // Street
+            $governorate,          // City
+            '',   // Package_Ref_Number
+            '',   // Merchant_Name
+            '',   // Warehouse_Name
+            'لا', // HasPOD
+            '',   // SellerName
+            '',   // Post_Id
         ];
     }
 
