@@ -217,20 +217,20 @@
     <a href="{{ route('user.shop') }}" class="text-decoration-none">المتجر</a>
     <i class="fa-solid fa-store ms-1"></i>
 </li>
+<li class="nav-item">
+    <hr class="divider my-1">
+</li>
+<li class="nav-item d-flex align-items-center justify-content-center nav-link text-white"
+    onclick="location.href='{{ route('user.orders.user') }}'" style="cursor: pointer;">
+    <a href="{{ route('user.orders.user') }}"
+        class="text-decoration-none @if ($lastSegment == 'myorders') active @endif">طلباتي</a>
+    <i class="fa-solid fa-box ms-1"></i>
+</li>
 @auth
+
     <li class="nav-item">
         <hr class="divider my-1">
     </li>
-@endauth
-<li class="nav-item d-flex align-items-center justify-content-center nav-link text-white"
-        onclick="location.href='{{ route('user.orders.user') }}'" style="cursor: pointer;">
-        <a href="{{ route('user.orders.user') }}"
-            class="text-decoration-none @if ($lastSegment == 'myorders') active @endif">طلباتي</a>
-        <i class="fa-solid fa-box ms-1"></i>
-    </li>
-@auth
-
-
     <li class="nav-item">
         <hr class="divider my-1">
     </li>
