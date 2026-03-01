@@ -229,8 +229,8 @@
         <i class="fa-solid fa-box ms-1"></i>
     </li>
 @auth
-    
-    
+
+
     <li class="nav-item">
         <hr class="divider my-1">
     </li>
