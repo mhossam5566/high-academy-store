@@ -231,9 +231,6 @@
     <li class="nav-item">
         <hr class="divider my-1">
     </li>
-    <li class="nav-item">
-        <hr class="divider my-1">
-    </li>
     <li class="nav-item d-flex align-items-center justify-content-center nav-link text-white"
         onclick="location.href='{{ route('user.vochers.user') }}'" style="cursor: pointer;">
         <a href="{{ route('user.vochers.user') }}"
