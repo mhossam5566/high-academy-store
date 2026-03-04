@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\Facades\DataTables;
 use App\Exports\BarcodeOrdersExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Services\WhatsappService;
 
 class OrderController extends Controller
 {
@@ -274,6 +275,8 @@ class OrderController extends Controller
                         // Optionally log if needed
                     }
                 }
+
+                $this->sendOrderStatusWhatsapp($order, 'success');
             } elseif ($state == "2") {
                 $order->status = "cancelled";
                 foreach ($order->orderDetails as $detail) {
@@ -284,6 +287,8 @@ class OrderController extends Controller
                     }
                     $product->save();
                 }
+
+                $this->sendOrderStatusWhatsapp($order, 'cancelled');
             }
             $order->save();
             DB::commit();
@@ -349,6 +354,8 @@ class OrderController extends Controller
             ];
 
             Mail::to($order->user->email)->send(new delivery($details));
+
+            $this->sendOrderStatusWhatsapp($order, 'delivered');
 
             return response()->json([
                 "success" => true,
@@ -555,6 +562,8 @@ class OrderController extends Controller
             default:
                 $order->update(['status' => 'Not Found']);
         }
+
+        $this->sendOrderStatusWhatsapp($order, $status);
 
         return redirect()->to(route('dashboard.orders'));
     }
@@ -816,6 +825,45 @@ class OrderController extends Controller
                 'success' => false,
                 'message' => 'فشل في إرسال الإشعار: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Send WhatsApp notification to customer on order status change
+     */
+    private function sendOrderStatusWhatsapp(Order $order, string $status): void
+    {
+        try {
+            $order->loadMissing('user');
+
+            $phone = $order->user->phone ?? $order->mobile ?? null;
+
+            if (empty($phone)) {
+                return;
+            }
+
+            $statusMessages = [
+                'new'       => 'تم استلام طلبك الجديد رقم #' . $order->id . ' وجاري مراجعته.',
+                'pending'   => 'طلبك رقم #' . $order->id . ' قيد المراجعة حالياً.',
+                'success'   => 'تم تأكيد طلبك رقم #' . $order->id . ' بنجاح ✅ وجاري تجهيزه للشحن.',
+                'cancelled' => 'تم إلغاء طلبك رقم #' . $order->id . '. إذا كان هناك خطأ تواصل معنا.',
+                'reserved'  => 'طلبك رقم #' . $order->id . ' تم حجزه وسيتم التواصل معك قريباً.',
+                'shipped'   => 'طلبك رقم #' . $order->id . ' تم شحنه ✅ وفي الطريق إليك.',
+                'delivered'  => 'طلبك رقم #' . $order->id . ' تم تسليمه بنجاح 🎉' . (!empty($order->barcode) ? "\nرقم التتبع: " . $order->barcode : ''),
+            ];
+
+            $message = $statusMessages[$status] ?? 'تم تحديث حالة طلبك رقم #' . $order->id . ' إلى: ' . $status;
+
+            $message = "مرحباً " . ($order->name ?? 'عميلنا العزيز') . " 👋\n\n" . $message . "\n\nشكراً لتعاملك مع هاي اكاديمي ستور 📚";
+
+            $whatsapp = new WhatsappService();
+            $whatsapp->send($phone, $message);
+        } catch (\Exception $e) {
+            Log::error('WhatsApp order notification failed', [
+                'order_id' => $order->id,
+                'status' => $status,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

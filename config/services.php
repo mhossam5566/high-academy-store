@@ -29,5 +29,10 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'whatsapp' => [
+        'url' => env('WHATSAPP_API_URL', 'https://waapi.hany-nasr.com/send-message'),
+        'api_key' => env('WHATSAPP_API_KEY'),
+        'sender' => env('WHATSAPP_SENDER'),
+    ],
 
 ];

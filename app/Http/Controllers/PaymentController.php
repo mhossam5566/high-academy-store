@@ -15,6 +15,7 @@ use Nafezly\Payments\Classes\TapPayment;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Nafezly\Payments\Classes\FawryPayment;
 use Nafezly\Payments\Classes\HyperPayPayment;
+use App\Services\WhatsappService;
 
 class PaymentController extends Controller
 {
@@ -270,6 +271,9 @@ class PaymentController extends Controller
             $order->save();
             $this->logToFile($logFile, "Order saved successfully");
 
+            // Send WhatsApp notification for successful payment
+            $this->sendOrderWhatsapp($order, $orderStatus, $logFile);
+
         } elseif ($request->orderStatus == "UNPAID") {
             $this->logToFile($logFile, "Processing UNPAID status");
 
@@ -331,6 +335,9 @@ class PaymentController extends Controller
 
             $order->save();
             $this->logToFile($logFile, "Order saved successfully");
+
+            // Send WhatsApp notification for cancelled payment
+            $this->sendOrderWhatsapp($order, 'cancelled', $logFile);
         } else {
             $this->logToFile($logFile, "Unknown order status: {$request->orderStatus}");
         }
@@ -484,6 +491,48 @@ class PaymentController extends Controller
         foreach ($voucher_orders as $voucherOrder) {
             $voucherOrder->state = "cancelled";
             $voucherOrder->save();
+        }
+    }
+
+    /**
+     * Send WhatsApp notification to customer on order status change
+     */
+    private function sendOrderWhatsapp(Order $order, string $status, ?string $logFile = null): void
+    {
+        try {
+            $order->loadMissing('user');
+
+            $phone = $order->user->phone ?? $order->mobile ?? null;
+
+            if (empty($phone)) {
+                if ($logFile) $this->logToFile($logFile, "WhatsApp: No phone number found for order #{$order->id}");
+                return;
+            }
+
+            $statusMessages = [
+                'success'   => 'تم تأكيد طلبك رقم #' . $order->id . ' بنجاح ✅ وتم استلام الدفع. جاري تجهيزه للشحن.',
+                'reserved'  => 'طلبك رقم #' . $order->id . ' تم حجزه بنجاح ✅ وتم استلام الدفع. سيتم التواصل معك قريباً.',
+                'cancelled' => 'تم إلغاء طلبك رقم #' . $order->id . ' بسبب عدم اكتمال الدفع. إذا كان هناك خطأ تواصل معنا.',
+            ];
+
+            $message = $statusMessages[$status] ?? 'تم تحديث حالة طلبك رقم #' . $order->id . ' إلى: ' . $status;
+            $message = "مرحباً " . ($order->name ?? 'عميلنا العزيز') . " 👋\n\n" . $message . "\n\nشكراً لتعاملك مع هاي اكاديمي ستور 📚";
+
+            $whatsapp = new WhatsappService();
+            $result = $whatsapp->send($phone, $message);
+
+            if ($logFile) {
+                $this->logToFile($logFile, "WhatsApp sent to {$phone} - Status: " . ($result['status'] ? 'Success' : 'Failed'));
+            }
+        } catch (\Exception $e) {
+            if ($logFile) {
+                $this->logToFile($logFile, "WhatsApp ERROR: " . $e->getMessage());
+            }
+            Log::error('WhatsApp order notification failed', [
+                'order_id' => $order->id,
+                'status' => $status,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }
