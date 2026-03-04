@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Mail\SuccessPaid;
 use Illuminate\Http\Request;
+use App\Services\WhatsappService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -15,7 +16,6 @@ use Nafezly\Payments\Classes\TapPayment;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Nafezly\Payments\Classes\FawryPayment;
 use Nafezly\Payments\Classes\HyperPayPayment;
-use App\Services\WhatsappService;
 
 class PaymentController extends Controller
 {
@@ -505,7 +505,8 @@ class PaymentController extends Controller
             $phone = $order->user->phone ?? $order->mobile ?? null;
 
             if (empty($phone)) {
-                if ($logFile) $this->logToFile($logFile, "WhatsApp: No phone number found for order #{$order->id}");
+                if ($logFile)
+                    $this->logToFile($logFile, "WhatsApp: No phone number found for order #{$order->id}");
                 return;
             }
 
@@ -522,8 +523,8 @@ class PaymentController extends Controller
             }
 
             $statusMessages = [
-                'success'   => 'تم تأكيد طلبك رقم #' . $order->id . ' بنجاح ✅ وتم استلام الدفع. جاري تجهيزه للشحن.',
-                'reserved'  => 'طلبك رقم #' . $order->id . ' تم حجزه بنجاح ✅ وتم استلام الدفع. سيتم التواصل معك قريباً.',
+                'success' => 'تم الدفع بنجاح 💳✅' . "\n" . 'طلبك رقم #' . $order->id . ' تم تأكيده وجاري تجهيزه للشحن.',
+                'reserved' => 'تم الدفع بنجاح 💳✅' . "\n" . 'طلبك رقم #' . $order->id . ' تم حجزه وسيتم التواصل معك قريباً.',
                 'cancelled' => 'تم إلغاء طلبك رقم #' . $order->id . ' بسبب عدم اكتمال الدفع. إذا كان هناك خطأ تواصل معنا.',
             ];
 
