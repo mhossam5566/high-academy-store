@@ -253,6 +253,7 @@ class OrderController extends Controller
         $state = $request->state;
         $orderid = $request->id;
         $order = Order::findOrFail($orderid);
+        $whatsappStatus = null;
         try {
             DB::beginTransaction();
             if ($state == "1") {
@@ -276,7 +277,7 @@ class OrderController extends Controller
                     }
                 }
 
-                $this->sendOrderStatusWhatsapp($order, 'success');
+                $whatsappStatus = 'success';
             } elseif ($state == "2") {
                 $order->status = "cancelled";
                 foreach ($order->orderDetails as $detail) {
@@ -288,10 +289,15 @@ class OrderController extends Controller
                     $product->save();
                 }
 
-                $this->sendOrderStatusWhatsapp($order, 'cancelled');
+                $whatsappStatus = 'cancelled';
             }
             $order->save();
             DB::commit();
+
+            // Send WhatsApp after successful commit
+            if ($whatsappStatus) {
+                $this->sendOrderStatusWhatsapp($order, $whatsappStatus);
+            }
 
             return response()->json([
                 "success" => true,
@@ -355,7 +361,7 @@ class OrderController extends Controller
 
             Mail::to($order->user->email)->send(new delivery($details));
 
-            $this->sendOrderStatusWhatsapp($order, 'delivered');
+            $this->sendOrderStatusWhatsapp($order, 'shipped');
 
             return response()->json([
                 "success" => true,
@@ -834,12 +840,24 @@ class OrderController extends Controller
     private function sendOrderStatusWhatsapp(Order $order, string $status): void
     {
         try {
-            $order->loadMissing('user');
+            $order->loadMissing(['user', 'orderDetails.products']);
 
             $phone = $order->user->phone ?? $order->mobile ?? null;
 
             if (empty($phone)) {
                 return;
+            }
+
+            // Build order items summary
+            $itemsSummary = '';
+            if ($order->orderDetails->isNotEmpty()) {
+                $itemsSummary = "\n\n📦 تفاصيل الطلب:\n";
+                foreach ($order->orderDetails as $detail) {
+                    $productName = optional($detail->products)->name ?? 'منتج';
+                    $qty = $detail->amout ?? 1;
+                    $itemsSummary .= "- {$productName} (x{$qty})\n";
+                }
+                $itemsSummary .= "الإجمالي: " . ($order->total ?? $order->amount ?? '0') . " ج.م";
             }
 
             $statusMessages = [
@@ -848,13 +866,13 @@ class OrderController extends Controller
                 'success'   => 'تم تأكيد طلبك رقم #' . $order->id . ' بنجاح ✅ وجاري تجهيزه للشحن.',
                 'cancelled' => 'تم إلغاء طلبك رقم #' . $order->id . '. إذا كان هناك خطأ تواصل معنا.',
                 'reserved'  => 'طلبك رقم #' . $order->id . ' تم حجزه وسيتم التواصل معك قريباً.',
-                'shipped'   => 'طلبك رقم #' . $order->id . ' تم شحنه ✅ وفي الطريق إليك.',
-                'delivered'  => 'طلبك رقم #' . $order->id . ' تم تسليمه بنجاح 🎉' . (!empty($order->barcode) ? "\nرقم التتبع: " . $order->barcode : ''),
+                'shipped'   => 'طلبك رقم #' . $order->id . ' تم شحنه ✅ وفي الطريق إليك.' . (!empty($order->barcode) ? "\n\nكود التتبع: " . $order->barcode . "\n\nيمكنك تتبع شحنتك من هنا:\nhttps://egyptpost.gov.eg/ar-eg/home/eservices/track-and-trace/" : ''),
+                'delivered'  => 'طلبك رقم #' . $order->id . ' تم تسليمه بنجاح 🎉',
             ];
 
             $message = $statusMessages[$status] ?? 'تم تحديث حالة طلبك رقم #' . $order->id . ' إلى: ' . $status;
 
-            $message = "مرحباً " . ($order->name ?? 'عميلنا العزيز') . " 👋\n\n" . $message . "\n\nشكراً لتعاملك مع هاي اكاديمي ستور 📚";
+            $message = "مرحباً " . ($order->name ?? 'عميلنا العزيز') . " 👋\n\n" . $message . $itemsSummary . "\n\nشكراً لتعاملك مع هاي اكاديمي ستور 📚";
 
             $whatsapp = new WhatsappService();
             $whatsapp->send($phone, $message);

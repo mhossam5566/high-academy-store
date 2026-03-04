@@ -500,13 +500,25 @@ class PaymentController extends Controller
     private function sendOrderWhatsapp(Order $order, string $status, ?string $logFile = null): void
     {
         try {
-            $order->loadMissing('user');
+            $order->loadMissing(['user', 'orderDetails.products']);
 
             $phone = $order->user->phone ?? $order->mobile ?? null;
 
             if (empty($phone)) {
                 if ($logFile) $this->logToFile($logFile, "WhatsApp: No phone number found for order #{$order->id}");
                 return;
+            }
+
+            // Build order items summary
+            $itemsSummary = '';
+            if ($order->orderDetails->isNotEmpty()) {
+                $itemsSummary = "\n\n📦 تفاصيل الطلب:\n";
+                foreach ($order->orderDetails as $detail) {
+                    $productName = optional($detail->products)->name ?? 'منتج';
+                    $qty = $detail->amout ?? 1;
+                    $itemsSummary .= "- {$productName} (x{$qty})\n";
+                }
+                $itemsSummary .= "الإجمالي: " . ($order->total ?? $order->amount ?? '0') . " ج.م";
             }
 
             $statusMessages = [
@@ -516,7 +528,7 @@ class PaymentController extends Controller
             ];
 
             $message = $statusMessages[$status] ?? 'تم تحديث حالة طلبك رقم #' . $order->id . ' إلى: ' . $status;
-            $message = "مرحباً " . ($order->name ?? 'عميلنا العزيز') . " 👋\n\n" . $message . "\n\nشكراً لتعاملك مع هاي اكاديمي ستور 📚";
+            $message = "مرحباً " . ($order->name ?? 'عميلنا العزيز') . " 👋\n\n" . $message . $itemsSummary . "\n\nشكراً لتعاملك مع هاي اكاديمي ستور 📚";
 
             $whatsapp = new WhatsappService();
             $result = $whatsapp->send($phone, $message);
