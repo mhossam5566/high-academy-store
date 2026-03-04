@@ -861,13 +861,13 @@ class OrderController extends Controller
             }
 
             $statusMessages = [
-                'new'       => 'تم استلام طلبك الجديد رقم #' . $order->id . ' وجاري مراجعته.',
-                'pending'   => 'طلبك رقم #' . $order->id . ' قيد المراجعة حالياً.',
-                'success'   => 'تم تأكيد طلبك رقم #' . $order->id . ' بنجاح ✅ وجاري تجهيزه للشحن.',
+                'new' => 'تم استلام طلبك الجديد رقم #' . $order->id . ' وجاري مراجعته.',
+                'pending' => 'طلبك رقم #' . $order->id . ' قيد المراجعة حالياً.',
+                'success' => 'تم تأكيد طلبك رقم #' . $order->id . ' بنجاح ✅ وجاري تجهيزه للشحن.',
                 'cancelled' => 'تم إلغاء طلبك رقم #' . $order->id . '. إذا كان هناك خطأ تواصل معنا.',
-                'reserved'  => 'طلبك رقم #' . $order->id . ' تم حجزه وسيتم التواصل معك قريباً.',
-                'shipped'   => 'طلبك رقم #' . $order->id . ' تم شحنه ✅ وفي الطريق إليك.' . (!empty($order->barcode) ? "\n\nكود التتبع: " . $order->barcode . "\n\nيمكنك تتبع شحنتك من هنا:\nhttps://egyptpost.gov.eg/ar-eg/home/eservices/track-and-trace/" : ''),
-                'delivered'  => 'طلبك رقم #' . $order->id . ' تم تسليمه بنجاح 🎉',
+                'reserved' => 'طلبك رقم #' . $order->id . ' تم حجزه وسيتم التواصل معك قريباً.',
+                'shipped' => 'طلبك رقم #' . $order->id . ' تم شحنه ✅ وفي الطريق إليك.' . (!empty($order->barcode) ? "\n\nكود التتبع: " . $order->barcode . "\n\nيمكنك تتبع شحنتك من هنا:\nhttps://egyptpost.gov.eg/ar-eg/home/eservices/track-and-trace/" : ''),
+                'delivered' => 'طلبك رقم #' . $order->id . ' تم تسليمه بنجاح 🎉',
             ];
 
             $message = $statusMessages[$status] ?? 'تم تحديث حالة طلبك رقم #' . $order->id . ' إلى: ' . $status;
