@@ -26,7 +26,7 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
 
     public function collection()
     {
-        $query = Order::where('shipping_method', "2")->with(['orderDetails.products'])
+        $query = Order::where('shipping_method', "2")->with(['orderDetails.products', 'governorate'])
             ->latest();
 
         if ($this->status) {
@@ -82,9 +82,10 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
             return $productWeight * ($detail->amout ?? 1);
         });
 
-        // Extract governorate from address (format: "محافظة - مدينة - ...")
-        $parts = explode(' - ', $order->address ?? '');
-        $governorate = $parts[0] ?? '';
+        // Get governorate English name in uppercase from the relation
+        $governorate = $order->governorate
+            ? strtoupper($order->governorate->governorate_name_en)
+            : '';
 
         // Primary phone: ensure starts with 0
         $mobile = $order->mobile ?? '';
