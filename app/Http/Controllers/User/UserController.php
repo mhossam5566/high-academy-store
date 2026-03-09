@@ -421,6 +421,7 @@ class UserController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string',
             'email' => 'required|unique:users,email|regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
+            'phone' => 'required|digits:11|regex:/^01[0125][0-9]{8}$/',
             'password' => 'required|min:6|confirmed',
         ], [
             'name.required' => 'الاسم مطلوب.',
@@ -428,6 +429,9 @@ class UserController extends Controller
             'email.required' => 'البريد الإلكتروني مطلوب.',
             'email.unique' => 'البريد الإلكتروني مسجل لدينا مسبقاً.',
             'email.regex' => 'تأكد من صحة البريد الإلكتروني وعدم وجود مسافات.',
+            'phone.required' => 'رقم الموبايل مطلوب.',
+            'phone.digits' => 'رقم الموبايل يجب أن يتكون من 11 رقم.',
+            'phone.regex' => 'رقم الموبايل غير صحيح.',
             'password.required' => 'كلمة المرور مطلوبة.',
             'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 حروف.',
             'password.confirmed' => 'كلمة المرور غير متطابقة.',
@@ -435,7 +439,6 @@ class UserController extends Controller
 
         $validatedData['password'] = bcrypt($request->password);
         $validatedData['address'] = '';
-        $validatedData['phone'] = '';
 
         $user = User::create($validatedData);
 

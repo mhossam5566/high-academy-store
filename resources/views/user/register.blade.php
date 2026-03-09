@@ -306,6 +306,19 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="phone" class="form-label">رقم الموبايل</label>
+                            <input type="tel" name="phone" id="phone"
+                                class="form-control @error('phone') is-invalid @enderror" placeholder="01xxxxxxxxx"
+                                value="{{ old('phone') }}" maxlength="11" />
+
+                            @error('phone')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
                             <label for="password" class="form-label">كلمة المرور</label>
                             <input type="password" name="password" id="password"
                                 class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" />
