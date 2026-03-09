@@ -712,14 +712,21 @@ $discountAmount = session()->has('applied_discount')
             });
         </script>
         <?php
-        $addressId;
-        $citiId;
+        $addressId = null;
+        $citiId = null;
         if ($orders !== null) {
-            foreach ($governoratesData as $governorate) {
-                if ($orders->governorate == $governorate->governorate_name_ar) {
-                    $addressId = $governorate->id;
+            // If the order has governorate_id saved, use it directly
+            if (!empty($orders->governorate_id)) {
+                $addressId = $orders->governorate_id;
+            } else {
+                // Fallback: match by name for older orders
+                foreach ($governoratesData as $governorate) {
+                    if ($orders->governorate == $governorate->governorate_name_ar) {
+                        $addressId = $governorate->id;
+                    }
                 }
             }
+            // City: match by name
             foreach ($citiesData as $cities) {
                 if ($orders->city == $cities->name_ar) {
                     $citiId = $cities->id;

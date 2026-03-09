@@ -14,6 +14,7 @@ class Order extends Model
         'mobile',
         'address',
         'address2',
+        'governorate_id',
         'near_post',
         'date',
         'status',
@@ -52,6 +53,11 @@ class Order extends Model
     public function getImagePathAttribute()
     {
         return asset('storage/images/screens/' . $this->image);
+    }
+
+    public function governorate()
+    {
+        return $this->belongsTo(Governorate::class, 'governorate_id');
     }
 
     public function shipping()

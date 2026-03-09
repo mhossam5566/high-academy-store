@@ -161,6 +161,7 @@ class CheckoutController extends Controller
             'near_post' => $request->input('near_post', null),
             'address' => $address,
             'address2' => $request->input('address', ''),
+            'governorate_id' => $request->government,
             'is_paid' => 0,
             'shipping_method_id' => $method->id,
             'shipping_name' => $method->name,
@@ -276,6 +277,7 @@ class CheckoutController extends Controller
             $order->code = Str::upper("#" . Str::random(8));
             $order->address = $addressStr;
             $order->address2 = $request->address;
+            $order->governorate_id = $request->government;
             $order->amount = $amount;
             $order->delivery_fee = $delivery;
             $order->name = $request->user_name;
