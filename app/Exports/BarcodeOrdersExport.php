@@ -113,7 +113,7 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
             '',   // Package_Ref_Number
             '',   // Merchant_Name
             '',   // Warehouse_Name
-            'لا', // HasPOD
+            '', // HasPOD
             '',   // SellerName
             '',   // Post_Id
         ];
