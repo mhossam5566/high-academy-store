@@ -122,18 +122,6 @@ Route::get('/clear-all', function () {
     return 'All caches cleared!';
 });
 
-Route::get('/github/webhook', function () {
-    $path = base_path();
-
-    $git = shell_exec("cd $path && git pull origin main 2>&1");
-    $composer = shell_exec("cd $path && composer install --no-dev --optimize-autoloader 2>&1");
-
-    Artisan::call('migrate', ['--force' => true]);
-    Artisan::call('optimize:clear');
-
-    return response()->json([
-        'git' => $git,
-        'composer' => $composer,
-        'migrate' => 'done'
-    ]);
-})->name('github.webhook');
+Route::get('test', function () {
+    return route('fawry.webhook');
+});
