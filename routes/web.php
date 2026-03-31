@@ -1,17 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\UserController;
-use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\User\VoucherController;
 use App\Http\Controllers\User\CheckoutController;
-use App\Http\Controllers\User\WishlistController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\User\UserAddressController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
-
 use App\Http\Controllers\User\OfferController as UserOfferController;
 
 /*
@@ -111,7 +109,7 @@ Route::post("pay/cards", [CheckoutController::class, "cards_pay"])->middleware('
 Route::post("pay/fawry", [CheckoutController::class, "fawry_pay"])->middleware('auth')->name("fawry.pay");
 Route::post("pay/fawry/wallet", [CheckoutController::class, "fawry_pay_wallet"])->middleware('auth')->name("fawry.wallet.pay");
 
-Route::post("fawry/webhook", [PaymentController::class, "fawry_webhook"])->name("fawry.webhook");
+//Route::post("fawry/webhook", [PaymentController::class, "fawry_webhook"])->name("fawry.webhook");
 
 Route::get("cronjob", [PaymentController::class, 'cronjob']);
 
@@ -123,3 +121,19 @@ Route::get('/clear-all', function () {
     Artisan::call('view:clear');
     return 'All caches cleared!';
 });
+
+Route::get('/github/webhook', function () {
+    $path = base_path();
+
+    $git = shell_exec("cd $path && git pull origin main 2>&1");
+    $composer = shell_exec("cd $path && composer install --no-dev --optimize-autoloader 2>&1");
+
+    Artisan::call('migrate', ['--force' => true]);
+    Artisan::call('optimize:clear');
+
+    return response()->json([
+        'git' => $git,
+        'composer' => $composer,
+        'migrate' => 'done'
+    ]);
+})->name('github.webhook');
