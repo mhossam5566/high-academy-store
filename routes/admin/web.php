@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\SearchKeywordController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
@@ -198,6 +199,15 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::get('/shipping-methods/{shipping_method}/edit', [ShippingMethodController::class, 'edit'])->name('shipping-methods.edit');
     Route::match(['put', 'patch'], '/shipping-methods/{shipping_method}', [ShippingMethodController::class, 'update'])->name('shipping-methods.update');
     Route::delete('/shipping-methods/{shipping_method}', [ShippingMethodController::class, 'destroy'])->name('shipping-methods.destroy');
+
+    // Search Keywords Management
+    Route::get('/search-keywords', [SearchKeywordController::class, 'index'])->name('search-keywords');
+    Route::get('/search-keywords/datatable', [SearchKeywordController::class, 'datatable'])->name('search-keywords.datatable');
+    Route::get('/search-keywords/create', [SearchKeywordController::class, 'create'])->name('search-keywords.create');
+    Route::post('/search-keywords', [SearchKeywordController::class, 'store'])->name('search-keywords.store');
+    Route::get('/search-keywords/{searchKeyword}/edit', [SearchKeywordController::class, 'edit'])->name('search-keywords.edit');
+    Route::match(['put', 'patch'], '/search-keywords/{searchKeyword}', [SearchKeywordController::class, 'update'])->name('search-keywords.update');
+    Route::delete('/search-keywords/{searchKeyword}', [SearchKeywordController::class, 'destroy'])->name('search-keywords.destroy');
 
     // FAQ Management
     Route::get('/faqs', [FaqController::class, 'index'])->name('faqs');

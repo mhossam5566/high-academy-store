@@ -211,7 +211,7 @@ class CheckoutController extends Controller
             'shipping_method' => 'required|exists:shipping_methods,id',
             'government' => 'required|numeric',
             'city' => 'required|numeric',
-            'address' => 'required|string',
+            'address' => ['required', 'string', 'regex:/^[\p{Arabic}0-9\s\-\,\.]+$/u'],
             'user_name' => [
                 'required',
                 'regex:/^[\p{Arabic}\s]+$/u',

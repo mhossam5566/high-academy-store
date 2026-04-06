@@ -23,6 +23,20 @@
                                            placeholder="ابحث عن اسم الكتاب" @endif
                                     value="{{ request('title') }}">
                             </div>
+                            @if (request('main_category_id') == 13 && isset($searchKeywords) && $searchKeywords->count())
+                                <div class="col-12 d-flex justify-content-center mb-2">
+                                    <select id="search-keyword-select" class="form-select dropdown btn-lg rounded-pill"
+                                        style="border: 1px solid #ffd700; text-align: right;">
+                                        <option value="">اختر كلمة بحث</option>
+                                        @foreach ($searchKeywords as $kw)
+                                            <option value="{{ $kw->keyword }}"
+                                                {{ request('title') == $kw->keyword ? 'selected' : '' }}>
+                                                {{ $kw->keyword }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
                             @if (!request('color') && !request('size'))
                                 @if (request('main_category_id') != 13)
                                     <div class="col-sm-6">
@@ -127,9 +141,21 @@
 @section('js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Search keyword select auto-submit
+            const keywordSelect = document.getElementById('search-keyword-select');
+            if (keywordSelect) {
+                keywordSelect.addEventListener('change', function() {
+                    const titleInput = document.querySelector('input[name="title"]');
+                    if (titleInput && this.value) {
+                        titleInput.value = this.value;
+                        titleInput.closest('form').submit();
+                    }
+                });
+            }
+
             const stageSelect = document.getElementById('stage-select');
             const sliderSelect = document.getElementById('slider-select');
-            
+
             // Store all slider options for filtering
             const allSliders = Array.from(sliderSelect.options);
 
@@ -137,13 +163,13 @@
             function filterSliders(selectedStageId) {
                 // Clear current options except the first one
                 sliderSelect.innerHTML = '<option value="">الصف الدراسي</option>';
-                
+
                 if (selectedStageId) {
                     // Enable slider select
                     sliderSelect.disabled = false;
-                    
+
                     // Filter and add matching sliders
-                    const filteredSliders = allSliders.filter(option => 
+                    const filteredSliders = allSliders.filter(option =>
                         option.dataset.stageId === selectedStageId
                     );
                     filteredSliders.forEach(option => {

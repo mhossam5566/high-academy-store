@@ -263,6 +263,26 @@
             ]
         },
         {
+            "name": "كلمات البحث",
+            "icon": "menu-icon tf-icons ti ti-search",
+            "slug": [
+                "dashboard.search-keywords",
+                "dashboard.search-keywords.create"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/search-keywords",
+                    "name": "كلمات البحث",
+                    "slug": "dashboard.search-keywords"
+                },
+                {
+                    "url": "/dashboard/search-keywords/create",
+                    "name": "إضافة كلمة بحث",
+                    "slug": "dashboard.search-keywords.create"
+                }
+            ]
+        },
+        {
             "name": "الأسئلة الشائعة",
             "icon": "menu-icon tf-icons ti ti-help-circle",
             "slug": [

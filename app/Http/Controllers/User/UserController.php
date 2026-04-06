@@ -100,10 +100,11 @@ class UserController extends Controller
         $sliders = Slider::with('translations')->get();
         $stages = Stage::with('translations')->get();
         $main_categories = MainCategory::orderBy('name', 'ASC')->get();
+        $searchKeywords = \App\Models\SearchKeyword::active()->ordered()->get();
         $sizes = $this->sizes;
         $colors = $this->colors;
 
-        return view('user.shop', compact('products', 'teachers', 'categories', 'sliders', 'stages', 'main_categories', 'sizes', 'colors'));
+        return view('user.shop', compact('products', 'teachers', 'categories', 'sliders', 'stages', 'main_categories', 'searchKeywords', 'sizes', 'colors'));
     }
 
 
