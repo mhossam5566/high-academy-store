@@ -108,7 +108,7 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
             $notes,       // Item_Special_Notes
             $order->name ?? '',    // Customer_Name
             $mobile,               // Mobile_No
-            $order->address ?? '', // Street
+            $order->address2 ?? '', // Street
             $governorate,          // City
             '',   // Package_Ref_Number
             '',   // Merchant_Name
