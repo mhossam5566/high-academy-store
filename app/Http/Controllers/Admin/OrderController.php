@@ -13,14 +13,14 @@ use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use App\Models\ShippingMethod;
 use App\Services\SliderService;
+use App\Services\WhatsappService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Exports\BarcodeOrdersExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
-use Yajra\DataTables\Facades\DataTables;
-use App\Exports\BarcodeOrdersExport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Services\WhatsappService;
+use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
 {
@@ -374,6 +374,7 @@ class OrderController extends Controller
             return response()->json([
                 "success" => false,
                 'code' => 400,
+                'info' => $e->
                 'msg' => "خطأ اثناء التنفيذ"
             ], 400);
         }
