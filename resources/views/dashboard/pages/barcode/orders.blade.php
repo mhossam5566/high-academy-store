@@ -123,7 +123,7 @@
                 ],
                 "paging": true,
                 "pageLength": 10,
-                "stateSave": false,
+                "stateSave": true,
                 'scrollX': true,
                 "processing": true,
                 "serverSide": true,

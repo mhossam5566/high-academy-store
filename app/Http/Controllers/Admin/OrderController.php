@@ -143,7 +143,8 @@ class OrderController extends Controller
                 if (in_array($row->shipping_method, ['3', '4'])) {
                     return '—';
                 }
-                return '<a href=' . route('dashboard.orders.editbarcode', $row->id) . ' type="button" class="btn btn-sm btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
+                $shipping = request('shipping') ? '?shipping=' . request('shipping') : '';
+                return '<a href=' . route('dashboard.orders.editbarcode', $row->id) . $shipping . ' type="button" class="btn btn-sm btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
             })
             ->addColumn('shipping_method', function ($row) {
                 // return $row->shipping_name ?? $row->shipping->name;

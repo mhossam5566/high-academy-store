@@ -21,7 +21,7 @@
                 <a href="{{ route('dashboard.orders.details', $order->id) }}" class="btn btn-info">
                     <i class="ti ti-eye me-1"></i>تفاصيل الطلب
                 </a>
-                <a href="{{ route('dashboard.orders.barcode.list') }}" class="btn btn-secondary">
+                <a href="{{ route('dashboard.orders.barcode.list', ['shipping' => request('shipping')]) }}" class="btn btn-secondary">
                     <i class="ti ti-arrow-right me-1"></i>العودة
                 </a>
             </div>
@@ -132,7 +132,7 @@
                             }).then(() => {
                                 // Optionally redirect back
                                 window.location.href =
-                                    '{{ route('dashboard.orders.barcode.list') }}';
+                                    '{{ route('dashboard.orders.barcode.list', ['shipping' => request('shipping')]) }}';
                             });
                         } else {
                             Swal.fire({
