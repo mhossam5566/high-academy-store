@@ -374,7 +374,7 @@ class OrderController extends Controller
             return response()->json([
                 "success" => false,
                 'code' => 400,
-                'info' => $e->
+                'info' => $e->getMessage(),
                 'msg' => "خطأ اثناء التنفيذ"
             ], 400);
         }
