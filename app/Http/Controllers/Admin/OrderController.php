@@ -350,7 +350,18 @@ class OrderController extends Controller
             $order->save();
 
             DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                "success" => false,
+                'code' => 400,
+                'info' => $e->getMessage(),
+                'msg' => "خطأ اثناء التنفيذ"
+            ], 400);
+        }
 
+        // Send email & WhatsApp outside the DB transaction so failures don't block saving
+        try {
             $shippingMethod = ShippingMethod::find($order->shipping_method);
 
             $details = [
@@ -361,23 +372,21 @@ class OrderController extends Controller
             ];
 
             Mail::to($order->user->email)->send(new delivery($details));
-
-            $this->sendOrderStatusWhatsapp($order, 'shipped');
-
-            return response()->json([
-                "success" => true,
-                'code' => 200,
-                'msg' => "تم تحديث الباركود بنجاح"
-            ], 200);
         } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                "success" => false,
-                'code' => 400,
-                'info' => $e->getMessage(),
-                'msg' => "خطأ اثناء التنفيذ"
-            ], 400);
+            // Mail failed (e.g. rate limit) — barcode is already saved
         }
+
+        try {
+            $this->sendOrderStatusWhatsapp($order, 'shipped');
+        } catch (\Exception $e) {
+            // WhatsApp failed — barcode is already saved
+        }
+
+        return response()->json([
+            "success" => true,
+            'code' => 200,
+            'msg' => "تم تحديث الباركود بنجاح"
+        ], 200);
     }
 
 
