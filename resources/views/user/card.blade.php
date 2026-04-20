@@ -488,6 +488,17 @@ $discountAmount = session()->has('applied_discount')
                             shippingSelect.appendChild(opt);
                         }
                     });
+                    if (shippingSelect.options.length === 1) {
+                        const opt = document.createElement('option');
+                        opt.value = '';
+                        opt.disabled = true;
+                        opt.textContent = allShippingMethods.length === 0 ?
+                            'لا توجد طريقة شحن متاحة للمنتجات الحالية' :
+                            (governoratesSelect.value ?
+                                'لا توجد طريقة شحن متاحة لهذه المحافظة' :
+                                'اختر المحافظة لعرض طرق الشحن المتاحة');
+                        shippingSelect.appendChild(opt);
+                    }
                     if ([...shippingSelect.options].some(o => o.value === prev)) {
                         shippingSelect.value = prev;
                     }

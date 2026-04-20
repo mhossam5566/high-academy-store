@@ -37,6 +37,8 @@ class EditProductRequest extends FormRequest
             'slider_id'=>'nullable|exists:sliders,id',
             // 'child_cat_id'=>'nullable|exists:categories,id',
             'brand_id'=>'nullable|exists:brands,id',
+            'available_shipping_methods' => 'nullable|array',
+            'available_shipping_methods.*' => 'string|exists:shipping_methods,name',
         ];
     }
 

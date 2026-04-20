@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Slider;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ShippingMethod;
 use App\Traits\ImageTrait;
 use App\Traits\DeleteTrait;
 use App\Models\MainCategory;
@@ -174,8 +175,9 @@ class ProductController extends Controller
         $sliders = Slider::get();
         $colors = $this->colors;
         $sizes = $this->sizes;
+        $shippingMethods = ShippingMethod::orderBy('name')->get();
 
-        return view('dashboard.pages.Product.create', compact('main_categories', 'categories', 'brands', 'sliders', 'colors', 'sizes'));
+        return view('dashboard.pages.Product.create', compact('main_categories', 'categories', 'brands', 'sliders', 'colors', 'sizes', 'shippingMethods'));
     }
 
 
@@ -183,6 +185,8 @@ class ProductController extends Controller
     {
         try {
             $data = $request->only('name:ar', 'name:en', 'slider_id', "short_name", 'commit', 'description:ar', 'description:en', 'quantity', 'price', "tax", "slowTax", 'final_price', 'main_category_id', 'category_id', 'child_cat_id', 'brand_id', 'offer_type', 'offer_value', 'have_offer', 'sizes', 'colors', 'max_qty_for_order', 'weight');
+            $shippingMethods = array_values(array_unique(array_filter($request->input('available_shipping_methods', []))));
+            $data['available_shipping_methods'] = count($shippingMethods) ? $shippingMethods : null;
             // Handle best_seller field
             $data['best_seller'] = $request->input('best_seller', 0); // Default to 0 if not provided
 
@@ -214,7 +218,8 @@ class ProductController extends Controller
         $brands = Brand::get();
         $colors = $this->colors;
         $sizes = $this->sizes;
-        return view('dashboard.pages.Product.edit', compact('product', 'main_categories', 'categories', 'brands', 'sliders', 'sizes', 'colors'));
+        $shippingMethods = ShippingMethod::orderBy('name')->get();
+        return view('dashboard.pages.Product.edit', compact('product', 'main_categories', 'categories', 'brands', 'sliders', 'sizes', 'colors', 'shippingMethods'));
     }
 
 
@@ -223,6 +228,8 @@ class ProductController extends Controller
         $product = Product::findOrFail($request->product_id);
 
         $data = $request->only('name:ar', 'name:en', 'slider_id', "short_name", 'commit', 'description:ar', 'description:en', 'price', "tax", 'slowTax', "quantity", 'main_category_id', 'child_cat_id', 'category_id', 'brand_id', 'offer_type', 'offer_value', 'have_offer', 'sizes', 'colors', 'max_qty_for_order', 'weight');
+        $shippingMethods = array_values(array_unique(array_filter($request->input('available_shipping_methods', []))));
+        $data['available_shipping_methods'] = count($shippingMethods) ? $shippingMethods : null;
         $data['best_seller'] = $request->best_seller;
         $data['is_deleted'] = $request->is_deleted;
         $data['state'] = $request->state;

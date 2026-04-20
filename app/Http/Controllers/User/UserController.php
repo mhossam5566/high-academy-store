@@ -182,7 +182,33 @@ class UserController extends Controller
             ]));
         }
 
-        $shippingMethods = ShippingMethod::all();
+        $allowedShippingMethodNames = null;
+        foreach (Cart::instance('shopping')->content() as $item) {
+            $product = Product::find($item->id);
+            if (!$product) {
+                continue;
+            }
+
+            $productShippingMethods = $product->available_shipping_methods ?? [];
+
+            if (is_string($productShippingMethods)) {
+                $productShippingMethods = json_decode($productShippingMethods, true) ?: [];
+            }
+
+            $productShippingMethods = array_values(array_filter((array) $productShippingMethods));
+            if (count($productShippingMethods) === 0) {
+                continue;
+            }
+
+            $allowedShippingMethodNames = is_null($allowedShippingMethodNames)
+                ? $productShippingMethods
+                : array_values(array_intersect($allowedShippingMethodNames, $productShippingMethods));
+        }
+
+        $shippingMethods = ShippingMethod::all()
+            ->when(!is_null($allowedShippingMethodNames), function ($methods) use ($allowedShippingMethodNames) {
+                return $methods->filter(fn($method) => in_array($method->name, $allowedShippingMethodNames, true))->values();
+            });
         $governoratesData = Governorate::select(
             'id',
             'governorate_name_ar',

@@ -259,6 +259,19 @@
                             @endforeach
                         </select>
                     </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">طرق الشحن المتاحة</label>
+                        <select name="available_shipping_methods[]" id="available_shipping_methods"
+                            class="form-select select2" multiple>
+                            @foreach ($shippingMethods as $shippingMethod)
+                                <option value="{{ $shippingMethod->name }}">
+                                    {{ $shippingMethod->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">اتركها فارغة إذا كانت كل طرق الشحن متاحة لهذا المنتج.</small>
+                    </div>
                 </div>
             </div>
         </div>

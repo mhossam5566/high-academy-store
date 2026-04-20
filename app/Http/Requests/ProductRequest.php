@@ -38,6 +38,8 @@ class ProductRequest extends FormRequest
             // 'child_cat_id'=>'nullable|exists:categories,id',
             'slider_id' => 'nullable|exists:sliders,id',
             'brand_id' => 'nullable|exists:brands,id',
+            'available_shipping_methods' => 'nullable|array',
+            'available_shipping_methods.*' => 'string|exists:shipping_methods,name',
         ];
     }
 

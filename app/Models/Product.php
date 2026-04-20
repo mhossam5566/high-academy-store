@@ -45,6 +45,7 @@ class Product extends Model implements TranslatableContract
         'colors',
         'max_qty_for_order',
         'weight',
+        'available_shipping_methods',
     ];
 
     protected $casts = [
@@ -54,6 +55,7 @@ class Product extends Model implements TranslatableContract
         'best_seller' => 'boolean',
         'sizes' => 'array',
         'colors' => 'array',
+        'available_shipping_methods' => 'array',
     ];
 
 

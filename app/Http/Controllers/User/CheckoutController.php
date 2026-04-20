@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\City;
 use App\Models\Order;
 use App\Models\Discount;
+use App\Models\Product;
 use App\Models\Governorate;
 use App\Models\OrderDetail;
 use Illuminate\Support\Str;
@@ -42,6 +43,10 @@ class CheckoutController extends Controller
      */
     protected function validateCommon(Request $request)
     {
+        if (!$request->filled('shipping_method') && $request->filled('shipping_method_id')) {
+            $request->merge(['shipping_method' => $request->shipping_method_id]);
+        }
+
         $rules = [
             'user_name' => ['required', 'string', 'min:3'],
             'mobile' => ['required', 'string', 'regex:/^01[0125][0-9]{8}$/'],
@@ -59,7 +64,47 @@ class CheckoutController extends Controller
             // now require it
             $rules['near_post'][] = 'required';
         }
-        Validator::make($request->all(), $rules)->validate();
+
+        $validator = Validator::make($request->all(), $rules);
+        $validator->after(function ($validator) use ($method) {
+            if ($method && !$this->shippingMethodAllowedForCart($method)) {
+                $validator->errors()->add('shipping_method_id', $this->shippingMethodNameError());
+            }
+        });
+
+        $validator->validate();
+    }
+
+    protected function normalizeProductShippingMethods($methods): array
+    {
+        if (is_string($methods)) {
+            $methods = json_decode($methods, true) ?: [];
+        }
+
+        return array_values(array_filter((array) $methods));
+    }
+
+    protected function shippingMethodAllowedForCart(ShippingMethod $method): bool
+    {
+        foreach (Cart::instance('shopping')->content() as $item) {
+            $product = Product::find($item->id);
+            if (!$product) {
+                return false;
+            }
+
+            $allowedMethods = $this->normalizeProductShippingMethods($product->available_shipping_methods ?? []);
+
+            if (count($allowedMethods) > 0 && !in_array($method->name, $allowedMethods, true)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function shippingMethodNameError(): string
+    {
+        return 'طريقة الشحن المختارة غير متاحة لبعض المنتجات في السلة.';
     }
 
 
@@ -254,6 +299,15 @@ class CheckoutController extends Controller
                 'success' => false,
                 'code' => 400,
                 'msg' => $validator->errors()->first()
+            ], 400);
+        }
+
+        $method = ShippingMethod::find($request->shipping_method);
+        if (!$method || !$this->shippingMethodAllowedForCart($method)) {
+            return response()->json([
+                'success' => false,
+                'code' => 400,
+                'msg' => $this->shippingMethodNameError()
             ], 400);
         }
 
