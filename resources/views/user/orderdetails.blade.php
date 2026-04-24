@@ -208,7 +208,7 @@
 
                                 <div class="order-tracking {{ $delivDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>تم
+                                    <p>قيد
                                         التوصيل<br><span>{{ $delivDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
                                     </p>
                                 </div>
