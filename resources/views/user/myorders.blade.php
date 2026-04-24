@@ -110,6 +110,7 @@
                                 @case('reserved')
                                     <span class="badge bg-info">طلب محجوز</span>
                                 @break
+
                                 @case('pending')
                                     <span class="badge bg-info">طلب معلق</span>
                                 @break
@@ -125,8 +126,7 @@
                                 <strong>طريقة الشحن</strong>
                                 <span class="text-primary">
                                     {{ $ship->name ?? '-' }}
-                                    (
-                                    @if ($ship->type === 'post')
+                                    (@if ($ship->type === 'post')
                                         مكتب بريد
                                     @elseif($ship->type === 'home')
                                         توصيل لباب البيت
@@ -134,8 +134,7 @@
                                         استلام من المكتبة
                                     @else
                                         -
-                                    @endif
-                                    )
+                                    @endif)
                                 </span>
                             </div>
 
@@ -173,11 +172,9 @@
                             @if ($o->status === 'success')
                                 <div class="d-flex justify-content-between mb-2">
                                     <strong>تاريخ الاستلام المتوقع</strong>
-                                    @if ($ship->type === 'home')
-                                        <span class="text-success">خلال 3 أيام عمل</span>
-                                    @else
-                                        <span class="text-success">من 3 إلى 5 أيام عمل</span>
-                                    @endif
+
+                                    <span class="text-success">خلال 2 لـ 5 ايام عمل بعد الشحن</span>
+
                                 </div>
                             @endif
                         </div>

@@ -15,6 +15,9 @@
                     {{-- <div class="ml-2"> --}}
                     <form action="{{ route('user.shop') }}" method="GET">
                         <div class="row g-3">
+                            @if (request('main_category_id') == 13)
+                                <input type="hidden" name="main_category_id" value="13">
+                            @endif
                             <div class="col-12 d-flex flex-wrap justify-content-center align-items-center gap-2 mb-4">
                                 <input name="title" class="form-control btn-lg rounded-pill w-100 search_input"
                                     style="border: 1px solid #ccc;"
