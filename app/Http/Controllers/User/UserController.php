@@ -83,7 +83,7 @@ class UserController extends Controller
 
         $products = Product::with('translations')
             ->when($request->category_id, fn($q) => $q->where('category_id', $request->category_id))
-            ->when($request->title, fn($q) => $q->whereTranslationLike('name', '%' . $request->title . '%'))
+            ->when($request->title, fn($q) => $this->applyProductSearch($q, $request->title))
             ->when($request->brand_id, fn($q) => $q->where('brand_id', $request->brand_id))
             ->when($request->slider_id, fn($q) => $q->where('slider_id', $request->slider_id))
             ->when($request->stage_id && !$request->slider_id, fn($q) => $q->whereIn('slider_id', $sliderIds))
@@ -105,6 +105,59 @@ class UserController extends Controller
         $colors = $this->colors;
 
         return view('user.shop', compact('products', 'teachers', 'categories', 'sliders', 'stages', 'main_categories', 'searchKeywords', 'sizes', 'colors'));
+    }
+
+    private function applyProductSearch($query, string $title)
+    {
+        $normalizedTitle = $this->normalizeArabicSearchText($title);
+        $words = array_values(array_filter(preg_split('/\s+/', $normalizedTitle)));
+
+        if (empty($words)) {
+            return $query;
+        }
+
+        $normalizedNameExpression = $this->arabicSearchSqlExpression('name');
+
+        return $query->whereHas('translations', function ($translationQuery) use ($words, $normalizedNameExpression) {
+            foreach ($words as $word) {
+                $translationQuery->whereRaw("$normalizedNameExpression LIKE ?", ['%' . $word . '%']);
+            }
+        });
+    }
+
+    private function normalizeArabicSearchText(string $text): string
+    {
+        $text = mb_strtolower($text, 'UTF-8');
+        $text = preg_replace('/[\x{064B}-\x{065F}\x{0670}\x{0640}]/u', '', $text);
+
+        $text = str_replace(
+            ['أ', 'إ', 'آ', 'ٱ', 'ة', 'ى', 'ئ', 'ؤ'],
+            ['ا', 'ا', 'ا', 'ا', 'ه', 'ي', 'ي', 'و'],
+            $text
+        );
+
+        return trim(preg_replace('/\s+/u', ' ', $text));
+    }
+
+    private function arabicSearchSqlExpression(string $column): string
+    {
+        $expression = "LOWER($column)";
+
+        foreach ([
+            'أ' => 'ا',
+            'إ' => 'ا',
+            'آ' => 'ا',
+            'ٱ' => 'ا',
+            'ة' => 'ه',
+            'ى' => 'ي',
+            'ئ' => 'ي',
+            'ؤ' => 'و',
+            'ـ' => '',
+        ] as $from => $to) {
+            $expression = "REPLACE($expression, '$from', '$to')";
+        }
+
+        return $expression;
     }
 
 
