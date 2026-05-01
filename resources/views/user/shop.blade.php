@@ -18,13 +18,16 @@
                             @if (request('main_category_id') == 13)
                                 <input type="hidden" name="main_category_id" value="13">
                             @endif
-                            <div class="col-12 d-flex flex-wrap justify-content-center align-items-center gap-2 mb-4">
-                                <input name="title" class="form-control btn-lg rounded-pill w-100 search_input"
+                            <div class="col-12 d-flex flex-wrap flex-md-nowrap justify-content-center align-items-center gap-2 mb-4">
+                                <input name="title" class="form-control btn-lg rounded-pill search_input"
                                     style="border: 1px solid #ccc;"
                                     @if (request('main_category_id') == 13) placeholder="ابحث عن اسم المنتج"
                                        @else
                                            placeholder="ابحث عن اسم الكتاب" @endif
                                     value="{{ request('title') }}">
+                                <button type="submit" class="btn-light rounded-pill px-5 py-2 text-bold flex-shrink-0"
+                                    style="border: none;">بحث
+                                </button>
                             </div>
                             @if (request('main_category_id') == 13 && isset($searchKeywords) && $searchKeywords->count())
                                 <div class="col-12 mb-3">
@@ -114,12 +117,6 @@
                                     </div>
                                 @endif
                             @endif
-                            <div class="col-12">
-                                <button type="submit" class="btn-light  mb-5 rounded-pill px-5 py-2 text-bold"
-                                    style="border: none;">بحث
-                                </button>
-                            </div>
-
                         </div>
                     </form>
 
