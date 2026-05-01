@@ -27,17 +27,19 @@
                                     value="{{ request('title') }}">
                             </div>
                             @if (request('main_category_id') == 13 && isset($searchKeywords) && $searchKeywords->count())
-                                <div class="col-12 d-flex justify-content-center mb-2">
-                                    <select id="search-keyword-select" class="form-select dropdown btn-lg rounded-pill"
-                                        style="border: 1px solid #ffd700; text-align: right;">
-                                        <option value="">اختر كلمة بحث</option>
+                                <div class="col-12 mb-3">
+                                    <div class="d-flex flex-wrap justify-content-center align-items-center gap-2"
+                                        dir="rtl">
+                                        <span class="fw-bold text-muted me-1">اقتراحات البحث:</span>
                                         @foreach ($searchKeywords as $kw)
-                                            <option value="{{ $kw->keyword }}"
-                                                {{ request('title') == $kw->keyword ? 'selected' : '' }}>
+                                            <button type="button"
+                                                class="search-keyword-tag btn btn-sm rounded-pill px-3 py-2 {{ request('title') == $kw->keyword ? 'active' : '' }}"
+                                                data-keyword="{{ $kw->keyword }}"
+                                                style="border: 1px solid #ffd700; background: {{ request('title') == $kw->keyword ? '#ffd700' : '#fff8d6' }}; color: #333;">
                                                 {{ $kw->keyword }}
-                                            </option>
+                                            </button>
                                         @endforeach
-                                    </select>
+                                    </div>
                                 </div>
                             @endif
                             @if (!request('color') && !request('size'))
@@ -144,20 +146,23 @@
 @section('js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Search keyword select auto-submit
-            const keywordSelect = document.getElementById('search-keyword-select');
-            if (keywordSelect) {
-                keywordSelect.addEventListener('change', function() {
+            // Search keyword tags auto-submit
+            document.querySelectorAll('.search-keyword-tag').forEach(function(keywordTag) {
+                keywordTag.addEventListener('click', function() {
                     const titleInput = document.querySelector('input[name="title"]');
-                    if (titleInput && this.value) {
-                        titleInput.value = this.value;
+                    if (titleInput && this.dataset.keyword) {
+                        titleInput.value = this.dataset.keyword;
                         titleInput.closest('form').submit();
                     }
                 });
-            }
+            });
 
             const stageSelect = document.getElementById('stage-select');
             const sliderSelect = document.getElementById('slider-select');
+
+            if (!stageSelect || !sliderSelect) {
+                return;
+            }
 
             // Store all slider options for filtering
             const allSliders = Array.from(sliderSelect.options);
