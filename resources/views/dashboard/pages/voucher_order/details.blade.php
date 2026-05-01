@@ -169,10 +169,8 @@
                             $userVouchers = App\Models\Voucher::where('coupon_id', $coupon->id)
                                 ->where('user_id', $order->user_id)
                                 ->where('is_used', 1)
-                                ->whereBetween('updated_at', [
-                                    $order->created_at->subMinutes(5),
-                                    $order->created_at->addMinutes(5),
-                                ])
+                                ->where('updated_at', '>=', $order->created_at)
+                                ->orderBy('updated_at')
                                 ->take($order->quantity)
                                 ->get();
                         @endphp
