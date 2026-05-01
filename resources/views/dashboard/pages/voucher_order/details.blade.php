@@ -166,13 +166,22 @@
                     <h5 class="card-header text-success">أكواد الكوبون المرسلة</h5>
                     <div class="card-body">
                         @php
-                            $userVouchers = App\Models\Voucher::where('coupon_id', $coupon->id)
+                            $nextOrder = App\Models\Order::where('user_id', $order->user_id)
+                                ->where('id', '>', $order->id)
+                                ->orderBy('id')
+                                ->first();
+
+                            $query = App\Models\Voucher::where('coupon_id', $coupon->id)
                                 ->where('user_id', $order->user_id)
-                                ->where('is_used', 1)
-                                ->where('updated_at', '>=', $order->created_at)
-                                ->orderBy('updated_at')
-                                ->take($order->quantity)
-                                ->get();
+                                ->where('is_used', 1);
+
+                            if ($nextOrder) {
+                                $query->whereBetween('updated_at', [$order->created_at, $nextOrder->created_at]);
+                            } else {
+                                $query->where('updated_at', '>=', $order->created_at);
+                            }
+
+                            $userVouchers = $query->orderBy('updated_at')->take($order->quantity)->get();
                         @endphp
 
                         @if ($userVouchers->count() > 0)
