@@ -108,8 +108,8 @@
                                 $cartSubtotal = (float) str_replace(',', '', Cart::subtotal());
 
                                 // Check if there's a discount in the session
-$discountAmount = session()->has('applied_discount')
-    ? session('applied_discount')['amount']
+                                $discountAmount = session()->has('applied_discount')
+                                    ? session('applied_discount')['amount']
                                     : 0;
 
                                 // Subtotal after discount (before shipping)
@@ -174,11 +174,6 @@ $discountAmount = session()->has('applied_discount')
                                         pattern="\d{11}" minlength="11" maxlength="11" placeholder="رقم موبايل الاحتياطي"
                                         required />
                                 </div>
-                                {{-- <div class="form-group">
-                                    <label for="near_post">اسم اقرب مكتب بريد</label>
-                                    <input class="form-control" id="near_post" name="near_post"
-                                        placeholder="اسم اقرب مكتب بريد" />
-                                </div> --}}
 
                             </form>
                             <!-- [ADDED] Discount Form here in the checkout -->
@@ -197,16 +192,6 @@ $discountAmount = session()->has('applied_discount')
                                         </form>
 
                                     </div>
-                                    {{-- <div class="col-md-12 mt-2">
-                            @if (session()->has('applied_discount'))
-                                <form action="{{ route('user.checkout.removeDiscount') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-danger">
-                                        إزالة الخصم
-                                    </button>
-                                </form>
-                            @endif
-                        </div> --}}
                                 </div>
                             @endif
 
@@ -341,6 +326,7 @@ $discountAmount = session()->has('applied_discount')
         @php
             $cartItems = Cart::instance('shopping')->content();
             $totalProducts = $cartItems->count();
+            $totalQuantity = $cartItems->sum('qty'); {{-- ← جديد: إجمالي الكميات --}}
 
             $productTax = 0;
             $productSlowTax = 0;
@@ -362,6 +348,7 @@ $discountAmount = session()->has('applied_discount')
         <script>
             const TAX_HOME = {{ $productTax }};
             const TAX_POST = {{ $productSlowTax }};
+            const TOTAL_QUANTITY = {{ $totalQuantity }}; // ← جديد: إجمالي الكميات
         </script>
 
         <script>
@@ -410,7 +397,12 @@ $discountAmount = session()->has('applied_discount')
                         npInput.value = ''; // clear out any old value
                     }
 
-                    document.getElementById('shipping_fee').innerText = Number(m.fee).toFixed(2);
+                    // ← تعديل: رسوم الفرع تُضرب في إجمالي الكميات
+                    if (m.type === 'branch') {
+                        document.getElementById('shipping_fee').innerText = (Number(m.fee) * TOTAL_QUANTITY).toFixed(2);
+                    } else {
+                        document.getElementById('shipping_fee').innerText = Number(m.fee).toFixed(2);
+                    }
 
                     const govId = governoratesSelect.value;
                     const matchedGov = governoratesDataset.find(g => g.id == govId);
@@ -661,6 +653,8 @@ $discountAmount = session()->has('applied_discount')
                     deliveryFee += (Number.isNaN(postBase) ? 0 : postBase) + appliedTax;
                     updateCostRows('post', deliveryFee);
                 } else {
+                    // ← تعديل: رسوم الفرع (branch) تُضرب في إجمالي الكميات
+                    deliveryFee = deliveryFee * TOTAL_QUANTITY;
                     updateCostRows('branch', deliveryFee);
                 }
 
@@ -671,6 +665,7 @@ $discountAmount = session()->has('applied_discount')
                     methodName: method.name,
                     governorateId: governorateId || null,
                     baseFee: Number(method.fee ?? 0),
+                    totalQuantity: TOTAL_QUANTITY,
                     homeBase: Number.isNaN(homeBase) ? null : homeBase,
                     postBase: Number.isNaN(postBase) ? null : postBase,
                     appliedTax,
