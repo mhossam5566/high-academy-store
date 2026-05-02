@@ -108,8 +108,8 @@
                                 $cartSubtotal = (float) str_replace(',', '', Cart::subtotal());
 
                                 // Check if there's a discount in the session
-                                $discountAmount = session()->has('applied_discount')
-                                    ? session('applied_discount')['amount']
+$discountAmount = session()->has('applied_discount')
+    ? session('applied_discount')['amount']
                                     : 0;
 
                                 // Subtotal after discount (before shipping)
@@ -326,7 +326,7 @@
         @php
             $cartItems = Cart::instance('shopping')->content();
             $totalProducts = $cartItems->count();
-            $totalQuantity = $cartItems->sum('qty'); {{-- ← جديد: إجمالي الكميات --}}
+            $totalQuantity = $cartItems->sum('qty');
 
             $productTax = 0;
             $productSlowTax = 0;
