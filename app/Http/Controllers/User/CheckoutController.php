@@ -5,8 +5,8 @@ namespace App\Http\Controllers\User;
 use Carbon\Carbon;
 use App\Models\City;
 use App\Models\Order;
-use App\Models\Discount;
 use App\Models\Product;
+use App\Models\Discount;
 use App\Models\Governorate;
 use App\Models\OrderDetail;
 use Illuminate\Support\Str;
@@ -120,7 +120,8 @@ class CheckoutController extends Controller
         // 1) Branch pickup: free
         if ($method->type === 'branch') {
             $address = "{$method->name}";
-            return [$address, $baseFee];
+            $totalQuantity = Cart::instance('shopping')->content()->sum('qty');
+            return [$address, $baseFee * $totalQuantity];
         }
 
         // 2) Fetch governorate & city from DB
