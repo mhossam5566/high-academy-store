@@ -1019,7 +1019,7 @@
                     <h2 class="accordion-header">
                         <button class="accordion-button pay-btn collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                            <img src="https://logos-download.com/wp-content/uploads/2023/02/Fawry_Logo.png"
+                            <img src="https://wp.logos-download.com/wp-content/uploads/2023/02/Fawry_Logo-3000x849.png"
                                 class="pay-logo">
                             Fawry Pay
                         </button>
@@ -1047,7 +1047,7 @@
         <div class="contact-strip" style="margin-top:20px;">
             <p>لو قابلتك أي مشكلة تواصل معنا</p>
             <div class="contact-btns">
-                <a href="https://wa.me/+201060683708" target="_blank" class="btn-contact btn-wa">📲 واتساب</a>
+                <a href="https://wa.me/+201550234324" target="_blank" class="btn-contact btn-wa">📲 واتساب</a>
                 <a href="https://www.facebook.com/highacademy2?mibextid=ZbWKwL" target="_blank"
                     class="btn-contact btn-fb">📘 فيس بوك</a>
             </div>
