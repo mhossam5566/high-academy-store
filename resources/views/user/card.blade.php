@@ -1179,7 +1179,7 @@
                 shippingMethods.forEach(m => {
                     const isPickup = m.type === 'branch';
                     if (!isPickup || (governoratesSelect.value && m.government == governoratesSelect
-                        .value)) {
+                            .value)) {
                         const opt = document.createElement('option');
                         opt.value = m.id;
                         opt.textContent = {
