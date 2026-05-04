@@ -25,14 +25,15 @@
             --text-main: #1a1a2e;
             --text-muted: #7b7b96;
             --success: #22c55e;
-            --radius: 16px;
+            --radius: 18px;
             --radius-sm: 10px;
-            --shadow: 0 4px 24px rgba(26, 26, 46, 0.07);
-            --shadow-sm: 0 2px 8px rgba(26, 26, 46, 0.05);
+            --shadow: 0 4px 28px rgba(26, 26, 46, 0.08);
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
@@ -45,75 +46,212 @@
             display: none !important;
         }
 
-        /* ─── Page Wrapper ─── */
+        /* ─── Wrapper ─── */
         .checkout-wrapper {
-            max-width: 1200px;
+            max-width: 860px;
             margin: 0 auto;
             padding: 100px 20px 60px;
         }
 
-        /* ─── Page Header ─── */
-        .page-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .page-header .badge-tag {
-            display: inline-block;
-            background: var(--accent);
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            padding: 4px 14px;
-            border-radius: 20px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        .page-header h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin: 0;
-        }
-
-        /* ─── Cards ─── */
-        .card-block {
-            background: var(--surface);
-            border-radius: var(--radius);
-            border: 1.5px solid var(--border);
-            box-shadow: var(--shadow);
-            padding: 28px 28px;
-            margin-bottom: 20px;
-            transition: box-shadow .2s;
-        }
-
-        .card-block:hover {
-            box-shadow: 0 8px 32px rgba(26, 26, 46, 0.11);
-        }
-
-        .card-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--primary);
+        /* ─── Flash ─── */
+        .flash-alert {
+            border-radius: var(--radius-sm);
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 600;
             margin-bottom: 18px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .card-title .icon-circle {
-            width: 34px;
-            height: 34px;
+        .flash-success {
+            background: #f0fdf4;
+            border: 1.5px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .flash-error {
+            background: #fef2f2;
+            border: 1.5px solid #fecaca;
+            color: #991b1b;
+        }
+
+        /* ─── Progress Bar ─── */
+        .stepper-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 36px;
+            direction: rtl;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            flex: 1;
+        }
+
+        .step-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 0;
+            right: 50%;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+            transition: background .4s;
+        }
+
+        .step-item:not(:first-child)::after {
+            content: '';
+            position: absolute;
+            top: 18px;
+            right: 0;
+            left: 50%;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+            transition: background .4s;
+        }
+
+        .step-item.done::before,
+        .step-item.done::after,
+        .step-item.active::after {
+            background: var(--accent);
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            z-index: 1;
+            transition: all .3s;
+            position: relative;
+        }
+
+        .step-item.active .step-circle {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 0 5px rgba(224, 123, 57, .18);
+        }
+
+        .step-item.done .step-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .step-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .step-item.active .step-label {
+            color: var(--accent);
+        }
+
+        .step-item.done .step-label {
+            color: var(--primary);
+        }
+
+        /* ─── Card ─── */
+        .step-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1.5px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 32px 32px 28px;
+            animation: fadeUp .35s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            direction: rtl;
+        }
+
+        .step-card-header .icon-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
             background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            font-size: 14px;
+            font-size: 18px;
             flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(224, 123, 57, .25);
+        }
+
+        .step-card-header h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .step-card-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* ─── Summary Sidebar (sticky top card) ─── */
+        .order-mini-bar {
+            background: var(--primary);
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            direction: rtl;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .order-mini-bar .mini-label {
+            font-size: 13px;
+            opacity: .7;
+        }
+
+        .order-mini-bar .mini-val {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent-light);
         }
 
         /* ─── Product Table ─── */
@@ -129,22 +267,16 @@
             color: var(--text-muted);
             font-size: 12px;
             font-weight: 700;
-            letter-spacing: .5px;
-            text-transform: uppercase;
-            padding: 12px 16px;
+            padding: 11px 14px;
             border-bottom: 1.5px solid var(--border);
         }
 
         .product-table thead th:first-child {
-            border-radius: 0 10px 0 0;
+            border-radius: 0 var(--radius-sm) 0 0;
         }
 
         .product-table thead th:last-child {
-            border-radius: 10px 0 0 0;
-        }
-
-        .product-table tbody tr {
-            transition: background .15s;
+            border-radius: var(--radius-sm) 0 0 0;
         }
 
         .product-table tbody tr:hover {
@@ -152,7 +284,7 @@
         }
 
         .product-table tbody td {
-            padding: 14px 16px;
+            padding: 13px 14px;
             border-bottom: 1px solid var(--border);
             font-size: 14px;
         }
@@ -177,23 +309,22 @@
             background: var(--surface-alt);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 3px 12px;
+            padding: 2px 12px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .price-tag {
             font-weight: 700;
             color: var(--accent);
-            font-size: 14px;
         }
 
         /* ─── Form Controls ─── */
         .form-label-custom {
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 7px;
             display: block;
         }
 
@@ -206,8 +337,8 @@
             font-size: 14px;
             color: var(--text-main);
             background: var(--surface);
-            transition: border-color .2s, box-shadow .2s;
             outline: none;
+            transition: border-color .2s, box-shadow .2s;
             appearance: none;
             -webkit-appearance: none;
         }
@@ -233,34 +364,106 @@
             margin-bottom: 16px;
         }
 
-        /* ─── Discount Alert ─── */
+        /* ─── Shipping Info ─── */
+        .ship-info-box {
+            background: var(--surface-alt);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-top: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            padding: 7px 0;
+            border-bottom: 1px dashed #e0e0ec;
+            direction: rtl;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row .info-label {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .info-row .info-value {
+            font-weight: 700;
+        }
+
+        /* ─── Summary Rows ─── */
+        .summary-lines {
+            direction: rtl;
+        }
+
+        .sum-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .sum-row:last-child {
+            border-bottom: none;
+        }
+
+        .sum-row .s-lbl {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .sum-row .s-val {
+            font-weight: 700;
+        }
+
+        .sum-row.total {
+            padding-top: 16px;
+            margin-top: 4px;
+            border-top: 2px solid var(--primary);
+        }
+
+        .sum-row.total .s-lbl {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .sum-row.total .s-val {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        /* ─── Discount Badge ─── */
         .discount-badge {
             background: #f0fdf4;
             border: 1.5px solid #bbf7d0;
             border-radius: var(--radius-sm);
-            padding: 14px 18px;
+            padding: 12px 16px;
             margin-bottom: 16px;
             font-size: 13px;
             color: #166534;
             display: flex;
             align-items: flex-start;
             gap: 10px;
-        }
-
-        .discount-badge .disc-icon {
-            font-size: 18px;
-            flex-shrink: 0;
+            direction: rtl;
         }
 
         .discount-badge strong {
             color: #15803d;
         }
 
-        /* ─── Coupon Row ─── */
+        /* ─── Coupon ─── */
         .coupon-row {
             display: flex;
             gap: 10px;
-            margin-bottom: 4px;
         }
 
         .coupon-row .form-control-custom {
@@ -278,130 +481,19 @@
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
-            transition: background .2s, transform .1s;
+            transition: background .2s;
         }
 
         .btn-apply:hover {
             background: var(--accent);
-            transform: translateY(-1px);
-        }
-
-        .btn-apply:active {
-            transform: translateY(0);
-        }
-
-        /* ─── Shipping Method Card ─── */
-        .shipping-card {
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 18px 20px;
-            background: var(--surface-alt);
-            margin-bottom: 16px;
-        }
-
-        .shipping-card .ship-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-
-        /* ─── Shipping Info Details ─── */
-        #shipping_info {
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid var(--border);
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            padding: 6px 0;
-            border-bottom: 1px dashed #ebebf5;
-            direction: rtl;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-row .info-label {
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .info-row .info-value {
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        /* ─── Near Post Input ─── */
-        #nearpost_wrapper {
-            margin-top: 4px;
-            margin-bottom: 16px;
-        }
-
-        /* ─── Order Summary Rows ─── */
-        .summary-block {
-            border-top: 1.5px solid var(--border);
-            padding-top: 18px;
-            margin-top: 4px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            direction: rtl;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .summary-row .s-label {
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .summary-row .s-value {
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .summary-row.total-row {
-            margin-top: 10px;
-            padding-top: 14px;
-            border-top: 1.5px solid var(--border);
-        }
-
-        .summary-row.total-row .s-label {
-            font-size: 17px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .summary-row.total-row .s-value {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--accent);
         }
 
         /* ─── Payment Accordion ─── */
-        #accordionExample {
-            margin-top: 20px;
-        }
-
         .pay-accordion-item {
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm) !important;
             margin-bottom: 10px;
             overflow: hidden;
-            transition: box-shadow .2s;
-        }
-
-        .pay-accordion-item:hover {
-            box-shadow: var(--shadow-sm);
         }
 
         .accordion-button.pay-btn {
@@ -427,11 +519,10 @@
         .accordion-button.pay-btn::after {
             margin-right: auto;
             margin-left: 0;
-            filter: none;
         }
 
         .pay-logo {
-            height: 36px;
+            height: 34px;
             width: auto;
             object-fit: contain;
             border-radius: 6px;
@@ -443,22 +534,83 @@
             font-size: 13px;
         }
 
-        /* ─── CTA Buttons ─── */
-        .btn-confirm {
+        /* ─── Navigation Buttons ─── */
+        .step-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 28px;
+            direction: rtl;
+        }
+
+        .btn-next {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
             color: #fff;
             border: none;
             border-radius: var(--radius-sm);
-            padding: 13px 28px;
+            padding: 13px 30px;
             font-family: 'Cairo', sans-serif;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: transform .15s, box-shadow .15s;
             box-shadow: 0 4px 14px rgba(224, 123, 57, .3);
+            transition: transform .15s, box-shadow .15s;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(224, 123, 57, .4);
+        }
+
+        .btn-next:active {
+            transform: translateY(0);
+        }
+
+        .btn-next:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 22px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: border-color .2s, color .2s;
+        }
+
+        .btn-back:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-confirm {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 13px 30px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(224, 123, 57, .3);
+            transition: transform .15s, box-shadow .15s;
         }
 
         .btn-confirm:hover {
@@ -476,16 +628,16 @@
             background: var(--surface);
             border-radius: var(--radius);
             border: 1.5px solid var(--border);
-            padding: 24px 28px;
-            margin-top: 24px;
+            padding: 20px 24px;
+            margin-top: 16px;
             text-align: center;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow);
         }
 
         .contact-strip p {
             color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 16px;
+            font-size: 13px;
+            margin-bottom: 14px;
         }
 
         .contact-btns {
@@ -499,18 +651,17 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 11px 22px;
+            padding: 10px 22px;
             border-radius: var(--radius-sm);
             font-family: 'Cairo', sans-serif;
             font-size: 14px;
             font-weight: 700;
             text-decoration: none;
-            transition: transform .15s, box-shadow .15s;
+            transition: transform .15s;
         }
 
         .btn-contact:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
         }
 
         .btn-wa {
@@ -523,95 +674,36 @@
             color: #fff;
         }
 
-        /* ─── Flash Alerts ─── */
-        .flash-alert {
-            border-radius: var(--radius-sm);
-            padding: 12px 18px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .flash-success {
-            background: #f0fdf4;
-            border: 1.5px solid #bbf7d0;
-            color: #166534;
-        }
-
-        .flash-error {
-            background: #fef2f2;
-            border: 1.5px solid #fecaca;
-            color: #991b1b;
-        }
-
         /* ─── Responsive ─── */
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             .checkout-wrapper {
                 padding: 80px 12px 40px;
             }
 
-            .card-block {
-                padding: 18px 14px;
+            .step-card {
+                padding: 22px 16px 18px;
             }
 
-            .page-header h1 {
-                font-size: 1.4rem;
+            .step-label {
+                display: none;
             }
 
-            .contact-btns {
-                flex-direction: column;
-                align-items: center;
+            .step-nav {
+                flex-direction: column-reverse;
+                gap: 10px;
             }
 
-            .btn-contact {
+            .btn-next,
+            .btn-back {
                 width: 100%;
                 justify-content: center;
             }
         }
-
-        /* ─── Animate in ─── */
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card-block,
-        .contact-strip {
-            animation: fadeUp .45s ease both;
-        }
-
-        .card-block:nth-child(2) {
-            animation-delay: .07s;
-        }
-
-        .card-block:nth-child(3) {
-            animation-delay: .14s;
-        }
-
-        .card-block:nth-child(4) {
-            animation-delay: .21s;
-        }
     </style>
 
+    <!-- ═══════════════════════════════════════ -->
     <div class="checkout-wrapper">
 
-        <!-- Page Header -->
-        <div class="page-header">
-            <span class="badge-tag">الطلب</span>
-            <h1>تفاصيل الدفع</h1>
-        </div>
-
-        <!-- Flash messages -->
         @if (session('success'))
             <div class="flash-alert flash-success">✅ {{ session('success') }}</div>
         @endif
@@ -619,294 +711,350 @@
             <div class="flash-alert flash-error">❌ {{ session('error') }}</div>
         @endif
 
-        <div class="row g-4">
+        @php
+            $cartSubtotal = (float) str_replace(',', '', Cart::subtotal());
+            $discountAmount = session()->has('applied_discount') ? session('applied_discount')['amount'] : 0;
+            $preShippingTotal = max($cartSubtotal - $discountAmount, 0);
+        @endphp
 
-            <!-- ═══ LEFT COLUMN ═══ -->
-            <div class="col-lg-7">
-
-                <!-- Products Table -->
-                <div class="card-block">
-                    <div class="card-title">
-                        <span class="icon-circle">🛍</span>
-                        منتجات طلبك
-                    </div>
-
-                    <form id="order">
-                        <div style="overflow-x:auto;">
-                            <table class="product-table">
-                                <thead>
-                                    <tr>
-                                        <th>وصف المنتج</th>
-                                        <th>السعر</th>
-                                        <th>العدد</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (Cart::instance('shopping')->content() as $item)
-                                        <tr>
-                                            <input type="hidden" name="product_id[]" value="{{ $item->id }}">
-                                            <input type="hidden" name="amount[]" value="{{ $item->qty }}">
-                                            <input type="hidden" name="price[]" value="{{ $item->price }}">
-                                            <input type="hidden" name="size[]" value="{{ $item->options->size }}">
-                                            <input type="hidden" name="color[]" value="{{ $item->options->color }}">
-                                            <input type="hidden" name="total_price[]" value="{{ $item->subtotal() }}">
-                                            <td>
-                                                <a href="{{ route('user.product.show', $item->id) }}"
-                                                    class="product-name-link">
-                                                    {{ $item->name }}
-                                                </a>
-                                            </td>
-                                            <td><span class="price-tag">{{ number_format($item->price, 2) }} جنيه</span>
-                                            </td>
-                                            <td><span class="qty-badge">× {{ $item->qty }}</span></td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </form>
+        <!-- Mini Order Bar -->
+        <div class="order-mini-bar">
+            <div>
+                <div class="mini-label">إجمالي المنتجات</div>
+                <div class="mini-val">{{ number_format($preShippingTotal, 2) }} جنيه</div>
+            </div>
+            <div style="text-align:left;">
+                <div class="mini-label">عدد المنتجات</div>
+                <div class="mini-val" style="font-size:15px;">{{ Cart::instance('shopping')->content()->sum('qty') }} قطعة
                 </div>
+            </div>
+        </div>
 
-                <!-- Shipping & Location -->
-                <div class="card-block">
-                    <div class="card-title">
-                        <span class="icon-circle">📍</span>
-                        بيانات الشحن والتوصيل
-                    </div>
+        <!-- ─── Progress Stepper ─── -->
+        <div class="stepper-bar">
+            <div class="step-item active" id="si-1">
+                <div class="step-circle">🛍</div>
+                <div class="step-label">مراجعة الطلب</div>
+            </div>
+            <div class="step-item" id="si-2">
+                <div class="step-circle">📍</div>
+                <div class="step-label">بيانات الشحن</div>
+            </div>
+            <div class="step-item" id="si-3">
+                <div class="step-circle">🚚</div>
+                <div class="step-label">طريقة التوصيل</div>
+            </div>
+            <div class="step-item" id="si-4">
+                <div class="step-circle">💳</div>
+                <div class="step-label">الدفع</div>
+            </div>
+        </div>
 
-                    <form id="location-data">
+        <!-- Hidden Forms (always in DOM for JS serialization) -->
+        <form id="order" style="display:none;">
+            @foreach (Cart::instance('shopping')->content() as $item)
+                <input type="hidden" name="product_id[]" value="{{ $item->id }}">
+                <input type="hidden" name="amount[]" value="{{ $item->qty }}">
+                <input type="hidden" name="price[]" value="{{ $item->price }}">
+                <input type="hidden" name="size[]" value="{{ $item->options->size }}">
+                <input type="hidden" name="color[]" value="{{ $item->options->color }}">
+                <input type="hidden" name="total_price[]" value="{{ $item->subtotal() }}">
+            @endforeach
+        </form>
+        <input type="hidden" name="all_total" value="{{ $preShippingTotal }}" id="all_total">
+        <p id="total" style="display:none;">{{ $preShippingTotal }}</p>
+
+        <!-- ══════════ STEP 1: Review ══════════ -->
+        <div class="step-card" id="step-1">
+            <div class="step-card-header">
+                <div class="icon-circle">🛍</div>
+                <div>
+                    <h2>مراجعة طلبك</h2>
+                    <p>تأكد من المنتجات قبل المتابعة</p>
+                </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>المنتج</th>
+                            <th>السعر</th>
+                            <th>الكمية</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Cart::instance('shopping')->content() as $item)
+                            <tr>
+                                <td><a href="{{ route('user.product.show', $item->id) }}"
+                                        class="product-name-link">{{ $item->name }}</a></td>
+                                <td><span class="price-tag">{{ number_format($item->price, 2) }} جنيه</span></td>
+                                <td><span class="qty-badge">× {{ $item->qty }}</span></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Coupon -->
+            @if ($discountSetting && $discountSetting->discount_enabled)
+                <div style="margin-top:20px; padding-top:20px; border-top:1.5px solid var(--border);">
+                    <label class="form-label-custom">🏷 هل معاك كوبون خصم؟</label>
+                    <form action="{{ route('user.checkout.applyDiscount') }}" method="POST">
                         @csrf
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-group-custom">
-                                    <label class="form-label-custom" for="governorates">المحافظة</label>
-                                    <select class="form-control-custom" id="governorates" name="government"
-                                        onchange="calculateTotal()">
-                                        <option value="">اختر المحافظة</option>
-                                        @foreach ($governoratesData as $governorate)
-                                            <option value="{{ $governorate->id }}" gov-price="{{ $governorate->price }}">
-                                                {{ $governorate->governorate_name_ar }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-custom">
-                                    <label class="form-label-custom" for="cities">المدينة</label>
-                                    <select class="form-control-custom" id="cities" name="city" disabled>
-                                        <option value="">اختر المدينة</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group-custom">
-                                    <label class="form-label-custom" for="address">العنوان التفصيلي</label>
-                                    <input class="form-control-custom" id="address" name="address"
-                                        placeholder="الشارع، الحي، المبنى..." />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-custom">
-                                    <label class="form-label-custom" for="user_name">الاسم ثلاثي (كما في البطاقة)</label>
-                                    <input class="form-control-custom" id="user_name" name="user_name"
-                                        placeholder="اسم المستلم" required />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-custom">
-                                    <label class="form-label-custom" for="mobile">رقم الموبايل</label>
-                                    <input class="form-control-custom" type="number" id="mobile" name="mobile"
-                                        pattern="\d{11}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx"
-                                        required />
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group-custom">
-                                    <label class="form-label-custom" for="temp_mobile">رقم الموبايل الاحتياطي</label>
-                                    <input class="form-control-custom" type="number" id="temp_mobile"
-                                        name="temp_mobile" pattern="\d{11}" minlength="11" maxlength="11"
-                                        placeholder="01xxxxxxxxx" required />
-                                </div>
-                            </div>
+                        <div class="coupon-row">
+                            <input type="text" name="coupon_code" class="form-control-custom"
+                                placeholder="ادخل كود الخصم"
+                                @if (session()->has('applied_discount')) value="{{ session('applied_discount')['code'] }}" @endif>
+                            <button type="submit" class="btn-apply">تطبيق</button>
                         </div>
                     </form>
                 </div>
+            @endif
 
-                <!-- Shipping Method -->
-                <div class="card-block">
-                    <div class="card-title">
-                        <span class="icon-circle">🚚</span>
-                        طريقة الاستلام
+            @if ($discountAmount > 0)
+                <div class="discount-badge" style="margin-top:12px;">
+                    🎉 تم تطبيق الخصم! الكوبون: <strong>{{ session('applied_discount')['code'] }}</strong> — وفرت
+                    <strong>{{ $discountAmount }} جنيه</strong>
+                </div>
+            @endif
+
+            <div class="step-nav">
+                <button class="btn-next" onclick="goTo(2)">
+                    التالي — بيانات الشحن
+                    <span>←</span>
+                </button>
+                <div></div>
+            </div>
+        </div>
+
+        <!-- ══════════ STEP 2: Location ══════════ -->
+        <div class="step-card hidden" id="step-2">
+            <div class="step-card-header">
+                <div class="icon-circle">📍</div>
+                <div>
+                    <h2>بيانات الشحن</h2>
+                    <p>سنوصل طلبك على هذا العنوان</p>
+                </div>
+            </div>
+
+            <form id="location-data">
+                @csrf
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="governorates">المحافظة</label>
+                            <select class="form-control-custom" id="governorates" name="government"
+                                onchange="calculateTotal()">
+                                <option value="">اختر المحافظة</option>
+                                @foreach ($governoratesData as $governorate)
+                                    <option value="{{ $governorate->id }}" gov-price="{{ $governorate->price }}">
+                                        {{ $governorate->governorate_name_ar }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-
-                    <div class="form-group-custom">
-                        <label class="form-label-custom" for="shipping_method">اختر طريقة الشحن</label>
-                        <select class="form-control-custom" id="shipping_method" name="shipping_method_id">
-                            <option value="">اختر طريقة الشحن</option>
-                        </select>
-                    </div>
-
-                    <!-- Shipping Details Panel -->
-                    <div id="shipping_info" style="display:none;">
-                        <div class="info-row" id="fee_row">
-                            <span class="info-label">رسوم الخدمة</span>
-                            <span class="info-value">+ <span id="shipping_fee">0.00</span> جنيه</span>
-                        </div>
-                        <div class="info-row" id="home_cost_row" style="display:none;">
-                            <span class="info-label">تكلفة التوصيل للمنزل</span>
-                            <span class="info-value"><span id="home_shipping_cost">0.00</span> جنيه</span>
-                        </div>
-                        <div class="info-row" id="post_cost_row" style="display:none;">
-                            <span class="info-label">تكلفة التوصيل لمكتب البريد</span>
-                            <span class="info-value">
-                                <span id="post_shipping_cost">0.00</span> جنيه &nbsp;
-                                <a href="{{ route('user.fqa') }}" class="btn-confirm"
-                                    style="padding:5px 12px; font-size:12px; border-radius:8px; text-decoration:none; display:inline-flex;">تعرف
-                                    على طريقة الاستلام</a>
-                            </span>
-                        </div>
-                        <div class="info-row" id="address_row">
-                            <span class="info-label">العنوان</span>
-                            <span class="info-value" id="shipping_address">---</span>
-                        </div>
-                        <div class="info-row" id="phones_row">
-                            <span class="info-label">أرقام الهاتف</span>
-                            <span class="info-value" id="shipping_phones">---</span>
+                    <div class="col-md-6">
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="cities">المدينة</label>
+                            <select class="form-control-custom" id="cities" name="city" disabled>
+                                <option value="">اختر المدينة</option>
+                            </select>
                         </div>
                     </div>
-
-                    <!-- Near Post -->
-                    <div id="nearpost_wrapper" style="display:none; margin-top:14px;">
-                        <label class="form-label-custom" for="near_post">اسم أقرب مكتب بريد</label>
-                        <input type="text" id="near_post" name="near_post" class="form-control-custom"
-                            placeholder="ادخل اسم مكتب البريد" />
+                    <div class="col-12">
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="address">العنوان التفصيلي</label>
+                            <input class="form-control-custom" id="address" name="address"
+                                placeholder="الشارع، الحي، المبنى..." />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="user_name">الاسم ثلاثي</label>
+                            <input class="form-control-custom" id="user_name" name="user_name" placeholder="اسم المستلم"
+                                required />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="mobile">رقم الموبايل</label>
+                            <input class="form-control-custom" type="number" id="mobile" name="mobile"
+                                pattern="\d{11}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="temp_mobile">رقم احتياطي</label>
+                            <input class="form-control-custom" type="number" id="temp_mobile" name="temp_mobile"
+                                pattern="\d{11}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
+                        </div>
                     </div>
                 </div>
+            </form>
 
-            </div><!-- /col -->
+            <div class="step-nav">
+                <button class="btn-next" onclick="validateStep2()">
+                    التالي — طريقة التوصيل
+                    <span>←</span>
+                </button>
+                <button class="btn-back" onclick="goTo(1)">
+                    <span>→</span> رجوع
+                </button>
+            </div>
+        </div>
 
-            <!-- ═══ RIGHT COLUMN ═══ -->
-            <div class="col-lg-5">
+        <!-- ══════════ STEP 3: Shipping Method ══════════ -->
+        <div class="step-card hidden" id="step-3">
+            <div class="step-card-header">
+                <div class="icon-circle">🚚</div>
+                <div>
+                    <h2>طريقة التوصيل</h2>
+                    <p>اختار الطريقة الأنسبلك</p>
+                </div>
+            </div>
 
-                <!-- Discount -->
-                @php
-                    $cartSubtotal = (float) str_replace(',', '', Cart::subtotal());
-                    $discountAmount = session()->has('applied_discount') ? session('applied_discount')['amount'] : 0;
-                    $preShippingTotal = max($cartSubtotal - $discountAmount, 0);
-                @endphp
-                <input type="hidden" name="all_total" value="{{ $preShippingTotal }}" id="all_total">
+            <div class="form-group-custom">
+                <label class="form-label-custom" for="shipping_method">اختر طريقة الشحن</label>
+                <select class="form-control-custom" id="shipping_method" name="shipping_method_id">
+                    <option value="">اختر طريقة الشحن</option>
+                </select>
+            </div>
 
+            <div id="shipping_info" class="ship-info-box" style="display:none;">
+                <div class="info-row" id="fee_row">
+                    <span class="info-label">رسوم الخدمة</span>
+                    <span class="info-value">+ <span id="shipping_fee">0.00</span> جنيه</span>
+                </div>
+                <div class="info-row" id="home_cost_row" style="display:none;">
+                    <span class="info-label">تكلفة التوصيل للمنزل</span>
+                    <span class="info-value"><span id="home_shipping_cost">0.00</span> جنيه</span>
+                </div>
+                <div class="info-row" id="post_cost_row" style="display:none;">
+                    <span class="info-label">تكلفة التوصيل لمكتب البريد</span>
+                    <span class="info-value">
+                        <span id="post_shipping_cost">0.00</span> جنيه &nbsp;
+                        <a href="{{ route('user.fqa') }}"
+                            style="color:var(--accent); font-size:12px; font-weight:700;">تعرف على الاستلام ←</a>
+                    </span>
+                </div>
+                <div class="info-row" id="address_row" style="display:none;">
+                    <span class="info-label">العنوان</span>
+                    <span class="info-value" id="shipping_address">---</span>
+                </div>
+                <div class="info-row" id="phones_row" style="display:none;">
+                    <span class="info-label">أرقام الهاتف</span>
+                    <span class="info-value" id="shipping_phones">---</span>
+                </div>
+            </div>
+
+            <div id="nearpost_wrapper" style="display:none; margin-top:14px;">
+                <div class="form-group-custom">
+                    <label class="form-label-custom" for="near_post">اسم أقرب مكتب بريد</label>
+                    <input type="text" id="near_post" name="near_post" class="form-control-custom"
+                        placeholder="ادخل اسم مكتب البريد" />
+                </div>
+            </div>
+
+            <!-- Live Total Preview -->
+            <div
+                style="background:linear-gradient(135deg,var(--primary) 0%,#2d2d50 100%); border-radius:var(--radius-sm); padding:16px 20px; margin-top:20px; direction:rtl; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="color:rgba(255,255,255,.6); font-size:12px; font-weight:600;">الإجمالي مع الشحن</div>
+                    <div id="all" style="color:var(--accent-light); font-size:22px; font-weight:800;">—</div>
+                </div>
+                <div style="text-align:left;">
+                    <div style="color:rgba(255,255,255,.6); font-size:12px; font-weight:600;">مصاريف الشحن</div>
+                    <div id="delivery" style="color:#fff; font-size:15px; font-weight:700;">—</div>
+                </div>
+            </div>
+
+            <div class="step-nav">
+                <button class="btn-next" onclick="validateStep3()">
+                    التالي — الدفع
+                    <span>←</span>
+                </button>
+                <button class="btn-back" onclick="goTo(2)">
+                    <span>→</span> رجوع
+                </button>
+            </div>
+        </div>
+
+        <!-- ══════════ STEP 4: Payment ══════════ -->
+        <div class="step-card hidden" id="step-4">
+            <div class="step-card-header">
+                <div class="icon-circle">💳</div>
+                <div>
+                    <h2>الدفع</h2>
+                    <p>اختار طريقة الدفع وأكمل طلبك</p>
+                </div>
+            </div>
+
+            <!-- Final Summary -->
+            <div class="summary-lines" style="margin-bottom:24px;">
+                <div class="sum-row">
+                    <span class="s-lbl">إجمالي المنتجات</span>
+                    <span class="s-val">{{ number_format($cartSubtotal, 2) }} جنيه</span>
+                </div>
                 @if ($discountAmount > 0)
-                    <div class="discount-badge">
-                        <span class="disc-icon">🎉</span>
-                        <div>
-                            تم تطبيق الخصم بنجاح!<br>
-                            رمز الكوبون: <strong>{{ session('applied_discount')['code'] }}</strong> &nbsp;|&nbsp;
-                            قيمة الخصم: <strong>{{ $discountAmount }} جنيه</strong>
-                        </div>
+                    <div class="sum-row">
+                        <span class="s-lbl">الخصم</span>
+                        <span class="s-val" style="color:var(--success);">- {{ $discountAmount }} جنيه</span>
                     </div>
                 @endif
-
-                @if ($discountSetting && $discountSetting->discount_enabled)
-                    <div class="card-block" style="padding:20px 22px;">
-                        <div class="card-title" style="margin-bottom:12px;">
-                            <span class="icon-circle">🏷</span>
-                            كوبون الخصم
-                        </div>
-                        <form action="{{ route('user.checkout.applyDiscount') }}" method="POST">
-                            @csrf
-                            <div class="coupon-row">
-                                <input type="text" name="coupon_code" class="form-control-custom"
-                                    placeholder="ادخل كود الخصم"
-                                    @if (session()->has('applied_discount')) value="{{ session('applied_discount')['code'] }}" @endif>
-                                <button type="submit" class="btn-apply">تطبيق</button>
-                            </div>
-                        </form>
-                    </div>
-                @endif
-
-                <!-- Order Summary -->
-                <div class="card-block">
-                    <div class="card-title">
-                        <span class="icon-circle">🧾</span>
-                        ملخص الطلب
-                    </div>
-
-                    <div class="summary-row">
-                        <span class="s-label">إجمالي المنتجات</span>
-                        <span class="s-value">{{ number_format($cartSubtotal, 2) }} جنيه</span>
-                    </div>
-                    @if ($discountAmount > 0)
-                        <div class="summary-row">
-                            <span class="s-label">الخصم</span>
-                            <span class="s-value" style="color:var(--success);">- {{ $discountAmount }} جنيه</span>
-                        </div>
-                    @endif
-                    <div class="summary-row">
-                        <span class="s-label">مصاريف الشحن</span>
-                        <span class="s-value" id="delivery">—</span>
-                    </div>
-                    <div class="summary-row total-row">
-                        <span class="s-label">الإجمالي النهائي</span>
-                        <span class="s-value" id="all">—</span>
-                    </div>
+                <div class="sum-row">
+                    <span class="s-lbl">مصاريف الشحن</span>
+                    <span class="s-val" id="delivery-final">—</span>
                 </div>
+                <div class="sum-row total">
+                    <span class="s-lbl">الإجمالي النهائي</span>
+                    <span class="s-val" id="all-final">—</span>
+                </div>
+            </div>
 
-                <!-- Payment Methods -->
-                <div class="accordion hidden" id="accordionExample">
-
-                    <div class="card-title" style="margin-bottom:14px; padding: 0 4px;">
-                        <span class="icon-circle">💳</span>
-                        طريقة الدفع
-                    </div>
-
-                    <!-- Fawry -->
-                    <div class="pay-accordion-item accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button pay-btn collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                <img src="https://wp.logos-download.com/wp-content/uploads/2023/02/Fawry_Logo-3000x849.png"
-                                    class="pay-logo">
-                                Fawry Pay
-                            </button>
-                        </h2>
-                        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                            <div class="accordion-body pay-body">
-                                <p style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">
-                                    يتم إضافة رسوم 1% + 2.5 جنيه للدفع بفوري باي
-                                </p>
-                                <button type="button" class="btn-confirm" id="fawry">
-                                    ✅ اضغط لإكمال عملية الدفع
-                                </button>
-                            </div>
+            <!-- Payment Methods Accordion -->
+            <div class="accordion" id="accordionExample">
+                <div class="pay-accordion-item accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button pay-btn collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            <img src="https://logos-download.com/wp-content/uploads/2023/02/Fawry_Logo.png"
+                                class="pay-logo">
+                            Fawry Pay
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="accordion-body pay-body">
+                            <p style="color:var(--text-muted); margin-bottom:14px;">يتم إضافة رسوم 1% + 2.5 جنيه للدفع
+                                بفوري باي</p>
+                            <button type="button" class="btn-confirm" id="fawry">✅ إكمال الدفع بفوري</button>
                         </div>
                     </div>
-
-                    {{-- More payment items go here ... --}}
-
                 </div>
+                {{-- More payment items ... --}}
+            </div>
 
-                <!-- Contact Strip -->
-                <div class="contact-strip">
-                    <p>لو قابلتك أي مشكلة، تواصل معنا على الفيس بوك أو الواتساب</p>
-                    <div class="contact-btns">
-                        <a href="https://wa.me/+201550234324" target="_blank" class="btn-contact btn-wa">
-                            <span>📲</span> واتساب
-                        </a>
-                        <a href="https://www.facebook.com/highacademy2?mibextid=ZbWKwL" target="_blank"
-                            class="btn-contact btn-fb">
-                            <span>📘</span> فيس بوك
-                        </a>
-                    </div>
-                </div>
+            <div class="step-nav" style="margin-top:20px;">
+                <div></div>
+                <button class="btn-back" onclick="goTo(3)">
+                    <span>→</span> رجوع
+                </button>
+            </div>
+        </div>
 
-            </div><!-- /col -->
-        </div><!-- /row -->
+        <!-- Contact -->
+        <div class="contact-strip" style="margin-top:20px;">
+            <p>لو قابلتك أي مشكلة تواصل معنا</p>
+            <div class="contact-btns">
+                <a href="https://wa.me/+201060683708" target="_blank" class="btn-contact btn-wa">📲 واتساب</a>
+                <a href="https://www.facebook.com/highacademy2?mibextid=ZbWKwL" target="_blank"
+                    class="btn-contact btn-fb">📘 فيس بوك</a>
+            </div>
+        </div>
+
     </div>
-
-    {{-- Hidden paragraph to store discounted subtotal for JavaScript --}}
-    <p id="total" style="display: none;">{{ $preShippingTotal }}</p>
+    <!-- ═══════════════════════════════════════ -->
 @endsection
 
 @section('js')
@@ -937,26 +1085,135 @@
         const TAX_HOME = {{ $productTax }};
         const TAX_POST = {{ $productSlowTax }};
         const TOTAL_QUANTITY = {{ $totalQuantity }};
-    </script>
+        const shippingMethods = @json($shippingMethods);
+        const governoratesData = @json($governoratesData);
+        const citiesData = @json($citiesData);
 
-    <script>
+        let currentStep = 1;
+
+        /* ─── Stepper Navigation ─── */
+        function goTo(n) {
+            document.getElementById('step-' + currentStep).classList.add('hidden');
+            currentStep = n;
+            document.getElementById('step-' + n).classList.remove('hidden');
+            document.getElementById('step-' + n).style.animation = 'none';
+            requestAnimationFrame(() => {
+                document.getElementById('step-' + n).style.animation = '';
+            });
+
+            // Update stepper UI
+            for (let i = 1; i <= 4; i++) {
+                const si = document.getElementById('si-' + i);
+                si.classList.remove('active', 'done');
+                if (i < n) si.classList.add('done');
+                if (i === n) si.classList.add('active');
+            }
+
+            // Sync final summary on step 4
+            if (n === 4) syncFinalSummary();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function validateStep2() {
+            const gov = document.getElementById('governorates').value;
+            const city = document.getElementById('cities').value;
+            const addr = document.getElementById('address').value.trim();
+            const name = document.getElementById('user_name').value.trim();
+            const mob = document.getElementById('mobile').value.trim();
+            const tmp = document.getElementById('temp_mobile').value.trim();
+            if (!gov || !city || !addr || !name || !mob || !tmp) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'بيانات ناقصة',
+                    text: 'من فضلك أكمل جميع البيانات قبل المتابعة',
+                    confirmButtonColor: '#e07b39'
+                });
+                return;
+            }
+            goTo(3);
+        }
+
+        function validateStep3() {
+            const method = document.getElementById('shipping_method').value;
+            if (!method) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'اختار طريقة الشحن',
+                    text: 'يرجى اختيار طريقة شحن قبل المتابعة',
+                    confirmButtonColor: '#e07b39'
+                });
+                return;
+            }
+            const m = shippingMethods.find(x => x.id == method);
+            const nearPost = document.getElementById('near_post').value.trim();
+            if (m?.type === 'post' && !nearPost) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'بيانات ناقصة',
+                    text: 'يرجى إدخال اسم أقرب مكتب بريد',
+                    confirmButtonColor: '#e07b39'
+                });
+                return;
+            }
+            goTo(4);
+        }
+
+        function syncFinalSummary() {
+            const d = document.getElementById('delivery');
+            const a = document.getElementById('all');
+            document.getElementById('delivery-final').innerText = d ? d.innerText : '—';
+            document.getElementById('all-final').innerText = a ? a.innerText : '—';
+        }
+
+        /* ─── Shipping Options ─── */
         document.addEventListener('DOMContentLoaded', function() {
-            const allShippingMethods = @json($shippingMethods);
-            const governoratesDataset = @json($governoratesData);
             const governoratesSelect = document.getElementById('governorates');
             const shippingSelect = document.getElementById('shipping_method');
 
+            function updateShippingOptions() {
+                const prev = shippingSelect.value;
+                shippingSelect.innerHTML = '<option value="">اختر طريقة الشحن</option>';
+                shippingMethods.forEach(m => {
+                    const isPickup = m.type === 'branch';
+                    if (!isPickup || (governoratesSelect.value && m.government == governoratesSelect
+                        .value)) {
+                        const opt = document.createElement('option');
+                        opt.value = m.id;
+                        opt.textContent = {
+                            branch: 'استلام من المكتبة',
+                            home: 'شحن لباب البيت',
+                            post: 'شحن لمكتب بريد'
+                        } [m.type] + ' — ' + m.name;
+                        shippingSelect.appendChild(opt);
+                    }
+                });
+                if (shippingSelect.options.length === 1) {
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.disabled = true;
+                    opt.textContent = shippingMethods.length === 0 ? 'لا توجد طريقة شحن للمنتجات الحالية' :
+                        (governoratesSelect.value ? 'لا توجد طريقة شحن لهذه المحافظة' : 'اختر المحافظة أولاً');
+                    shippingSelect.appendChild(opt);
+                }
+                if ([...shippingSelect.options].some(o => o.value === prev)) shippingSelect.value = prev;
+                calculateTotal();
+                updateShippingInfo();
+            }
+
             function updateShippingInfo() {
                 const sel = shippingSelect.value;
-                const m = allShippingMethods.find(x => x.id == sel);
+                const m = shippingMethods.find(x => x.id == sel);
                 const info = document.getElementById('shipping_info');
                 const wrapper = document.getElementById('nearpost_wrapper');
                 const npInput = document.getElementById('near_post');
                 const fee_row = document.getElementById('fee_row');
                 const homeRow = document.getElementById('home_cost_row');
                 const postRow = document.getElementById('post_cost_row');
-                const homeValue = document.getElementById('home_shipping_cost');
-                const postValue = document.getElementById('post_shipping_cost');
+                const homeVal = document.getElementById('home_shipping_cost');
+                const postVal = document.getElementById('post_shipping_cost');
 
                 if (!m) {
                     wrapper.style.display = 'none';
@@ -965,7 +1222,6 @@
                     if (postRow) postRow.style.display = 'none';
                     return;
                 }
-
                 if (m.type === 'post') {
                     wrapper.style.display = 'block';
                     npInput.required = true;
@@ -975,18 +1231,16 @@
                     npInput.value = '';
                 }
 
-                if (m.type === 'branch') {
-                    document.getElementById('shipping_fee').innerText = (Number(m.fee) * TOTAL_QUANTITY).toFixed(2);
-                } else {
-                    document.getElementById('shipping_fee').innerText = Number(m.fee).toFixed(2);
-                }
+                document.getElementById('shipping_fee').innerText = m.type === 'branch' ?
+                    (Number(m.fee) * TOTAL_QUANTITY).toFixed(2) :
+                    Number(m.fee).toFixed(2);
 
-                const govId = governoratesSelect.value;
-                const matchedGov = governoratesDataset.find(g => g.id == govId);
-                const rawHomeBase = matchedGov ? (matchedGov.home_shipping_price ?? matchedGov.price) : null;
-                const rawPostBase = matchedGov ? (matchedGov.post_shipping_price ?? matchedGov.price) : null;
-                const homeBase = rawHomeBase !== null && rawHomeBase !== undefined ? Number(rawHomeBase) : NaN;
-                const postBase = rawPostBase !== null && rawPostBase !== undefined ? Number(rawPostBase) : NaN;
+                const govId = document.getElementById('governorates').value;
+                const matchedGov = governoratesData.find(g => g.id == govId);
+                const rawHome = matchedGov ? (matchedGov.home_shipping_price ?? matchedGov.price) : null;
+                const rawPost = matchedGov ? (matchedGov.post_shipping_price ?? matchedGov.price) : null;
+                const homeBase = rawHome !== null && rawHome !== undefined ? Number(rawHome) : NaN;
+                const postBase = rawPost !== null && rawPost !== undefined ? Number(rawPost) : NaN;
                 const baseFee = Number(m.fee ?? 0);
 
                 if (homeRow && postRow) {
@@ -994,191 +1248,79 @@
                     postRow.style.display = 'none';
                     if (m.type === 'home' && govId) {
                         homeRow.style.display = 'flex';
-                        homeValue.innerText = (baseFee + homeBase + TAX_HOME).toFixed(2);
+                        homeVal.innerText = (baseFee + homeBase + TAX_HOME).toFixed(2);
                         if (Number.isFinite(postBase)) {
                             postRow.style.display = 'flex';
-                            postValue.innerText = (baseFee + postBase + TAX_POST).toFixed(2);
+                            postVal.innerText = (baseFee + postBase + TAX_POST).toFixed(2);
                         }
                     } else if (m.type === 'post' && govId) {
                         postRow.style.display = 'flex';
-                        postValue.innerText = (baseFee + postBase + TAX_POST).toFixed(2);
+                        postVal.innerText = (baseFee + postBase + TAX_POST).toFixed(2);
                         if (Number.isFinite(homeBase)) {
                             homeRow.style.display = 'flex';
-                            homeValue.innerText = (baseFee + homeBase + TAX_HOME).toFixed(2);
+                            homeVal.innerText = (baseFee + homeBase + TAX_HOME).toFixed(2);
                         }
                     }
                 }
-
-                const addr = document.getElementById('address_row');
-                const phone = document.getElementById('phones_row');
+                const addr_r = document.getElementById('address_row');
+                const ph_r = document.getElementById('phones_row');
                 if (m.type === 'branch') {
                     fee_row.style.display = 'flex';
-                    addr.style.display = 'flex';
-                    phone.style.display = 'flex';
+                    addr_r.style.display = 'flex';
+                    ph_r.style.display = 'flex';
                     document.getElementById('shipping_address').innerText = m.address;
                     document.getElementById('shipping_phones').innerText = (m.phones || []).join(', ');
                 } else {
                     fee_row.style.display = 'none';
-                    addr.style.display = 'none';
-                    phone.style.display = 'none';
+                    addr_r.style.display = 'none';
+                    ph_r.style.display = 'none';
                 }
-
                 info.style.display = 'block';
                 calculateTotal();
-            }
-
-            function updateShippingOptions() {
-                const prev = shippingSelect.value;
-                shippingSelect.innerHTML = '<option value="">اختر طريقة الشحن</option>';
-                allShippingMethods.forEach(m => {
-                    const isPickup = m.type === 'branch';
-                    if (!isPickup || (governoratesSelect.value && m.government == governoratesSelect
-                            .value)) {
-                        const opt = document.createElement('option');
-                        opt.value = m.id;
-                        const label = {
-                            branch: 'استلام من المكتبة',
-                            home: 'شحن لباب البيت',
-                            post: 'شحن لمكتب بريد'
-                        } [m.type] + ' — ' + m.name;
-                        opt.textContent = label;
-                        shippingSelect.appendChild(opt);
-                    }
-                });
-                if (shippingSelect.options.length === 1) {
-                    const opt = document.createElement('option');
-                    opt.value = '';
-                    opt.disabled = true;
-                    opt.textContent = allShippingMethods.length === 0 ?
-                        'لا توجد طريقة شحن متاحة للمنتجات الحالية' :
-                        (governoratesSelect.value ? 'لا توجد طريقة شحن متاحة لهذه المحافظة' :
-                            'اختر المحافظة لعرض طرق الشحن المتاحة');
-                    shippingSelect.appendChild(opt);
-                }
-                if ([...shippingSelect.options].some(o => o.value === prev)) shippingSelect.value = prev;
-                calculateTotal();
-                updateShippingInfo();
             }
 
             governoratesSelect.addEventListener('change', updateShippingOptions);
             shippingSelect.addEventListener('change', updateShippingInfo);
             updateShippingOptions();
-        });
-    </script>
 
-    <script>
-        const shippingMethods = @json($shippingMethods);
-        const governoratesData = @json($governoratesData);
-        const citiesData = @json($citiesData);
-        const shippingSelect = document.getElementById('shipping_method');
-
-        function setupPaymentHandler(buttonId, routeUrl, extraFormId = null) {
-            $(buttonId).click(function() {
-                const btn = $(this);
-                const originalText = btn.text();
-                btn.prop('disabled', true).text('جاري المعالجة...');
-
-                const selectedMethod = shippingMethods.find(m => m.id == shippingSelect.value);
-                const nearPostInput = document.getElementById('near_post');
-
-                if (selectedMethod?.type === 'post' && !nearPostInput.value.trim()) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'خطأ',
-                        text: 'يرجى إدخال اسم أقرب مكتب بريد قبل المتابعة'
+            // Cities
+            governoratesSelect.addEventListener('change', function() {
+                const govId = this.value;
+                const citiesSelect = document.getElementById('cities');
+                citiesSelect.innerHTML = '<option value="">اختر المدينة</option>';
+                if (govId) {
+                    citiesSelect.disabled = false;
+                    citiesData.filter(c => c.governorate_id == govId).forEach(city => {
+                        const o = document.createElement('option');
+                        o.value = city.id;
+                        o.textContent = city.name_ar;
+                        citiesSelect.appendChild(o);
                     });
-                    btn.prop('disabled', false).text(originalText);
-                    return;
+                } else {
+                    citiesSelect.disabled = true;
                 }
-
-                var formData = new FormData();
-                $('#order').serializeArray().forEach(function(field) {
-                    formData.append(field.name, field.value);
-                });
-                formData.append('shipping_method', $('#shipping_method').val());
-                $('#location-data').serializeArray().forEach(function(field) {
-                    formData.append(field.name, field.value);
-                });
-                formData.append('near_post', nearPostInput.value.trim());
-
-                if (extraFormId) {
-                    $(extraFormId).serializeArray().forEach(function(field) {
-                        formData.append(field.name, field.value);
-                    });
-                    var fileInput = $(extraFormId).find('input[type="file"]');
-                    if (fileInput.length > 0 && fileInput[0].files.length > 0) {
-                        formData.append(fileInput.attr('name'), fileInput[0].files[0]);
-                    }
-                }
-
-                $.ajax({
-                    url: routeUrl,
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (response.url) {
-                            window.location.href = response.url;
-                        } else if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.msg,
-                                showConfirmButton: false
-                            });
-                            setTimeout(function() {
-                                window.location.href = '/';
-                            }, 500);
-                        } else {
-                            btn.prop('disabled', false).text(originalText);
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.msg || 'An unknown error occurred.',
-                                showConfirmButton: false
-                            });
-                        }
-                    },
-                    error: function(jqXHR) {
-                        btn.prop('disabled', false).text(originalText);
-                        var errorMessage = jqXHR.responseJSON && jqXHR.responseJSON.msg ? jqXHR
-                            .responseJSON.msg : 'خطا اثناء التنفيذ';
-                        Swal.fire({
-                            icon: 'error',
-                            title: errorMessage,
-                            showConfirmButton: false
-                        });
-                    }
-                });
+                calculateTotal();
             });
-        }
+        });
 
-        setupPaymentHandler('#credit_card', "{{ route('cards.pay') }}");
-        setupPaymentHandler('#fawry', "{{ route('fawry.pay') }}");
-        setupPaymentHandler('#wallet', "{{ route('fawry.wallet.pay') }}", '#ewallets-form');
-        setupPaymentHandler('#insta-pay', "{{ route('manual.pay') }}", '#instapay-form');
-
+        /* ─── Calculate Total ─── */
         function calculateTotal() {
-            const discountedSubtotal = parseFloat(document.getElementById("total").innerText.trim()) || 0;
-            const shippingMethodId = parseInt(document.getElementById("shipping_method").value);
-            const governorateId = parseInt(document.getElementById("governorates").value);
-            const method = shippingMethods.find(m => m.id === shippingMethodId);
-            let grandTotal = discountedSubtotal;
-
+            const sub = parseFloat(document.getElementById("total").innerText.trim()) || 0;
+            const methId = parseInt(document.getElementById("shipping_method").value);
+            const govId = parseInt(document.getElementById("governorates").value);
+            const method = shippingMethods.find(m => m.id === methId);
             if (!method) {
                 updateCostRows(null, 0);
                 return;
             }
 
-            let deliveryFee = Number(method.fee ?? 0);
-            const gov = governoratesData.find(g => g.id == governorateId);
-            const rawHomeBase = gov ? (gov.home_shipping_price ?? gov.price) : null;
-            const rawPostBase = gov ? (gov.post_shipping_price ?? gov.price) : null;
-            const homeBase = rawHomeBase !== null && rawHomeBase !== undefined ? Number(rawHomeBase) : NaN;
-            const postBase = rawPostBase !== null && rawPostBase !== undefined ? Number(rawPostBase) : NaN;
-            let appliedTax = 0;
+            let fee = Number(method.fee ?? 0);
+            const gov = governoratesData.find(g => g.id == govId);
+            const rawH = gov ? (gov.home_shipping_price ?? gov.price) : null;
+            const rawP = gov ? (gov.post_shipping_price ?? gov.price) : null;
+            const homeBase = rawH !== null && rawH !== undefined ? Number(rawH) : NaN;
+            const postBase = rawP !== null && rawP !== undefined ? Number(rawP) : NaN;
+            let tax = 0;
 
             if (method.type === 'home' && Number.isNaN(homeBase)) {
                 updateCostRows(null, 0);
@@ -1190,51 +1332,109 @@
             }
 
             if (method.type === 'home') {
-                appliedTax = TAX_HOME;
-                deliveryFee += (Number.isNaN(homeBase) ? 0 : homeBase) + appliedTax;
-                updateCostRows('home', deliveryFee);
+                tax = TAX_HOME;
+                fee += (Number.isNaN(homeBase) ? 0 : homeBase) + tax;
+                updateCostRows('home', fee);
             } else if (method.type === 'post') {
-                appliedTax = TAX_POST;
-                deliveryFee += (Number.isNaN(postBase) ? 0 : postBase) + appliedTax;
-                updateCostRows('post', deliveryFee);
+                tax = TAX_POST;
+                fee += (Number.isNaN(postBase) ? 0 : postBase) + tax;
+                updateCostRows('post', fee);
             } else {
-                deliveryFee = deliveryFee * TOTAL_QUANTITY;
-                updateCostRows('branch', deliveryFee);
+                fee = fee * TOTAL_QUANTITY;
+                updateCostRows('branch', fee);
             }
 
-            grandTotal = discountedSubtotal + deliveryFee;
-
-            document.querySelectorAll("#delivery").forEach(el => {
-                el.innerText = `جنيه ${deliveryFee.toFixed(2)}`;
-            });
-            document.querySelectorAll("#all").forEach(el => {
-                el.innerText = `جنيه ${grandTotal.toFixed(2)}`;
-            });
-            const shippingTaxEl = document.getElementById('shippingTax');
-            if (shippingTaxEl) shippingTaxEl.innerText = `جنيه ${appliedTax.toFixed(2)}`;
+            const grand = sub + fee;
+            document.querySelectorAll("#delivery").forEach(el => el.innerText = `جنيه ${fee.toFixed(2)}`);
+            document.querySelectorAll("#all").forEach(el => el.innerText = `جنيه ${grand.toFixed(2)}`);
         }
 
         function updateCostRows(type, cost) {
-            const homeRow = document.getElementById('home_cost_row');
-            const postRow = document.getElementById('post_cost_row');
-            const homeValue = document.getElementById('home_shipping_cost');
-            const postValue = document.getElementById('post_shipping_cost');
-            if (!homeRow || !postRow) return;
-            homeRow.style.display = 'none';
-            postRow.style.display = 'none';
+            const hr = document.getElementById('home_cost_row');
+            const pr = document.getElementById('post_cost_row');
+            if (!hr || !pr) return;
+            hr.style.display = 'none';
+            pr.style.display = 'none';
             if (!type || !Number.isFinite(cost)) return;
             if (type === 'home') {
-                homeRow.style.display = 'flex';
-                homeValue.innerText = cost.toFixed(2);
+                hr.style.display = 'flex';
+                document.getElementById('home_shipping_cost').innerText = cost.toFixed(2);
             } else if (type === 'post') {
-                postRow.style.display = 'flex';
-                postValue.innerText = cost.toFixed(2);
+                pr.style.display = 'flex';
+                document.getElementById('post_shipping_cost').innerText = cost.toFixed(2);
             }
         }
 
-        document.getElementById('shipping_method').addEventListener('change', function() {
-            calculateTotal();
-        });
+        /* ─── Payment Handlers ─── */
+        function setupPaymentHandler(buttonId, routeUrl, extraFormId = null) {
+            $(buttonId).click(function() {
+                const btn = $(this);
+                const orig = btn.text();
+                btn.prop('disabled', true).text('جاري المعالجة...');
+                const selM = shippingMethods.find(m => m.id == document.getElementById('shipping_method').value);
+                const np = document.getElementById('near_post');
+                if (selM?.type === 'post' && !np.value.trim()) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'يرجى إدخال اسم أقرب مكتب بريد'
+                    });
+                    btn.prop('disabled', false).text(orig);
+                    return;
+                }
+                var fd = new FormData();
+                $('#order').serializeArray().forEach(f => fd.append(f.name, f.value));
+                fd.append('shipping_method', $('#shipping_method').val());
+                $('#location-data').serializeArray().forEach(f => fd.append(f.name, f.value));
+                fd.append('near_post', np.value.trim());
+                if (extraFormId) {
+                    $(extraFormId).serializeArray().forEach(f => fd.append(f.name, f.value));
+                    var fi = $(extraFormId).find('input[type="file"]');
+                    if (fi.length > 0 && fi[0].files.length > 0) fd.append(fi.attr('name'), fi[0].files[0]);
+                }
+                $.ajax({
+                    url: routeUrl,
+                    type: "POST",
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    success: function(r) {
+                        if (r.url) window.location.href = r.url;
+                        else if (r.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: r.msg,
+                                showConfirmButton: false
+                            });
+                            setTimeout(() => window.location.href = '/', 500);
+                        } else {
+                            btn.prop('disabled', false).text(orig);
+                            Swal.fire({
+                                icon: 'error',
+                                title: r.msg || 'خطأ غير معروف',
+                                showConfirmButton: false
+                            });
+                        }
+                    },
+                    error: function(x) {
+                        btn.prop('disabled', false).text(orig);
+                        Swal.fire({
+                            icon: 'error',
+                            title: x.responseJSON?.msg || 'خطا اثناء التنفيذ',
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
+        }
+
+        setupPaymentHandler('#credit_card', "{{ route('cards.pay') }}");
+        setupPaymentHandler('#fawry', "{{ route('fawry.pay') }}");
+        setupPaymentHandler('#wallet', "{{ route('fawry.wallet.pay') }}", '#ewallets-form');
+        setupPaymentHandler('#insta-pay', "{{ route('manual.pay') }}", '#instapay-form');
     </script>
 
     <?php
@@ -1244,79 +1444,30 @@
         if (!empty($orders->governorate_id)) {
             $addressId = $orders->governorate_id;
         } else {
-            foreach ($governoratesData as $governorate) {
-                if ($orders->governorate == $governorate->governorate_name_ar) {
-                    $addressId = $governorate->id;
+            foreach ($governoratesData as $g) {
+                if ($orders->governorate == $g->governorate_name_ar) {
+                    $addressId = $g->id;
                 }
             }
         }
-        foreach ($citiesData as $cities) {
-            if ($orders->city == $cities->name_ar) {
-                $citiId = $cities->id;
+        foreach ($citiesData as $c) {
+            if ($orders->city == $c->name_ar) {
+                $citiId = $c->id;
             }
         }
     }
     ?>
 
-    <script>
-        var accordion = document.getElementById('accordionExample');
-        accordion.classList.add('hidden');
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const citiesData = @json($citiesData);
-
-            document.getElementById('governorates').addEventListener('change', function() {
-                const governorateId = this.value;
-                const citiesSelect = document.getElementById('cities');
-                citiesSelect.innerHTML = '<option value="">اختر المدينة</option>';
-                if (governorateId) {
-                    citiesSelect.disabled = false;
-                    citiesData.filter(city => city.governorate_id == governorateId).forEach(city => {
-                        const option = document.createElement('option');
-                        option.value = city.id;
-                        option.textContent = city.name_ar;
-                        citiesSelect.appendChild(option);
-                    });
-                } else {
-                    citiesSelect.disabled = true;
-                }
-                updateFormState();
-                calculateTotal();
-            });
-
-            document.getElementById('cities').addEventListener('change', function() {
-                updateFormState();
-                calculateTotal();
-            });
-
-            function updateFormState() {
-                const governorate = document.getElementById('governorates').value;
-                const city = document.getElementById('cities').value;
-                const shippingMethodId = document.getElementById('shipping_method').value;
-                const selectedMethod = shippingMethods.find(m => m.id == shippingMethodId);
-                let show = false;
-                if (selectedMethod) {
-                    if (selectedMethod.type === 'branch') show = true;
-                    else if (governorate && city) show = true;
-                }
-                if (show) accordion.classList.remove('hidden');
-                else accordion.classList.add('hidden');
-            }
-
-            calculateTotal();
-            updateFormState();
-            document.getElementById('shipping_method').addEventListener('change', updateFormState);
-        });
-    </script>
-
     @if ($orders !== null)
         <script>
             Swal.fire({
-                title: "سهلناها عليك، جبنا بيانات الشحن من طلبك السابق",
+                title: "سهلناها عليك 😊",
+                text: "جبنا بيانات الشحن من طلبك السابق",
                 icon: "success",
                 confirmButtonText: "حسنًا",
+                confirmButtonColor: "#e07b39",
                 showCloseButton: true
-            }).then((result) => {
+            }).then(() => {
                 document.getElementById('governorates').value = "{{ $addressId ?? '' }}";
                 document.getElementById('governorates').dispatchEvent(new Event('change'));
                 document.getElementById('cities').value = "{{ $citiId ?? '' }}";
@@ -1330,22 +1481,20 @@
         </script>
     @endif
 
-    <script type="text/javascript">
+    <script>
         function showPreview(event) {
             if (event.target.files.length > 0) {
-                var src = URL.createObjectURL(event.target.files[0]);
-                var preview = document.getElementById("file-ip-1-preview");
-                preview.src = src;
-                preview.style.display = "block";
+                var p = document.getElementById("file-ip-1-preview");
+                p.src = URL.createObjectURL(event.target.files[0]);
+                p.style.display = "block";
             }
         }
 
         function showPreview2(event) {
             if (event.target.files.length > 0) {
-                var src = URL.createObjectURL(event.target.files[0]);
-                var preview = document.getElementById("file-ip-2-preview");
-                preview.src = src;
-                preview.style.display = "block";
+                var p = document.getElementById("file-ip-2-preview");
+                p.src = URL.createObjectURL(event.target.files[0]);
+                p.style.display = "block";
             }
         }
     </script>
