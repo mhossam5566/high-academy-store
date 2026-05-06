@@ -276,7 +276,7 @@ class UserController extends Controller
     }
 
 
-    public function cardData()
+    public function UniqueAddresses()
     {
         $user = auth()->user();
 
@@ -343,6 +343,11 @@ class UserController extends Controller
         return view('user.card_data', ['addresses' => $uniqueAddresses->values()]);
     }
 
+    public function cardData(){
+        $uniqueAddresses = UniqueAddresses();
+        return view('user.card_data', ['addresses' => $uniqueAddresses->values()]);
+    }
+    
 
     public function myorders()
     {
