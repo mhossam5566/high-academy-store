@@ -924,14 +924,8 @@
             {{-- ── Saved Addresses (shown only if addresses exist) ── --}}
             @if (isset($addresses) && $addresses->count() > 0)
                 <div id="saved-addresses-section" style="margin-bottom:24px;">
-                    <div
-                        style="display:flex; align-items:center; justify-content:space-between; direction:rtl; margin-bottom:14px;">
-                        <span class="form-label-custom" style="margin:0; font-size:14px;">📋 عناوينك المحفوظة</span>
-                        <button type="button" class="btn-back" style="padding:6px 14px; font-size:12px;"
-                            onclick="toggleManualForm()">
-                            <span id="toggle-form-icon">✏️</span> <span id="toggle-form-text">إدخال عنوان جديد</span>
-                        </button>
-                    </div>
+                    <span class="form-label-custom" style="font-size:14px; display:block; margin-bottom:14px;">📋 عناوينك
+                        المحفوظة</span>
 
                     <div id="address-cards-grid"
                         style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; direction:rtl;">
@@ -975,18 +969,27 @@
                         @endforeach
                     </div>
 
+                    {{-- Selected banner --}}
                     <div id="selected-addr-banner"
-                        style="display:none; margin-top:14px; padding:12px 16px; background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:10px; direction:rtl; font-size:13px; color:#166534; font-weight:600;">
+                        style="display:none; margin-top:16px; padding:12px 16px; background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:10px; direction:rtl; font-size:13px; color:#166534; font-weight:600;">
                         ✅ تم اختيار العنوان — يمكنك المتابعة أو <button type="button" onclick="clearSelectedAddress()"
                             style="background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;">تغييره</button>
                     </div>
+
+                    {{-- Add new address button — big & prominent --}}
+                    <button type="button" onclick="toggleManualForm()"
+                        style="width:100%; margin-top:16px; padding:14px; background:transparent; border:2px dashed var(--accent); border-radius:var(--radius-sm); font-family:'Cairo',sans-serif; font-size:15px; font-weight:700; color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:background .2s, color .2s;"
+                        onmouseover="this.style.background='#fff8f3'" onmouseout="this.style.background='transparent'">
+                        <span id="toggle-form-icon" style="font-size:18px;">＋</span>
+                        <span id="toggle-form-text">إضافة عنوان جديد</span>
+                    </button>
                 </div>
 
-                {{-- Divider with "أو" --}}
-                <div id="addr-divider" style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+                {{-- Divider --}}
+                <div id="addr-divider" style="display:none; align-items:center; gap:12px; margin-bottom:20px;">
                     <div style="flex:1; height:1px; background:var(--border);"></div>
-                    <span style="font-size:12px; font-weight:700; color:var(--text-muted); white-space:nowrap;">أو أدخل
-                        عنوان جديد</span>
+                    <span style="font-size:12px; font-weight:700; color:var(--text-muted); white-space:nowrap;">عنوان
+                        جديد</span>
                     <div style="flex:1; height:1px; background:var(--border);"></div>
                 </div>
             @endif
