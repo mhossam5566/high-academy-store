@@ -340,13 +340,13 @@ class UserController extends Controller
             return trim($address->name) . trim($address->mobile) . trim($address->governorate) . trim($address->city) . trim($address->address);
         });
 
-        return view('user.card_data', ['addresses' => $uniqueAddresses->values()]);
+        return $uniqueAddresses->values();
     }
 
     public function cardData()
     {
         $uniqueAddresses = $this->UniqueAddresses();
-        return view('user.card_data', ['addresses' => $uniqueAddresses->values()]);
+        return view('user.card_data', ['addresses' => $uniqueAddresses]);
     }
 
 
