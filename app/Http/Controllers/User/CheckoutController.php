@@ -44,7 +44,9 @@ class CheckoutController extends Controller
     protected function validateCommon(Request $request)
     {
         if (!$request->filled('shipping_method') && $request->filled('shipping_method_id')) {
-            $request->merge(['shipping_method' => $request->shipping_method_id]);
+            $request->merge([
+                'shipping_method' => $request->shipping_method_id
+            ]);
         }
 
         $rules = [
@@ -55,26 +57,56 @@ class CheckoutController extends Controller
             'government' => ['required', 'integer', 'exists:governorates,id'],
             'city' => ['required', 'integer', 'exists:cities,id'],
             'address' => ['required', 'string'],
-            'near_post' => ['nullable', 'string'],  // optional
+            'near_post' => ['nullable', 'string'],
         ];
-        // 👉 fetch chosen method
+
+        $messages = [
+            'user_name.required' => 'يرجى إدخال الاسم',
+            'user_name.min' => 'الاسم يجب ألا يقل عن 3 أحرف',
+
+            'mobile.required' => 'يرجى إدخال رقم الهاتف',
+            'mobile.regex' => 'رقم الهاتف غير صحيح',
+
+            'temp_mobile.required' => 'يرجى إدخال رقم الهاتف الاحتياطي',
+            'temp_mobile.regex' => 'رقم الهاتف الاحتياطي غير صحيح',
+
+            'shipping_method_id.required' => 'يرجى اختيار طريقة الشحن',
+            'shipping_method_id.exists' => 'طريقة الشحن المختارة غير متاحة',
+
+            'government.required' => 'يرجى اختيار المحافظة',
+            'government.exists' => 'المحافظة المختارة غير صحيحة',
+
+            'city.required' => 'يرجى اختيار المدينة',
+            'city.exists' => 'المدينة المختارة غير صحيحة',
+
+            'address.required' => 'يرجى إدخال العنوان',
+
+            'near_post.required' => 'يرجى إدخال أقرب مكتب بريد',
+        ];
+
         $method = ShippingMethod::find($request->shipping_method_id);
 
         if ($method && $method->type === 'post') {
-            // now require it
             $rules['near_post'][] = 'required';
         }
 
-        $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make(
+            $request->all(),
+            $rules,
+            $messages
+        );
+
         $validator->after(function ($validator) use ($method) {
             if ($method && !$this->shippingMethodAllowedForCart($method)) {
-                $validator->errors()->add('shipping_method_id', $this->shippingMethodNameError());
+                $validator->errors()->add(
+                    'shipping_method_id',
+                    $this->shippingMethodNameError()
+                );
             }
         });
 
         $validator->validate();
     }
-
     protected function normalizeProductShippingMethods($methods): array
     {
         if (is_string($methods)) {
