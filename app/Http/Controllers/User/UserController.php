@@ -272,7 +272,8 @@ class UserController extends Controller
         )->get();
         $citiesData = City::select('id', 'governorate_id', 'name_ar', 'name_en', 'status')->get();
 
-        return view('user.card', compact('governoratesData', 'citiesData', 'orders', 'shippingMethods'));
+        $addresses = $this->UniqueAddresses();
+        return view('user.card', compact('governoratesData', 'citiesData', 'orders', 'shippingMethods', 'addresses'));
     }
 
 
