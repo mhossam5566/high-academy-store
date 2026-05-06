@@ -42,7 +42,7 @@
                                                 <a href="{{ route('user.product.show', $item->id) }}"
                                                     class="nav-link text-dark">{{ $item->name }}</a>
                                             </td>
-                                            <td>{{ number_format((float)$item->price, 2) }} جنيه</td>
+                                            <td>{{ number_format((float) $item->price, 2) }} جنيه</td>
                                             <td>{{ $item->options->color }}</td>
                                             <td>{{ $item->options->size }}</td>
                                             <td>
@@ -53,7 +53,7 @@
                                             </td>
                                             <td>
                                                 <span class="item-subtotal" data-id="{{ $item->rowId }}">
-                                                    {{ number_format((float)$item->subtotal(), 2) }} جنيه
+                                                    {{ number_format((float) $item->subtotal(), 2) }} جنيه
                                                 </span>
                                             </td>
                                         </tr>
@@ -68,14 +68,15 @@
                 <div class="d-block d-md-none">
                     @foreach (Cart::instance('shopping')->content() as $item)
                         <div class="card mb-3 mobile-card" data-row="{{ $item->rowId }}">
-                            <img src="{{ $item->model->image_path }}" class="card-img-top" style="object-fit: cover;" height="200px" alt="Product Image">
+                            <img src="{{ $item->model->image_path }}" class="card-img-top" style="object-fit: cover;"
+                                height="200px" alt="Product Image">
 
                             <div class="card-body">
                                 <h5 class="card-title mb-1">{{ $item->name }}</h5>
 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <p class="card-text my-0">
-                                        <strong>السعر:</strong> {{ number_format((float)$item->price, 2) }} جنيه
+                                        <strong>السعر:</strong> {{ number_format((float) $item->price, 2) }} جنيه
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <input type="number" class="form-control qty-input" data-id="{{ $item->rowId }}"
@@ -100,7 +101,7 @@
                                 <p class="card-text my-0 mb-3">
                                     <strong>الاجمالي:</strong>
                                     <span class="item-subtotal" data-id="{{ $item->rowId }}">
-                                        {{ number_format((float)$item->subtotal(), 2) }} جنيه
+                                        {{ number_format((float) $item->subtotal(), 2) }} جنيه
                                     </span>
                                 </p>
 
@@ -129,7 +130,7 @@
                     <h4><strong>:الإجمالي الكلي</strong></h4>
                 </div>
                 <div class="col-12">
-                    <a href="{{ route('user.card.data') }}" id="checkout-btn" class="btn btn-primary w-100 text-light">
+                    <a href="{{ route('user.card') }}" id="checkout-btn" class="btn btn-primary w-100 text-light">
                         اتمام عملية الدفع
                     </a>
                 </div>
