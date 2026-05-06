@@ -674,6 +674,89 @@
             color: #fff;
         }
 
+        /* ─── Saved Address Cards ─── */
+        .saved-addr-card {
+            position: relative;
+            background: var(--surface-alt);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px 16px 12px;
+            cursor: pointer;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+            direction: rtl;
+        }
+
+        .saved-addr-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 16px rgba(224, 123, 57, .15);
+        }
+
+        .saved-addr-card.selected {
+            border-color: var(--accent);
+            background: #fff8f3;
+            box-shadow: 0 0 0 3px rgba(224, 123, 57, .18);
+        }
+
+        .saved-addr-check {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--border);
+            color: transparent;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+        }
+
+        .saved-addr-card.selected .saved-addr-check {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .saved-addr-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 13px;
+            padding: 4px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .saved-addr-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .saved-addr-label {
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .saved-addr-val {
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .saved-addr-edit {
+            display: block;
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .saved-addr-edit:hover {
+            text-decoration: underline;
+        }
+
         /* ─── Responsive ─── */
         @media (max-width: 600px) {
             .checkout-wrapper {
@@ -834,65 +917,138 @@
                 <div class="icon-circle">📍</div>
                 <div>
                     <h2>بيانات الشحن</h2>
-                    <p>سنوصل طلبك على هذا العنوان</p>
+                    <p>اختار من عناوينك السابقة أو أدخل عنوان جديد</p>
                 </div>
             </div>
 
-            <form id="location-data">
-                @csrf
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="form-group-custom">
-                            <label class="form-label-custom" for="governorates">المحافظة</label>
-                            <select class="form-control-custom" id="governorates" name="government"
-                                onchange="calculateTotal()">
-                                <option value="">اختر المحافظة</option>
-                                @foreach ($governoratesData as $governorate)
-                                    <option value="{{ $governorate->id }}" gov-price="{{ $governorate->price }}">
-                                        {{ $governorate->governorate_name_ar }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+            {{-- ── Saved Addresses (shown only if addresses exist) ── --}}
+            @if (isset($addresses) && $addresses->count() > 0)
+                <div id="saved-addresses-section" style="margin-bottom:24px;">
+                    <div
+                        style="display:flex; align-items:center; justify-content:space-between; direction:rtl; margin-bottom:14px;">
+                        <span class="form-label-custom" style="margin:0; font-size:14px;">📋 عناوينك المحفوظة</span>
+                        <button type="button" class="btn-back" style="padding:6px 14px; font-size:12px;"
+                            onclick="toggleManualForm()">
+                            <span id="toggle-form-icon">✏️</span> <span id="toggle-form-text">إدخال عنوان جديد</span>
+                        </button>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group-custom">
-                            <label class="form-label-custom" for="cities">المدينة</label>
-                            <select class="form-control-custom" id="cities" name="city" disabled>
-                                <option value="">اختر المدينة</option>
-                            </select>
-                        </div>
+
+                    <div id="address-cards-grid"
+                        style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; direction:rtl;">
+                        @foreach ($addresses as $address)
+                            <div class="saved-addr-card" onclick="selectAddress(this)"
+                                data-id="{{ $address->id ?? '' }}" data-gov="{{ $address->governorate ?? '' }}"
+                                data-city="{{ $address->city ?? '' }}" data-address="{{ $address->address ?? '' }}"
+                                data-name="{{ $address->name ?? '' }}" data-mobile="{{ $address->mobile ?? '' }}"
+                                data-temp="{{ $address->temp_mobile ?? '' }}"
+                                data-nearpost="{{ $address->near_post ?? '' }}"
+                                @if ($address->id) data-gov-id="{{ \App\Models\Governorate::where('governorate_name_ar', $address->governorate)->value('id') ?? '' }}"
+                        data-city-id="{{ \App\Models\City::where('name_ar', $address->city)->value('id') ?? '' }}" @endif>
+                                <div class="saved-addr-check">✓</div>
+                                <div class="saved-addr-row">
+                                    <span class="saved-addr-label">المحافظة</span>
+                                    <span class="saved-addr-val">{{ $address->governorate }}</span>
+                                </div>
+                                @if ($address->city)
+                                    <div class="saved-addr-row">
+                                        <span class="saved-addr-label">المدينة</span>
+                                        <span class="saved-addr-val">{{ $address->city }}</span>
+                                    </div>
+                                @endif
+                                <div class="saved-addr-row">
+                                    <span class="saved-addr-label">العنوان</span>
+                                    <span class="saved-addr-val">{{ Str::limit($address->address, 30) }}</span>
+                                </div>
+                                <div class="saved-addr-row">
+                                    <span class="saved-addr-label">الاسم</span>
+                                    <span class="saved-addr-val">{{ $address->name }}</span>
+                                </div>
+                                <div class="saved-addr-row">
+                                    <span class="saved-addr-label">الموبايل</span>
+                                    <span class="saved-addr-val">{{ $address->mobile }}</span>
+                                </div>
+                                @if ($address->id)
+                                    <a href="{{ route('user.shipping.edit', $address->id) }}"
+                                        onclick="event.stopPropagation()" class="saved-addr-edit">تعديل ←</a>
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
-                    <div class="col-12">
-                        <div class="form-group-custom">
-                            <label class="form-label-custom" for="address">العنوان التفصيلي</label>
-                            <input class="form-control-custom" id="address" name="address"
-                                placeholder="الشارع، الحي، المبنى..." />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group-custom">
-                            <label class="form-label-custom" for="user_name">الاسم ثلاثي</label>
-                            <input class="form-control-custom" id="user_name" name="user_name" placeholder="اسم المستلم"
-                                required />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group-custom">
-                            <label class="form-label-custom" for="mobile">رقم الموبايل</label>
-                            <input class="form-control-custom" type="number" id="mobile" name="mobile"
-                                pattern="\d{11}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-group-custom">
-                            <label class="form-label-custom" for="temp_mobile">رقم احتياطي</label>
-                            <input class="form-control-custom" type="number" id="temp_mobile" name="temp_mobile"
-                                pattern="\d{11}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
-                        </div>
+
+                    <div id="selected-addr-banner"
+                        style="display:none; margin-top:14px; padding:12px 16px; background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:10px; direction:rtl; font-size:13px; color:#166534; font-weight:600;">
+                        ✅ تم اختيار العنوان — يمكنك المتابعة أو <button type="button" onclick="clearSelectedAddress()"
+                            style="background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;">تغييره</button>
                     </div>
                 </div>
-            </form>
+
+                {{-- Divider with "أو" --}}
+                <div id="addr-divider" style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+                    <div style="flex:1; height:1px; background:var(--border);"></div>
+                    <span style="font-size:12px; font-weight:700; color:var(--text-muted); white-space:nowrap;">أو أدخل
+                        عنوان جديد</span>
+                    <div style="flex:1; height:1px; background:var(--border);"></div>
+                </div>
+            @endif
+
+            {{-- Manual form (collapsible if addresses exist) --}}
+            <div id="manual-form-wrapper" @if (isset($addresses) && $addresses->count() > 0) style="display:none;" @endif>
+                <form id="location-data">
+                    @csrf
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label-custom" for="governorates">المحافظة</label>
+                                <select class="form-control-custom" id="governorates" name="government"
+                                    onchange="calculateTotal()">
+                                    <option value="">اختر المحافظة</option>
+                                    @foreach ($governoratesData as $governorate)
+                                        <option value="{{ $governorate->id }}" gov-price="{{ $governorate->price }}">
+                                            {{ $governorate->governorate_name_ar }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label-custom" for="cities">المدينة</label>
+                                <select class="form-control-custom" id="cities" name="city" disabled>
+                                    <option value="">اختر المدينة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group-custom">
+                                <label class="form-label-custom" for="address">العنوان التفصيلي</label>
+                                <input class="form-control-custom" id="address" name="address"
+                                    placeholder="الشارع، الحي، المبنى..." />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label-custom" for="user_name">الاسم ثلاثي</label>
+                                <input class="form-control-custom" id="user_name" name="user_name"
+                                    placeholder="اسم المستلم" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label-custom" for="mobile">رقم الموبايل</label>
+                                <input class="form-control-custom" type="number" id="mobile" name="mobile"
+                                    pattern="\d{11}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group-custom">
+                                <label class="form-label-custom" for="temp_mobile">رقم احتياطي</label>
+                                <input class="form-control-custom" type="number" id="temp_mobile" name="temp_mobile"
+                                    pattern="\d{11}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>{{-- /manual-form-wrapper --}}
 
             <div class="step-nav">
                 <button class="btn-next" onclick="validateStep2()">
@@ -1117,7 +1273,82 @@
             });
         }
 
+        /* ─── Saved Addresses Logic ─── */
+        let selectedAddressData = null;
+        let manualFormVisible = @json(isset($addresses) ? $addresses->count() === 0 : true);
+
+        function selectAddress(card) {
+            document.querySelectorAll('.saved-addr-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedAddressData = {
+                govId: card.dataset.govId || '',
+                cityId: card.dataset.cityId || '',
+                address: card.dataset.address || '',
+                name: card.dataset.name || '',
+                mobile: card.dataset.mobile || '',
+                temp: card.dataset.temp || '',
+                nearpost: card.dataset.nearpost || '',
+            };
+            fillFormFromData(selectedAddressData);
+            document.getElementById('selected-addr-banner').style.display = 'block';
+            const divider = document.getElementById('addr-divider');
+            const wrapper = document.getElementById('manual-form-wrapper');
+            if (divider) divider.style.display = 'none';
+            if (wrapper) wrapper.style.display = 'none';
+            manualFormVisible = false;
+            document.getElementById('toggle-form-text').innerText = 'إدخال عنوان جديد';
+            document.getElementById('toggle-form-icon').innerText = '✏️';
+        }
+
+        function fillFormFromData(d) {
+            const govSel = document.getElementById('governorates');
+            govSel.value = d.govId;
+            govSel.dispatchEvent(new Event('change'));
+            setTimeout(() => {
+                const citySel = document.getElementById('cities');
+                if (citySel) citySel.value = d.cityId;
+            }, 120);
+            document.getElementById('address').value = d.address;
+            document.getElementById('user_name').value = d.name;
+            document.getElementById('mobile').value = d.mobile;
+            document.getElementById('temp_mobile').value = d.temp;
+            document.getElementById('near_post').value = d.nearpost;
+        }
+
+        function clearSelectedAddress() {
+            selectedAddressData = null;
+            document.querySelectorAll('.saved-addr-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('selected-addr-banner').style.display = 'none';
+            const divider = document.getElementById('addr-divider');
+            if (divider) divider.style.display = 'flex';
+        }
+
+        function toggleManualForm() {
+            manualFormVisible = !manualFormVisible;
+            const wrapper = document.getElementById('manual-form-wrapper');
+            const divider = document.getElementById('addr-divider');
+            const icon = document.getElementById('toggle-form-icon');
+            const text = document.getElementById('toggle-form-text');
+            if (manualFormVisible) {
+                wrapper.style.display = 'block';
+                if (divider) divider.style.display = 'flex';
+                icon.innerText = '✕';
+                text.innerText = 'إخفاء الفورم';
+            } else {
+                wrapper.style.display = 'none';
+                icon.innerText = '✏️';
+                text.innerText = 'إدخال عنوان جديد';
+            }
+        }
+
         function validateStep2() {
+            // Card selected → fields already filled
+            if (selectedAddressData) {
+                goTo(3);
+                return;
+            }
+
+            // Manual form validation
             const gov = document.getElementById('governorates').value;
             const city = document.getElementById('cities').value;
             const addr = document.getElementById('address').value.trim();
@@ -1128,9 +1359,11 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'بيانات ناقصة',
-                    text: 'من فضلك أكمل جميع البيانات قبل المتابعة',
+                    text: 'من فضلك اختار عنوان محفوظ أو أكمل جميع البيانات يدوياً',
                     confirmButtonColor: '#e07b39'
                 });
+                // Show the manual form if hidden
+                if (!manualFormVisible) toggleManualForm();
                 return;
             }
             goTo(3);
