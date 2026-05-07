@@ -782,6 +782,70 @@
                 justify-content: center;
             }
         }
+
+        /* ─── Cart Edit Controls ─── */
+        .qty-control {
+            display: inline-flex;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            direction: ltr;
+            /* للحفاظ على ترتيب الزائد والناقص */
+        }
+
+        .qty-btn {
+            background: var(--surface-alt);
+            border: none;
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: 700;
+            padding: 2px 12px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .qty-input {
+            width: 40px;
+            text-align: center;
+            border: none;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            background: transparent;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            -moz-appearance: textfield;
+        }
+
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .btn-remove-item {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-remove-item:hover {
+            background: #ef4444;
+            color: #fff;
+        }
     </style>
 
     <!-- ═══════════════════════════════════════ -->
@@ -863,7 +927,8 @@
                         <tr>
                             <th>المنتج</th>
                             <th>السعر</th>
-                            <th>الكمية</th>
+                            <th style="text-align: center;">الكمية</th>
+                            <th style="text-align: center;">حذف</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -872,11 +937,30 @@
                                 <td><a href="{{ route('user.product.show', $item->id) }}"
                                         class="product-name-link">{{ $item->name }}</a></td>
                                 <td><span class="price-tag">{{ number_format($item->price, 2) }} جنيه</span></td>
-                                <td><span class="qty-badge">× {{ $item->qty }}</span></td>
+                                <td style="text-align: center;">
+                                    <div class="qty-control">
+                                        <button type="button" class="qty-btn"
+                                            onclick="updateCartQty('{{ $item->rowId }}', -1)">-</button>
+                                        <input type="number" class="qty-input" id="qty-{{ $item->rowId }}"
+                                            value="{{ $item->qty }}" min="1" readonly>
+                                        <button type="button" class="qty-btn"
+                                            onclick="updateCartQty('{{ $item->rowId }}', 1)">+</button>
+                                    </div>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn-remove-item"
+                                        onclick="removeCartItem('{{ $item->rowId }}')" title="حذف المنتج">🗑️</button>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+
+                @if (Cart::instance('shopping')->count() == 0)
+                    <div style="text-align: center; padding: 20px; color: var(--text-muted); font-weight: 600;">
+                        سلة المشتريات فارغة. <a href="{{ route('user.home') }}" style="color: var(--accent);">تسوق الآن</a>
+                    </div>
+                @endif
             </div>
 
             <!-- Coupon -->
@@ -1732,6 +1816,93 @@
                 p.src = URL.createObjectURL(event.target.files[0]);
                 p.style.display = "block";
             }
+        }
+
+        /* ─── Cart Edit Logic (Update & Remove) ─── */
+        function updateCartQty(rowId, change) {
+            let input = document.getElementById('qty-' + rowId);
+            let currentQty = parseInt(input.value);
+            let newQty = currentQty + change;
+
+            if (newQty < 1) {
+                // لو الكمية هتبقى صفر، نقوم بحذف المنتج
+                removeCartItem(rowId);
+                return;
+            }
+
+            // إظهار حالة التحميل
+            Swal.fire({
+                title: 'جاري تحديث الكمية...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: '/cart/update', // ⚠️ استبدل هذا المسار بالـ Route الصحيح الخاص بالتعديل عندك
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    rowId: rowId,
+                    qty: newQty
+                },
+                success: function(response) {
+                    // إعادة تحميل الصفحة لتحديث كل الحسابات (شحن، إجمالي، Hidden forms)
+                    window.location.reload();
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'حدث خطأ أثناء التحديث',
+                        confirmButtonColor: '#e07b39'
+                    });
+                }
+            });
+        }
+
+        function removeCartItem(rowId) {
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: "هل تريد حذف هذا المنتج من الطلب؟",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#7b7b96',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'جاري الحذف...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.ajax({
+                        url: '/cart/remove', // ⚠️ استبدل هذا المسار بالـ Route الصحيح الخاص بالحذف عندك
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            rowId: rowId
+                        },
+                        success: function(response) {
+                            window.location.reload();
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطأ',
+                                text: 'حدث خطأ أثناء الحذف',
+                                confirmButtonColor: '#e07b39'
+                            });
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endsection
