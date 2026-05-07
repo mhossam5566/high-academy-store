@@ -1883,7 +1883,7 @@
                     });
 
                     $.ajax({
-                        url: '/cart/remove', // ⚠️ استبدل هذا المسار بالـ Route الصحيح الخاص بالحذف عندك
+                        url: "{{ route('user.cart.delete') }}", // ⚠️ استبدل هذا المسار بالـ Route الصحيح الخاص بالحذف عندك
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
