@@ -141,7 +141,7 @@
         <div class="col-12 d-block d-md-none bg-light p-4 text-center">
             <h4 class="mb-4"><strong>الإجمالي الكلي:</strong> <span id="cart-total-mobile">{{ Cart::subtotal() }}
                     جنيه</span></h4>
-            <a href="{{ route('user.card.data') }}" id="checkout-btn-mobile" class="btn btn-primary w-100 text-light">
+            <a href="{{ route('user.card') }}" id="checkout-btn-mobile" class="btn btn-primary w-100 text-light">
                 اتمام عملية الدفع
             </a>
         </div>
