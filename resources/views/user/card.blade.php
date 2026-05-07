@@ -1887,7 +1887,7 @@
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
-                            rowId: rowId
+                            cart_id: rowId
                         },
                         success: function(response) {
                             window.location.reload();
