@@ -130,7 +130,7 @@
                     <span class="text-uppercase text-light bg-warning px-1 ml-n1 logo-text">Academy Store</span>
                 </a>
                 <div class="d-flex g-2">
-                    <a href="{{ route('user.cart') }}" class="btn px-0 mr-1">
+                    <a href="{{ route('user.card') }}" class="btn px-0 mr-1">
                         <i class="fas fa-shopping-cart text-warning"></i>
                         <span class="badge text-white border border-white rounded-circle"
                             style="padding-bottom: 2px;">{{ Cart::instance('shopping')->count() }}</span>

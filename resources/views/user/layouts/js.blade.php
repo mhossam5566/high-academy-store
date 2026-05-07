@@ -180,7 +180,7 @@
                     }).then((value) => {
                         if (value === "cart") {
                             // Redirect to cart page
-                            window.location.href = "{{ route('user.cart') }}";
+                            window.location.href = "{{ route('user.car') }}";
                         }
                         // If "continue", do nothing (stay on current page)
                     });

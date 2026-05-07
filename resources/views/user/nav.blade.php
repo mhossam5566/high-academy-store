@@ -78,7 +78,7 @@
                 <div class="navbar-nav d-flex flex-row align-items-center d-lg-none d-block me-3">
 
                     @auth
-                        <a href="{{ route('user.cart') }}" class="btn px-0">
+                        <a href="{{ route('user.card') }}" class="btn px-0">
                             <i class="fas fa-shopping-cart text-warning"></i>
                             <span class="badge text-secondary border border-secondary rounded-circle"
                                 style="padding-bottom: 2px;">{{ Cart::instance('shopping')->count() }}</span>
@@ -89,16 +89,17 @@
                         <div class="dropdown d-flex">
                             <a class="avatar btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
-                                <img src="{{ Auth()->user()->profile_image ? asset('storage/images/user/' . Auth()->user()->profile_image) : asset('storage/images/pngegg.png') }}" alt="Logo"
-                                    class="rounded-circle w-100 h-100">
+                                <img src="{{ Auth()->user()->profile_image ? asset('storage/images/user/' . Auth()->user()->profile_image) : asset('storage/images/pngegg.png') }}"
+                                    alt="Logo" class="rounded-circle w-100 h-100">
                                 <i class="fa-solid fa-caret-down text-white"></i>
                             </a>
                             <ul class="dropdown-menu">
                                 <li> <a href="{{ route('user.myaccount') }}"
                                         class="dropdown-item @if ($lastSegment == 'myaccount') active @endif">حسابى</a>
                                 </li>
-                              <li> <a href="{{ route('user.shipping') }}"
-                                        class="dropdown-item @if ($lastSegment == 'shipping') active @endif">بيانات الشحن</a>
+                                <li> <a href="{{ route('user.shipping') }}"
+                                        class="dropdown-item @if ($lastSegment == 'shipping') active @endif">بيانات
+                                        الشحن</a>
                                 </li>
                                 <li> <a href="{{ route('user.orders.user') }}"
                                         class="dropdown-item @if ($lastSegment == 'myorders') active @endif">طلباتي</a>
@@ -146,7 +147,7 @@
                     </div>
                     <div class="navbar-nav d-lg-block">
                         @auth
-                            <a href="{{ route('user.cart') }}" class="btn px-0 ml-3">
+                            <a href="{{ route('user.card') }}" class="btn px-0 ml-3">
                                 <i class="fas fa-shopping-cart text-warning"></i>
                                 <span class="badge text-secondary border border-secondary rounded-circle"
                                     style="padding-bottom: 2px;">{{ Cart::instance('shopping')->count() }}</span>
@@ -176,17 +177,17 @@
             @auth
                 <div class="dropdown">
                     <a class="avatar btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{{ Auth()->user()->profile_image ? asset('storage/images/user/' . Auth()->user()->profile_image) : asset('storage/images/pngegg.png') }}" alt="Logo"
-                            class="rounded-circle w-100 h-100">
+                        <img src="{{ Auth()->user()->profile_image ? asset('storage/images/user/' . Auth()->user()->profile_image) : asset('storage/images/pngegg.png') }}"
+                            alt="Logo" class="rounded-circle w-100 h-100">
                         {{-- <i class="fa-solid fa-caret-down text-white"></i> --}}
                     </a>
                     <ul class="dropdown-menu">
                         <li> <a href="{{ route('user.myaccount') }}"
-                            class="dropdown-item @if ($lastSegment == 'myaccount') active @endif">حسابى</a>
+                                class="dropdown-item @if ($lastSegment == 'myaccount') active @endif">حسابى</a>
                         </li>
-                         <li> <a href="{{ route('user.shipping') }}"
-                                        class="dropdown-item @if ($lastSegment == 'shipping') active @endif">بيانات الشحن</a>
-                                </li>
+                        <li> <a href="{{ route('user.shipping') }}"
+                                class="dropdown-item @if ($lastSegment == 'shipping') active @endif">بيانات الشحن</a>
+                        </li>
                         <li> <a href="{{ route('user.orders.user') }}"
                                 class="dropdown-item @if ($lastSegment == 'myorders') active @endif">طلباتي</a>
                         </li>
