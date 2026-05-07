@@ -1845,7 +1845,7 @@
                 data: {
                     _token: '{{ csrf_token() }}',
                     rowId: rowId,
-                    qty: newQty
+                    product_qty: newQty
                 },
                 success: function(response) {
                     // إعادة تحميل الصفحة لتحديث كل الحسابات (شحن، إجمالي، Hidden forms)
