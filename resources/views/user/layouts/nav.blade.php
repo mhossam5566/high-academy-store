@@ -81,6 +81,7 @@
 
     .nav-search form {
         width: 100%;
+        margin-top: 20px;
         display: flex;
         align-items: center;
         background: var(--nav-surface);
