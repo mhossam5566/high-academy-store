@@ -33,14 +33,15 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    direction: ltr;
   }
 
-  /* Logo */
+  /* Flip logo order so Academy (orange) appears first in RTL */
   .nav-logo {
-    text-decoration: none;
     display: flex;
+    flex-direction: row-reverse;
     align-items: center;
-    gap: 0;
+    text-decoration: none;
     flex-shrink: 0;
   }
   .nav-logo .logo-high {
@@ -51,7 +52,7 @@
     background: #fff;
     color: var(--nav-bg);
     padding: 4px 10px;
-    border-radius: 6px 0 0 6px;
+    border-radius: 0 6px 6px 0;
   }
   .nav-logo .logo-academy {
     font-size: 15px;
@@ -61,14 +62,16 @@
     background: var(--nav-accent);
     color: #fff;
     padding: 4px 10px;
-    border-radius: 0 6px 6px 0;
+    border-radius: 6px 0 0 6px;
   }
 
   /* Search bar (desktop) */
   .nav-search {
     flex: 1;
     max-width: 380px;
-    margin: 0 auto;
+    margin-right: auto;
+    margin-left: auto;
+    align-self: center;
   }
   .nav-search form {
     display: flex;
@@ -234,11 +237,11 @@
   }
   .sidebar-logo {
     display: flex;
+    flex-direction: row-reverse;
     align-items: center;
-    gap: 0;
   }
-  .sidebar-logo .logo-high    { font-size: 13px; font-weight: 800; text-transform:uppercase; background:#fff; color:var(--nav-bg); padding:3px 8px; border-radius:5px 0 0 5px; }
-  .sidebar-logo .logo-academy { font-size: 13px; font-weight: 800; text-transform:uppercase; background:var(--nav-accent); color:#fff; padding:3px 8px; border-radius:0 5px 5px 0; }
+  .sidebar-logo .logo-high    { font-size: 13px; font-weight: 800; text-transform:uppercase; background:#fff; color:var(--nav-bg); padding:3px 8px; border-radius:0 5px 5px 0; }
+  .sidebar-logo .logo-academy { font-size: 13px; font-weight: 800; text-transform:uppercase; background:var(--nav-accent); color:#fff; padding:3px 8px; border-radius:5px 0 0 5px; }
 
   .sidebar-close {
     background: rgba(255,255,255,.1);
