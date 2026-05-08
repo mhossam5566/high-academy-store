@@ -35,16 +35,16 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        direction: ltr;
+        direction: rtl;
     }
 
-    /* Flip logo order so Academy (orange) appears first in RTL */
+    /* Logo uses ltr internally so "High Academy Store" reads left-to-right */
     .nav-logo {
-        display: flex;
-        flex-direction: row-reverse;
+        display: inline-flex;
         align-items: center;
         text-decoration: none;
         flex-shrink: 0;
+        direction: ltr;
     }
 
     .nav-logo .logo-high {
@@ -55,7 +55,7 @@
         background: #fff;
         color: var(--nav-bg);
         padding: 4px 10px;
-        border-radius: 0 6px 6px 0;
+        border-radius: 6px 0 0 6px;
     }
 
     .nav-logo .logo-academy {
@@ -66,19 +66,21 @@
         background: var(--nav-accent);
         color: #fff;
         padding: 4px 10px;
-        border-radius: 6px 0 0 6px;
+        border-radius: 0 6px 6px 0;
     }
 
-    /* Search bar (desktop) */
+    /* Search bar centred via flex:1 and auto side margins */
     .nav-search {
         flex: 1;
         max-width: 380px;
         margin-right: auto;
         margin-left: auto;
-        align-self: center;
+        display: flex;
+        align-items: center;
     }
 
     .nav-search form {
+        width: 100%;
         display: flex;
         align-items: center;
         background: var(--nav-surface);
@@ -293,9 +295,9 @@
     }
 
     .sidebar-logo {
-        display: flex;
-        flex-direction: row-reverse;
+        display: inline-flex;
         align-items: center;
+        direction: ltr;
     }
 
     .sidebar-logo .logo-high {
@@ -305,7 +307,7 @@
         background: #fff;
         color: var(--nav-bg);
         padding: 3px 8px;
-        border-radius: 0 5px 5px 0;
+        border-radius: 5px 0 0 5px;
     }
 
     .sidebar-logo .logo-academy {
@@ -315,7 +317,7 @@
         background: var(--nav-accent);
         color: #fff;
         padding: 3px 8px;
-        border-radius: 5px 0 0 5px;
+        border-radius: 0 5px 5px 0;
     }
 
     .sidebar-close {
