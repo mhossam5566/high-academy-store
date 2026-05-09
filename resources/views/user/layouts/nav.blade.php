@@ -42,7 +42,6 @@
     .nav-logo {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
         text-decoration: none;
         flex-shrink: 0;
         direction: ltr;
