@@ -42,6 +42,7 @@
     .nav-logo {
         display: inline-flex;
         align-items: center;
+        gap: 8px;
         text-decoration: none;
         flex-shrink: 0;
         direction: ltr;
@@ -67,6 +68,13 @@
         color: #fff;
         padding: 4px 10px;
         border-radius: 0 6px 6px 0;
+    }
+
+    .nav-logo-icon {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        border-radius: 8px;
     }
 
     /* Search bar centred via flex:1 and auto side margins */
@@ -533,6 +541,7 @@
         <a class="nav-logo" href="/">
             <span class="logo-high">High</span>
             <span class="logo-academy">Academy Store</span>
+            <img src="{{ asset('storage/images/pngegg.png') }}" alt="High Academy logo" class="nav-logo-icon">
         </a>
 
         {{-- Search (desktop, shows only on shop page) --}}
