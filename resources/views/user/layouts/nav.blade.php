@@ -541,7 +541,7 @@
         <a class="nav-logo" href="/">
             <span class="logo-high">High</span>
             <span class="logo-academy">Academy Store</span>
-            <img src="{{ asset('storage/images/pngegg.png') }}" alt="High Academy logo" class="nav-logo-icon">
+            <img src="{{ asset('front/img/logo.png') }}" alt="High Academy logo" class="nav-logo-icon">
         </a>
 
         {{-- Search (desktop, shows only on shop page) --}}
