@@ -74,6 +74,7 @@
         height: 32px;
         object-fit: contain;
         border-radius: 8px;
+        margin-right: 10px;
     }
 
     /* Search bar centred via flex:1 and auto side margins */
@@ -538,9 +539,9 @@
 
         {{-- Logo --}}
         <a class="nav-logo" href="/">
+            <img src="{{ asset('front/img/logo.png') }}" alt="High Academy logo" class="nav-logo-icon">
             <span class="logo-high">High</span>
             <span class="logo-academy">Academy Store</span>
-            <img src="{{ asset('front/img/logo.png') }}" alt="High Academy logo" class="nav-logo-icon">
         </a>
 
         {{-- Search (desktop, shows only on shop page) --}}
