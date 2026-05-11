@@ -25,7 +25,7 @@
         z-index: 1050;
         box-shadow: 0 2px 20px rgba(0, 0, 0, 0.25);
         font-family: 'Cairo', sans-serif;
-        direction: rtl;
+        direction: ltr;
     }
 
     .nav-inner {
@@ -35,7 +35,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        direction: rtl;
+        direction: ltr;
     }
 
     /* Logo uses ltr internally so "High Academy Store" reads left-to-right */
@@ -112,7 +112,7 @@
         font-family: 'Cairo', sans-serif;
         font-size: 13px;
         color: #fff;
-        direction: rtl;
+        direction: ltr;
     }
 
     .nav-search input::placeholder {
@@ -140,8 +140,8 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-right: auto;
-        margin-left: 0;
+        margin-left: auto;
+        margin-right: 0;
         flex-shrink: 0;
     }
 
@@ -238,7 +238,7 @@
         font-family: 'Cairo', sans-serif;
         font-size: 13px;
         color: #fff;
-        direction: rtl;
+        direction: ltr;
     }
 
     .nav-search-mobile input::placeholder {
@@ -413,11 +413,11 @@
         font-weight: 600;
         transition: background .18s, color .18s;
         cursor: pointer;
-        direction: rtl;
+        direction: ltr;
         border: none;
         background: none;
         width: 100%;
-        text-align: right;
+        text-align: left;
     }
 
     .sidebar-nav-link:hover {
@@ -472,7 +472,7 @@
         font-size: 13px;
         font-weight: 600;
         transition: background .15s, color .15s;
-        direction: rtl;
+        direction: ltr;
     }
 
     .sidebar-dropdown-link:hover {
