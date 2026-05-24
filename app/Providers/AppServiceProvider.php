@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
 use App\Models\SiteNotification;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
