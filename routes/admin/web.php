@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\GovernorateController;
 use App\Http\Controllers\Admin\VoucherOrderController;
 use App\Http\Controllers\Admin\MainCategoriesController;
 use App\Http\Controllers\Admin\ShippingMethodController;
+use App\Http\Controllers\Admin\SiteNotificationController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 /*
@@ -88,13 +89,13 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
 
     // Site Notifications
     Route::prefix('site-notifications')->name('site_notifications.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'index'])->name('index');
-        Route::get('/datatable', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'datatable'])->name('datatable');
-        Route::get('/create', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'create'])->name('create');
-        Route::post('/store', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'edit'])->name('edit');
-        Route::post('/update/{id}', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'update'])->name('update');
-        Route::post('/destroy/{id}', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'destroy'])->name('destroy');
+        Route::get('/', [SiteNotificationController::class, 'index'])->name('index');
+        Route::get('/datatable', [SiteNotificationController::class, 'datatable'])->name('datatable');
+        Route::get('/create', [SiteNotificationController::class, 'create'])->name('create');
+        Route::post('/store', [SiteNotificationController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [SiteNotificationController::class, 'edit'])->name('edit');
+        Route::post('/update/{id}', [SiteNotificationController::class, 'update'])->name('update');
+        Route::post('/destroy/{id}', [SiteNotificationController::class, 'destroy'])->name('destroy');
     });
 
     //main_categories
