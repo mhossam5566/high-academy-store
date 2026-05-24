@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SiteNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Yajra\DataTables\Facades\DataTables;
 
 class SiteNotificationController extends Controller
@@ -34,6 +35,8 @@ class SiteNotificationController extends Controller
             'is_active' => $request->is_active
         ]);
 
+        Cache::forget('active_site_notification');
+
         return redirect()->route('dashboard.site_notifications.index')->with('success', 'تم إضافة التنبيه بنجاح');
     }
 
@@ -60,6 +63,8 @@ class SiteNotificationController extends Controller
             'is_active' => $request->is_active
         ]);
 
+        Cache::forget('active_site_notification');
+
         return redirect()->route('dashboard.site_notifications.index')->with('success', 'تم تحديث التنبيه بنجاح');
     }
 
@@ -68,6 +73,9 @@ class SiteNotificationController extends Controller
         try {
             $notification = SiteNotification::findOrFail($id);
             $notification->delete();
+
+            Cache::forget('active_site_notification');
+
             return response()->json([
                 'success' => true,
                 'message' => 'تم حذف التنبيه بنجاح'

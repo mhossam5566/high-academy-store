@@ -210,10 +210,20 @@ body{
 <body class="no-scroll" style="font-family: --font-family-sans-serif !important;">
     @if($siteNotification)
         <div id="site-notification" class="site-notification d-none">
-            <div class="notification-content">
-                {!! $siteNotification->content !!}
+            <div class="notification-container">
+                <div class="notification-header">
+                    <div class="nav-logo">
+                        <span class="logo-high">High</span>
+                        <span class="logo-academy">Academy</span>
+                    </div>
+                    <button type="button" class="close-notification" onclick="closeSiteNotification()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="notification-body">
+                    {!! $siteNotification->content !!}
+                </div>
             </div>
-            <button type="button" class="close-notification" onclick="closeSiteNotification()">&times;</button>
         </div>
 
         <style>
@@ -222,51 +232,106 @@ body{
                 top: 0;
                 left: 0;
                 width: 100%;
-                background: white;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
                 z-index: 10001;
-                padding: 30px 20px;
                 display: flex;
                 justify-content: center;
+                align-items: flex-start;
+                padding-top: 20px;
+                font-family: 'Cairo', sans-serif;
+                backdrop-filter: blur(4px);
+            }
+            .notification-container {
+                width: 90%;
+                max-width: 800px;
+                background: #1a1a2e; /* var(--nav-bg) */
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                animation: slideInDown 0.4s ease-out;
+            }
+            .notification-header {
+                padding: 15px 20px;
+                background: rgba(255, 255, 255, 0.05);
+                display: flex;
+                justify-content: space-between;
                 align-items: center;
-                min-height: 100px;
-                max-height: 50vh;
-                overflow-y: auto;
-                border-bottom: 3px solid #007bff;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
-            .notification-content {
-                width: 100%;
-                max-width: 1200px;
+            .notification-header .nav-logo {
+                display: inline-flex;
+                align-items: center;
+                text-decoration: none;
+                direction: ltr;
+            }
+            .notification-header .logo-high {
+                font-size: 14px;
+                font-weight: 800;
+                text-transform: uppercase;
+                background: #fff;
+                color: #1a1a2e;
+                padding: 3px 8px;
+                border-radius: 5px 0 0 5px;
+            }
+            .notification-header .logo-academy {
+                font-size: 14px;
+                font-weight: 800;
+                text-transform: uppercase;
+                background: #e07b39; /* var(--nav-accent) */
+                color: #fff;
+                padding: 3px 8px;
+                border-radius: 0 5px 5px 0;
+            }
+            .notification-body {
+                padding: 25px;
+                color: rgba(255, 255, 255, 0.9);
                 text-align: center;
+                max-height: 70vh;
+                overflow-y: auto;
             }
-            .notification-content img {
+            .notification-body img {
                 max-width: 100%;
                 height: auto;
+                border-radius: 8px;
+                margin: 10px 0;
             }
             .close-notification {
-                position: absolute;
-                top: 10px;
-                right: 15px;
-                background: #eee;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                color: #333;
-                width: 35px;
-                height: 35px;
-                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                width: 32px;
+                height: 32px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                transition: background 0.3s;
+                cursor: pointer;
+                color: #fff;
+                font-size: 14px;
+                transition: all 0.3s;
             }
             .close-notification:hover {
-                background: #ddd;
+                background: #e07b39;
+                border-color: #e07b39;
+            }
+            @keyframes slideInDown {
+                from {
+                    transform: translateY(-100px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
             }
             @media (max-width: 768px) {
-                .site-notification {
-                    min-height: 25vh;
-                    padding: 40px 15px 20px;
+                .notification-container {
+                    width: 95%;
+                    margin-top: 10px;
+                }
+                .notification-body {
+                    padding: 15px;
                 }
             }
         </style>
