@@ -244,16 +244,16 @@ body{
             }
             .notification-container {
                 width: 100%;
-                max-width: 600px;
+                max-width: 1000px; /* Increased from 600px for PC */
                 background: #ffffff; 
                 border-radius: 20px;
-                box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+                box-shadow: 0 20px 60px rgba(0,0,0,0.35);
                 overflow: hidden;
                 border: 1px solid rgba(0, 0, 0, 0.08);
                 animation: popupShow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
             .notification-header {
-                padding: 15px 25px;
+                padding: 20px 30px; /* Increased padding */
                 background: #f8f9fa;
                 display: flex;
                 justify-content: space-between;
@@ -267,49 +267,50 @@ body{
                 direction: ltr;
             }
             .notification-header .logo-high {
-                font-size: 14px;
+                font-size: 16px; /* Slightly larger logo */
                 font-weight: 800;
                 text-transform: uppercase;
                 background: #1a1a2e;
                 color: #fff;
-                padding: 3px 8px;
-                border-radius: 5px 0 0 5px;
+                padding: 4px 10px;
+                border-radius: 6px 0 0 6px;
             }
             .notification-header .logo-academy {
-                font-size: 14px;
+                font-size: 16px;
                 font-weight: 800;
                 text-transform: uppercase;
                 background: #e07b39; /* var(--nav-accent) */
                 color: #fff;
-                padding: 3px 8px;
-                border-radius: 0 5px 5px 0;
+                padding: 4px 10px;
+                border-radius: 0 6px 6px 0;
             }
             .notification-body {
-                padding: 30px 25px;
+                padding: 40px 50px; /* More generous padding for desktop */
                 color: #333333;
                 text-align: center;
-                max-height: 70vh;
+                max-height: 80vh; /* Increased height capacity */
                 overflow-y: auto;
+                font-size: 18px; /* Slightly larger default text */
             }
             .notification-body img {
                 max-width: 100%;
                 height: auto;
-                border-radius: 12px;
-                margin: 15px 0;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                border-radius: 15px;
+                margin: 20px 0;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             }
             .close-notification {
                 background: #eee;
                 border: 1px solid rgba(0, 0, 0, 0.05);
-                border-radius: 10px;
-                width: 36px;
-                height: 36px;
+                border-radius: 12px;
+                width: 42px; /* Larger close button */
+                height: 42px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
                 color: #333;
-                font-size: 16px;
+                font-size: 18px;
                 transition: all 0.3s;
             }
             .close-notification:hover {
@@ -328,12 +329,30 @@ body{
                     opacity: 1;
                 }
             }
-            @media (max-width: 768px) {
+            @media (max-width: 992px) { /* Tablet adjustments */
+                .notification-container {
+                    max-width: 85%;
+                }
+                .notification-body {
+                    padding: 30px 40px;
+                }
+            }
+            @media (max-width: 768px) { /* Mobile adjustments */
                 .notification-container {
                     width: 95%;
+                    border-radius: 15px;
                 }
                 .notification-body {
                     padding: 20px;
+                    font-size: 16px;
+                }
+                .notification-header {
+                    padding: 15px 20px;
+                }
+                .close-notification {
+                    width: 36px;
+                    height: 36px;
+                    font-size: 16px;
                 }
             }
         </style>
