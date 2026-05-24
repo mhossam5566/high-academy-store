@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\Category;
+use App\Models\SiteNotification;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -34,7 +34,15 @@ class AppServiceProvider extends ServiceProvider
             $categories = Cache::remember('categories', 60, function () {
                 return Category::with('translations', 'children')->get();
             });
-            $view->with('categories', $categories);
+
+            $siteNotification = Cache::remember('active_site_notification', 60, function () {
+                return SiteNotification::where('is_active', true)->latest()->first();
+            });
+
+            $view->with([
+                'categories' => $categories,
+                'siteNotification' => $siteNotification
+            ]);
         });
     }
 }

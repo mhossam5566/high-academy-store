@@ -341,6 +341,26 @@
                     "slug": "dashboard.cities.create"
                 }
             ]
+        },
+        {
+            "name": "تنبيهات الموقع",
+            "icon": "menu-icon tf-icons ti ti-bell",
+            "slug": [
+                "dashboard.site_notifications.index",
+                "dashboard.site_notifications.create"
+            ],
+            "submenu": [
+                {
+                    "url": "/dashboard/site-notifications",
+                    "name": "كل التنبيهات",
+                    "slug": "dashboard.site_notifications.index"
+                },
+                {
+                    "url": "/dashboard/site-notifications/create",
+                    "name": "إضافة تنبيه جديد",
+                    "slug": "dashboard.site_notifications.create"
+                }
+            ]
         }
     ]
 }

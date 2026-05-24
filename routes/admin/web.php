@@ -86,6 +86,17 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::post('category/destroy', [CategoryController::class, 'destroy'])->name('category.destroy');
     Route::post('category/{id}/child', [CategoryController::class, 'getChildByParentID'])->name('getChildByParentID');
 
+    // Site Notifications
+    Route::prefix('site-notifications')->name('site_notifications.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'index'])->name('index');
+        Route::get('/datatable', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'datatable'])->name('datatable');
+        Route::get('/create', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'create'])->name('create');
+        Route::post('/store', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'edit'])->name('edit');
+        Route::post('/update/{id}', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'update'])->name('update');
+        Route::post('/destroy/{id}', [\App\Http\Controllers\Admin\SiteNotificationController::class, 'destroy'])->name('destroy');
+    });
+
     //main_categories
     Route::get('/main_categories', [MainCategoriesController::class, 'index'])->name('main_categories');
     Route::get('/main_categories/create', [MainCategoriesController::class, 'create'])->name('create.main_categories');
