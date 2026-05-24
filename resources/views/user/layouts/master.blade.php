@@ -208,6 +208,82 @@ body{
 </head>
 
 <body class="no-scroll" style="font-family: --font-family-sans-serif !important;">
+    @if($siteNotification)
+        <div id="site-notification" class="site-notification d-none">
+            <div class="notification-content">
+                {!! $siteNotification->content !!}
+            </div>
+            <button type="button" class="close-notification" onclick="closeSiteNotification()">&times;</button>
+        </div>
+
+        <style>
+            .site-notification {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: white;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                z-index: 10001;
+                padding: 30px 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100px;
+                max-height: 50vh;
+                overflow-y: auto;
+                border-bottom: 3px solid #007bff;
+            }
+            .notification-content {
+                width: 100%;
+                max-width: 1200px;
+                text-align: center;
+            }
+            .notification-content img {
+                max-width: 100%;
+                height: auto;
+            }
+            .close-notification {
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                background: #eee;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #333;
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.3s;
+            }
+            .close-notification:hover {
+                background: #ddd;
+            }
+            @media (max-width: 768px) {
+                .site-notification {
+                    min-height: 25vh;
+                    padding: 40px 15px 20px;
+                }
+            }
+        </style>
+
+        <script>
+            function closeSiteNotification() {
+                document.getElementById('site-notification').classList.add('d-none');
+                sessionStorage.setItem('site_notification_closed', 'true');
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                if (!sessionStorage.getItem('site_notification_closed')) {
+                    document.getElementById('site-notification').classList.remove('d-none');
+                }
+            });
+        </script>
+    @endif
     <style>
     	.whatsapp-float {
     		z-index: 100;
