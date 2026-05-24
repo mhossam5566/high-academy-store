@@ -233,7 +233,7 @@ body{
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.75);
+                background: rgba(0, 0, 0, 0.6);
                 z-index: 10001;
                 display: flex;
                 justify-content: center;
@@ -245,20 +245,20 @@ body{
             .notification-container {
                 width: 100%;
                 max-width: 600px;
-                background: #1a1a2e; /* var(--nav-bg) */
+                background: #ffffff; 
                 border-radius: 20px;
-                box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+                box-shadow: 0 15px 50px rgba(0,0,0,0.3);
                 overflow: hidden;
-                border: 1px solid rgba(255, 255, 255, 0.15);
+                border: 1px solid rgba(0, 0, 0, 0.08);
                 animation: popupShow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
             .notification-header {
                 padding: 15px 25px;
-                background: rgba(255, 255, 255, 0.05);
+                background: #f8f9fa;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             }
             .notification-header .nav-logo {
                 display: inline-flex;
@@ -270,8 +270,8 @@ body{
                 font-size: 14px;
                 font-weight: 800;
                 text-transform: uppercase;
-                background: #fff;
-                color: #1a1a2e;
+                background: #1a1a2e;
+                color: #fff;
                 padding: 3px 8px;
                 border-radius: 5px 0 0 5px;
             }
@@ -286,7 +286,7 @@ body{
             }
             .notification-body {
                 padding: 30px 25px;
-                color: rgba(255, 255, 255, 0.9);
+                color: #333333;
                 text-align: center;
                 max-height: 70vh;
                 overflow-y: auto;
@@ -296,11 +296,11 @@ body{
                 height: auto;
                 border-radius: 12px;
                 margin: 15px 0;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             }
             .close-notification {
-                background: rgba(255, 255, 255, 0.1);
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: #eee;
+                border: 1px solid rgba(0, 0, 0, 0.05);
                 border-radius: 10px;
                 width: 36px;
                 height: 36px;
@@ -308,13 +308,14 @@ body{
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
-                color: #fff;
+                color: #333;
                 font-size: 16px;
                 transition: all 0.3s;
             }
             .close-notification:hover {
                 background: #e07b39;
                 border-color: #e07b39;
+                color: #fff;
                 transform: rotate(90deg);
             }
             @keyframes popupShow {
