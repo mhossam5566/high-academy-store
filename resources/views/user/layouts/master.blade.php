@@ -233,27 +233,27 @@ body{
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.7);
+                background: rgba(0, 0, 0, 0.75);
                 z-index: 10001;
                 display: flex;
                 justify-content: center;
-                align-items: flex-start;
-                padding-top: 20px;
+                align-items: center; /* Center vertically */
+                padding: 20px;
                 font-family: 'Cairo', sans-serif;
-                backdrop-filter: blur(4px);
+                backdrop-filter: blur(5px);
             }
             .notification-container {
-                width: 90%;
-                max-width: 800px;
+                width: 100%;
+                max-width: 600px;
                 background: #1a1a2e; /* var(--nav-bg) */
-                border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                border-radius: 20px;
+                box-shadow: 0 15px 50px rgba(0,0,0,0.6);
                 overflow: hidden;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                animation: slideInDown 0.4s ease-out;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                animation: popupShow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
             .notification-header {
-                padding: 15px 20px;
+                padding: 15px 25px;
                 background: rgba(255, 255, 255, 0.05);
                 display: flex;
                 justify-content: space-between;
@@ -285,7 +285,7 @@ body{
                 border-radius: 0 5px 5px 0;
             }
             .notification-body {
-                padding: 25px;
+                padding: 30px 25px;
                 color: rgba(255, 255, 255, 0.9);
                 text-align: center;
                 max-height: 70vh;
@@ -294,44 +294,45 @@ body{
             .notification-body img {
                 max-width: 100%;
                 height: auto;
-                border-radius: 8px;
-                margin: 10px 0;
+                border-radius: 12px;
+                margin: 15px 0;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             }
             .close-notification {
                 background: rgba(255, 255, 255, 0.1);
                 border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 8px;
-                width: 32px;
-                height: 32px;
+                border-radius: 10px;
+                width: 36px;
+                height: 36px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
                 color: #fff;
-                font-size: 14px;
+                font-size: 16px;
                 transition: all 0.3s;
             }
             .close-notification:hover {
                 background: #e07b39;
                 border-color: #e07b39;
+                transform: rotate(90deg);
             }
-            @keyframes slideInDown {
+            @keyframes popupShow {
                 from {
-                    transform: translateY(-100px);
+                    transform: scale(0.8);
                     opacity: 0;
                 }
                 to {
-                    transform: translateY(0);
+                    transform: scale(1);
                     opacity: 1;
                 }
             }
             @media (max-width: 768px) {
                 .notification-container {
                     width: 95%;
-                    margin-top: 10px;
                 }
                 .notification-body {
-                    padding: 15px;
+                    padding: 20px;
                 }
             }
         </style>
