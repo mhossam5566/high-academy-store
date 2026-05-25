@@ -211,72 +211,62 @@ body{
     @if($siteNotification)
         <div id="site-notification" class="site-notification-wrapper d-none">
             <div class="notification-character-container">
-                <!-- Detailed Cartoon Child -->
-                <div class="character-svg">
+                <!-- Cute Eid Sheep SVG -->
+                <div class="character-svg sheep-svg">
                     <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Backpack (Back) -->
-                        <rect x="130" y="160" width="65" height="75" rx="15" fill="#1a1a2e" />
+                        <!-- Fluffy Body (Cloud shape) -->
+                        <g fill="#ffffff" stroke="#e0e0e0" stroke-width="2">
+                            <circle cx="160" cy="180" r="50" />
+                            <circle cx="120" cy="170" r="45" />
+                            <circle cx="200" cy="170" r="45" />
+                            <circle cx="140" cy="140" r="40" />
+                            <circle cx="180" cy="140" r="40" />
+                            <circle cx="160" cy="210" r="40" />
+                        </g>
                         
-                        <!-- Legs (Wider Stance) -->
-                        <rect x="135" y="235" width="18" height="40" fill="#2c3e50" />
-                        <rect x="172" y="235" width="18" height="40" fill="#2c3e50" />
+                        <!-- Legs (Black/Dark Gray) -->
+                        <rect x="135" y="220" width="12" height="40" rx="6" fill="#333333" />
+                        <rect x="175" y="220" width="12" height="40" rx="6" fill="#333333" />
                         
-                        <!-- Shoes -->
-                        <path d="M135 275 h-15 q-5 0 -5 -5 v-5 h20 Z" fill="#1a1a2e" />
-                        <path d="M172 275 h18 q5 0 5 -5 v-5 h-23 Z" fill="#1a1a2e" />
-                        
-                        <!-- Body/Shirt -->
-                        <rect x="125" y="155" width="75" height="90" rx="18" fill="#e07b39" />
-                        <!-- Shirt Details -->
-                        <path d="M125 165 L162.5 180 L200 165 L200 155 L125 155 Z" fill="#c06a30" />
-                        <circle cx="162.5" cy="200" r="3" fill="#fff" opacity="0.5" />
-                        <circle cx="162.5" cy="215" r="3" fill="#fff" opacity="0.5" />
-                        
-                        <!-- Backpack Straps -->
-                        <rect x="135" y="165" width="12" height="70" rx="6" fill="#1a1a2e" opacity="0.8" />
-                        <rect x="178" y="165" width="12" height="70" rx="6" fill="#1a1a2e" opacity="0.8" />
+                        <!-- Hooves -->
+                        <path d="M135 260 h12 v5 a3 3 0 0 1 -3 3 h-6 a3 3 0 0 1 -3 -3 z" fill="#1a1a1a" />
+                        <path d="M175 260 h12 v5 a3 3 0 0 1 -3 3 h-6 a3 3 0 0 1 -3 -3 z" fill="#1a1a1a" />
 
-                        <!-- Waving Arm (Right) -->
-                        <g class="arm-waving">
-                            <circle cx="200" cy="180" r="10" fill="#FFDBAC" />
-                            <path d="M200 180 Q250 180 270 120" stroke="#FFDBAC" stroke-width="18" fill="none" stroke-linecap="round" />
-                            <!-- Hand -->
-                            <circle cx="270" cy="120" r="16" fill="#FFDBAC" />
-                            <circle cx="260" cy="100" r="6" fill="#FFDBAC" />
-                            <circle cx="270" cy="95" r="6" fill="#FFDBAC" />
-                            <circle cx="280" cy="100" r="6" fill="#FFDBAC" />
+                        <!-- Waving Leg (Right) -->
+                        <g class="sheep-leg-waving">
+                            <rect x="210" y="160" width="12" height="50" rx="6" fill="#333333" transform="rotate(-30 210 160)" />
+                            <path d="M245 140 h12 v8 a3 3 0 0 1 -3 3 h-6 a3 3 0 0 1 -3 -3 z" fill="#1a1a1a" transform="rotate(-30 210 160)" />
                         </g>
 
-                        <!-- Holding Arm & Integrated Hand (Left) -->
-                        <g class="arm-holding">
-                            <circle cx="125" cy="180" r="10" fill="#FFDBAC" />
-                            <path d="M125 180 Q60 180 40 200" stroke="#FFDBAC" stroke-width="18" fill="none" stroke-linecap="round" />
-                            <!-- Hand Grabbing fingers -->
-                            <g transform="translate(10, 185)">
-                                <rect x="0" y="0" width="40" height="50" rx="15" fill="#FFDBAC" stroke="#1a1a2e" stroke-width="3" />
-                                <path d="M40 10 v30" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round" />
-                                <path d="M30 10 v30" stroke="#1a1a2e" stroke-width="2" opacity="0.3" />
-                                <path d="M20 10 v30" stroke="#1a1a2e" stroke-width="2" opacity="0.3" />
+                        <!-- Holding Leg (Left) -->
+                        <g class="sheep-leg-holding">
+                            <rect x="100" y="160" width="12" height="60" rx="6" fill="#333333" transform="rotate(60 110 160)" />
+                            <!-- Hoof Grabbing fingers effect -->
+                            <g transform="translate(15, 185)">
+                                <rect x="0" y="0" width="40" height="45" rx="12" fill="#333333" stroke="#1a1a2e" stroke-width="2" />
+                                <path d="M35 10 v25" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" />
                             </g>
                         </g>
 
-                        <!-- Head -->
-                        <circle cx="162.5" cy="110" r="55" fill="#FFDBAC" />
-                        <!-- Ears -->
-                        <circle cx="107.5" cy="110" r="12" fill="#FFDBAC" />
-                        <circle cx="217.5" cy="110" r="12" fill="#FFDBAC" />
-                        
-                        <!-- Hair -->
-                        <path d="M107.5 110 Q107.5 50 162.5 45 Q217.5 50 217.5 110 L217.5 100 Q217.5 60 162.5 55 Q107.5 60 107.5 100 Z" fill="#4B2C20" />
-                        
-                        <!-- Face -->
-                        <circle cx="135" cy="125" r="9" fill="#ffb6c1" opacity="0.5" />
-                        <circle cx="190" cy="125" r="9" fill="#ffb6c1" opacity="0.5" />
-                        <circle cx="145" cy="105" r="7" fill="white" />
-                        <circle cx="146" cy="105" r="3.5" fill="#333" />
-                        <circle cx="180" cy="105" r="7" fill="white" />
-                        <circle cx="181" cy="105" r="3.5" fill="#333" />
-                        <path d="M145 140 Q162.5 155 180 140" stroke="#333" stroke-width="4" fill="none" stroke-linecap="round" />
+                        <!-- Sheep Head -->
+                        <g transform="translate(160, 110)">
+                            <!-- Head shape -->
+                            <ellipse cx="0" cy="0" rx="35" ry="40" fill="#444444" />
+                            <!-- Ears -->
+                            <path d="M-35 -10 Q-50 -30 -40 -40 Q-30 -50 -25 -15" fill="#444444" />
+                            <path d="M35 -10 Q50 -30 40 -40 Q30 -50 25 -15" fill="#444444" />
+                            <!-- Fluffy Hair on top -->
+                            <circle cx="-10" cy="-35" r="12" fill="#ffffff" />
+                            <circle cx="10" cy="-35" r="12" fill="#ffffff" />
+                            <circle cx="0" cy="-42" r="10" fill="#ffffff" />
+                            <!-- Eyes -->
+                            <circle cx="-12" cy="-5" r="5" fill="white" />
+                            <circle cx="-11" cy="-5" r="2" fill="black" />
+                            <circle cx="12" cy="-5" r="5" fill="white" />
+                            <circle cx="13" cy="-5" r="2" fill="black" />
+                            <!-- Nose/Mouth -->
+                            <path d="M-5 15 Q0 22 5 15" stroke="#ff9999" stroke-width="2" fill="none" stroke-linecap="round" />
+                        </g>
                     </svg>
                 </div>
 
@@ -316,7 +306,7 @@ body{
             .character-svg {
                 width: 320px;
                 height: auto;
-                filter: drop-shadow(0 20px 35px rgba(0,0,0,0.4));
+                filter: drop-shadow(0 20px 35px rgba(0,0,0,0.3));
                 margin-left: -110px;
                 order: 2;
                 z-index: 10;
@@ -393,13 +383,13 @@ body{
             }
 
             /* Animations */
-            @keyframes armWaving {
-                0%, 100% { transform: rotate(-5deg); }
-                50% { transform: rotate(10deg); }
+            @keyframes sheepWaving {
+                0%, 100% { transform: rotate(-30deg); }
+                50% { transform: rotate(0deg); }
             }
-            .arm-waving {
-                animation: armWaving 1.8s ease-in-out infinite;
-                transform-origin: 162.5px 180px;
+            .sheep-leg-waving {
+                animation: sheepWaving 1.5s ease-in-out infinite;
+                transform-origin: 210px 160px;
             }
             @keyframes floatSign {
                 0%, 100% { transform: translateY(0) rotate(-0.3deg); }
