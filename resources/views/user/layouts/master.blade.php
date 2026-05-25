@@ -247,18 +247,19 @@ body{
                 max-width: 1000px; /* Increased from 600px for PC */
                 background: #ffffff; 
                 border-radius: 20px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.4);
                 overflow: hidden;
-                border: 1px solid rgba(0, 0, 0, 0.08);
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                border-top: 6px solid #e07b39; /* Site Orange Accent */
                 animation: popupShow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
             .notification-header {
-                padding: 20px 30px; /* Increased padding */
-                background: #f8f9fa;
+                padding: 20px 30px;
+                background: #1a1a2e; /* Site Navy Background */
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                border-bottom: 2px solid rgba(224, 123, 57, 0.3);
             }
             .notification-header .nav-logo {
                 display: inline-flex;
@@ -267,11 +268,11 @@ body{
                 direction: ltr;
             }
             .notification-header .logo-high {
-                font-size: 16px; /* Slightly larger logo */
+                font-size: 16px;
                 font-weight: 800;
                 text-transform: uppercase;
-                background: #1a1a2e;
-                color: #fff;
+                background: #fff;
+                color: #1a1a2e;
                 padding: 4px 10px;
                 border-radius: 6px 0 0 6px;
             }
@@ -279,45 +280,45 @@ body{
                 font-size: 16px;
                 font-weight: 800;
                 text-transform: uppercase;
-                background: #e07b39; /* var(--nav-accent) */
+                background: #e07b39; /* Site Orange */
                 color: #fff;
                 padding: 4px 10px;
                 border-radius: 0 6px 6px 0;
             }
             .notification-body {
-                padding: 40px 50px; /* More generous padding for desktop */
-                color: #333333;
+                padding: 40px 50px;
+                color: #1a1a2e; /* Navy text for better consistency */
                 text-align: center;
-                max-height: 80vh; /* Increased height capacity */
+                max-height: 80vh;
                 overflow-y: auto;
-                font-size: 18px; /* Slightly larger default text */
+                font-size: 18px;
             }
             .notification-body img {
                 max-width: 100%;
                 height: auto;
                 border-radius: 15px;
                 margin: 20px 0;
-                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+                box-shadow: 0 8px 30px rgba(224, 123, 57, 0.15); /* Orange-tinted shadow */
+                border: 1px solid rgba(224, 123, 57, 0.1);
             }
             .close-notification {
-                background: #eee;
-                border: 1px solid rgba(0, 0, 0, 0.05);
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
                 border-radius: 12px;
-                width: 42px; /* Larger close button */
+                width: 42px;
                 height: 42px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
-                color: #333;
+                color: #fff;
                 font-size: 18px;
                 transition: all 0.3s;
             }
             .close-notification:hover {
                 background: #e07b39;
                 border-color: #e07b39;
-                color: #fff;
-                transform: rotate(90deg);
+                transform: rotate(90deg) scale(1.1);
             }
             @keyframes popupShow {
                 from {
