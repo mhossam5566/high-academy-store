@@ -293,40 +293,30 @@ body{
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
-                backdrop-filter: blur(8px); /* Blurred backdrop */
+                background: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(8px);
                 z-index: 10001;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 padding: 20px;
-                pointer-events: auto;
             }
             .notification-character-container {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                position: relative;
                 width: 100%;
-                max-width: 800px;
-            }
-            .character-svg {
-                width: 250px;
-                height: auto;
-                filter: drop-shadow(0 20px 35px rgba(0,0,0,0.4));
-                margin-bottom: -100px; /* Overlap with sign pole */
-                z-index: 10;
+                max-width: 650px;
                 position: relative;
             }
             .notification-sign {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                position: relative;
-                z-index: 5;
-                animation: floatSign 4s ease-in-out infinite;
                 width: 100%;
+                animation: floatSign 4s ease-in-out infinite;
+                z-index: 5;
             }
             .sign-board-content {
                 background: #fdfaf5;
@@ -336,10 +326,9 @@ body{
                 box-shadow: 0 30px 60px rgba(0,0,0,0.3);
                 position: relative;
                 width: 100%;
-                max-width: 600px;
             }
             .sign-inner-body {
-                max-height: 400px;
+                max-height: 350px;
                 overflow-y: auto;
                 font-family: 'Cairo', sans-serif;
                 font-size: 20px;
@@ -353,16 +342,22 @@ body{
                 height: auto;
                 border-radius: 15px;
                 margin-top: 20px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             }
             .sign-pole {
                 width: 24px;
-                height: 120px;
+                height: 100px;
                 background: linear-gradient(90deg, #3d241a 0%, #6d412e 50%, #3d241a 100%);
                 border: 4px solid #1a1a2e;
                 border-top: none;
-                border-radius: 0 0 12px 12px;
-                box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
+                margin-bottom: -40px; /* Overlap with sheep */
+                z-index: 4;
+            }
+            .character-svg {
+                width: 220px;
+                height: auto;
+                filter: drop-shadow(0 20px 35px rgba(0,0,0,0.4));
+                z-index: 10;
+                position: relative;
             }
             .close-notification-new {
                 position: absolute;
@@ -381,7 +376,6 @@ body{
                 font-size: 22px;
                 transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 z-index: 12;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             }
             .close-notification-new:hover {
                 transform: scale(1.1) rotate(90deg);
@@ -398,20 +392,17 @@ body{
                 transform-origin: 210px 160px;
             }
             @keyframes floatSign {
-                0%, 100% { transform: translateY(0) rotate(-0.3deg); }
-                50% { transform: translateY(-15px) rotate(0.3deg); }
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-15px); }
             }
 
             /* Mobile Adjustments */
             @media (max-width: 768px) {
                 .character-svg {
-                    width: 180px;
-                    margin-bottom: -70px;
+                    width: 160px;
                 }
                 .sign-board-content {
-                    min-width: unset;
                     padding: 25px;
-                    border-width: 4px;
                 }
                 .sign-inner-body {
                     font-size: 16px;
@@ -420,13 +411,12 @@ body{
                     width: 40px;
                     height: 40px;
                     font-size: 16px;
-                    top: -18px;
-                    right: -18px;
-                    border-width: 3px;
+                    top: -15px;
+                    right: -15px;
                 }
                 .sign-pole {
-                    height: 80px;
-                    width: 18px;
+                    height: 60px;
+                    margin-bottom: -30px;
                 }
             }
         </style>
