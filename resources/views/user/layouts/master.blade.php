@@ -452,21 +452,6 @@ body{
             });
         </script>
     @endif
-        </style>
-
-        <script>
-            function closeSiteNotification() {
-                document.getElementById('site-notification').classList.add('d-none');
-                sessionStorage.setItem('site_notification_closed', 'true');
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                if (!sessionStorage.getItem('site_notification_closed')) {
-                    document.getElementById('site-notification').classList.remove('d-none');
-                }
-            });
-        </script>
-    @endif
     <style>
     	.whatsapp-float {
     		z-index: 100;
