@@ -213,67 +213,70 @@ body{
             <div class="notification-character-container">
                 <!-- Detailed Cartoon Child -->
                 <div class="character-svg">
-                    <svg viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg">
                         <!-- Backpack (Back) -->
-                        <rect x="90" y="160" width="60" height="70" rx="15" fill="#1a1a2e" />
+                        <rect x="130" y="160" width="65" height="75" rx="15" fill="#1a1a2e" />
                         
                         <!-- Legs (Wider Stance) -->
-                        <rect x="95" y="230" width="16" height="40" fill="#2c3e50" />
-                        <rect x="129" y="230" width="16" height="40" fill="#2c3e50" />
+                        <rect x="135" y="235" width="18" height="40" fill="#2c3e50" />
+                        <rect x="172" y="235" width="18" height="40" fill="#2c3e50" />
                         
                         <!-- Shoes -->
-                        <path d="M95 270 h-15 q-5 0 -5 -5 v-5 h20 Z" fill="#1a1a2e" />
-                        <path d="M129 270 h18 q5 0 5 -5 v-5 h-23 Z" fill="#1a1a2e" />
+                        <path d="M135 275 h-15 q-5 0 -5 -5 v-5 h20 Z" fill="#1a1a2e" />
+                        <path d="M172 275 h18 q5 0 5 -5 v-5 h-23 Z" fill="#1a1a2e" />
                         
                         <!-- Body/Shirt -->
-                        <rect x="90" y="155" width="60" height="85" rx="15" fill="#e07b39" />
-                        <!-- Shirt Collar -->
-                        <path d="M90 165 L120 178 L150 165 L150 155 L90 155 Z" fill="#c06a30" />
+                        <rect x="125" y="155" width="75" height="90" rx="18" fill="#e07b39" />
+                        <!-- Shirt Details -->
+                        <path d="M125 165 L162.5 180 L200 165 L200 155 L125 155 Z" fill="#c06a30" />
+                        <circle cx="162.5" cy="200" r="3" fill="#fff" opacity="0.5" />
+                        <circle cx="162.5" cy="215" r="3" fill="#fff" opacity="0.5" />
                         
                         <!-- Backpack Straps -->
-                        <rect x="98" y="165" width="10" height="65" rx="5" fill="#1a1a2e" opacity="0.8" />
-                        <rect x="132" y="165" width="10" height="65" rx="5" fill="#1a1a2e" opacity="0.8" />
+                        <rect x="135" y="165" width="12" height="70" rx="6" fill="#1a1a2e" opacity="0.8" />
+                        <rect x="178" y="165" width="12" height="70" rx="6" fill="#1a1a2e" opacity="0.8" />
 
                         <!-- Waving Arm (Right) -->
                         <g class="arm-waving">
-                            <!-- Shoulder connection -->
-                            <circle cx="150" cy="175" r="8" fill="#FFDBAC" />
-                            <path d="M150 175 Q190 175 210 120" stroke="#FFDBAC" stroke-width="16" fill="none" stroke-linecap="round" />
+                            <circle cx="200" cy="180" r="10" fill="#FFDBAC" />
+                            <path d="M200 180 Q250 180 270 120" stroke="#FFDBAC" stroke-width="18" fill="none" stroke-linecap="round" />
                             <!-- Hand -->
-                            <circle cx="210" cy="120" r="14" fill="#FFDBAC" />
-                            <!-- Fingers -->
-                            <circle cx="200" cy="105" r="5" fill="#FFDBAC" />
-                            <circle cx="210" cy="100" r="5" fill="#FFDBAC" />
-                            <circle cx="220" cy="105" r="5" fill="#FFDBAC" />
+                            <circle cx="270" cy="120" r="16" fill="#FFDBAC" />
+                            <circle cx="260" cy="100" r="6" fill="#FFDBAC" />
+                            <circle cx="270" cy="95" r="6" fill="#FFDBAC" />
+                            <circle cx="280" cy="100" r="6" fill="#FFDBAC" />
                         </g>
 
                         <!-- Holding Arm & Integrated Hand (Left) -->
                         <g class="arm-holding">
-                            <!-- Shoulder connection -->
-                            <circle cx="90" cy="175" r="8" fill="#FFDBAC" />
-                            <path d="M90 175 Q40 175 15 195" stroke="#FFDBAC" stroke-width="16" fill="none" stroke-linecap="round" />
-                            <!-- Hand Grabbing (Overlap the board) -->
-                            <rect x="0" y="180" width="35" height="45" rx="12" fill="#FFDBAC" stroke="#1a1a2e" stroke-width="3" />
-                            <path d="M35 185 v35" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round" />
+                            <circle cx="125" cy="180" r="10" fill="#FFDBAC" />
+                            <path d="M125 180 Q60 180 40 200" stroke="#FFDBAC" stroke-width="18" fill="none" stroke-linecap="round" />
+                            <!-- Hand Grabbing fingers -->
+                            <g transform="translate(10, 185)">
+                                <rect x="0" y="0" width="40" height="50" rx="15" fill="#FFDBAC" stroke="#1a1a2e" stroke-width="3" />
+                                <path d="M40 10 v30" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round" />
+                                <path d="M30 10 v30" stroke="#1a1a2e" stroke-width="2" opacity="0.3" />
+                                <path d="M20 10 v30" stroke="#1a1a2e" stroke-width="2" opacity="0.3" />
+                            </g>
                         </g>
 
                         <!-- Head -->
-                        <circle cx="120" cy="110" r="50" fill="#FFDBAC" />
+                        <circle cx="162.5" cy="110" r="55" fill="#FFDBAC" />
                         <!-- Ears -->
-                        <circle cx="70" cy="110" r="10" fill="#FFDBAC" />
-                        <circle cx="170" cy="110" r="10" fill="#FFDBAC" />
+                        <circle cx="107.5" cy="110" r="12" fill="#FFDBAC" />
+                        <circle cx="217.5" cy="110" r="12" fill="#FFDBAC" />
                         
                         <!-- Hair -->
-                        <path d="M70 110 Q70 55 120 50 Q170 55 170 110 L170 100 Q170 65 120 60 Q70 65 70 100 Z" fill="#4B2C20" />
+                        <path d="M107.5 110 Q107.5 50 162.5 45 Q217.5 50 217.5 110 L217.5 100 Q217.5 60 162.5 55 Q107.5 60 107.5 100 Z" fill="#4B2C20" />
                         
                         <!-- Face -->
-                        <circle cx="95" cy="125" r="8" fill="#ffb6c1" opacity="0.5" />
-                        <circle cx="145" cy="125" r="8" fill="#ffb6c1" opacity="0.5" />
-                        <circle cx="105" cy="105" r="6" fill="white" />
-                        <circle cx="106" cy="105" r="3" fill="#333" />
-                        <circle cx="135" cy="105" r="6" fill="white" />
-                        <circle cx="136" cy="105" r="3" fill="#333" />
-                        <path d="M105 135 Q120 150 135 135" stroke="#333" stroke-width="4" fill="none" stroke-linecap="round" />
+                        <circle cx="135" cy="125" r="9" fill="#ffb6c1" opacity="0.5" />
+                        <circle cx="190" cy="125" r="9" fill="#ffb6c1" opacity="0.5" />
+                        <circle cx="145" cy="105" r="7" fill="white" />
+                        <circle cx="146" cy="105" r="3.5" fill="#333" />
+                        <circle cx="180" cy="105" r="7" fill="white" />
+                        <circle cx="181" cy="105" r="3.5" fill="#333" />
+                        <path d="M145 140 Q162.5 155 180 140" stroke="#333" stroke-width="4" fill="none" stroke-linecap="round" />
                     </svg>
                 </div>
 
@@ -288,9 +291,7 @@ body{
                         </div>
                     </div>
                     <!-- Pole -->
-                    <div class="sign-pole-container">
-                        <div class="sign-pole"></div>
-                    </div>
+                    <div class="sign-pole"></div>
                 </div>
             </div>
         </div>
@@ -303,7 +304,7 @@ body{
                 z-index: 10001;
                 pointer-events: none;
                 width: auto;
-                max-width: 95vw;
+                max-width: 98vw;
             }
             .notification-character-container {
                 display: flex;
@@ -313,13 +314,13 @@ body{
                 position: relative;
             }
             .character-svg {
-                width: 280px; /* Bigger boy */
+                width: 320px;
                 height: auto;
-                filter: drop-shadow(0 15px 30px rgba(0,0,0,0.35));
-                margin-left: -90px; /* Deeper overlap for the integrated hand */
+                filter: drop-shadow(0 20px 35px rgba(0,0,0,0.4));
+                margin-left: -110px;
                 order: 2;
                 z-index: 10;
-                transform: translateX(20px);
+                transform: translateX(30px);
             }
             .notification-sign {
                 order: 1;
@@ -332,111 +333,126 @@ body{
                 animation: floatSign 4s ease-in-out infinite;
             }
             .sign-board-content {
-                background: #fdfaf5; /* Warm parchment color */
+                background: #fdfaf5;
                 border: 6px solid #1a1a2e;
-                border-radius: 25px;
-                padding: 35px;
-                box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+                border-radius: 30px;
+                padding: 40px;
+                box-shadow: 0 30px 60px rgba(0,0,0,0.3);
                 position: relative;
-                min-width: 380px;
-                max-width: 580px;
+                min-width: 400px;
+                max-width: 600px;
             }
             .sign-inner-body {
-                max-height: 380px;
+                max-height: 400px;
                 overflow-y: auto;
                 font-family: 'Cairo', sans-serif;
-                font-size: 19px;
+                font-size: 20px;
                 color: #1a1a2e;
-                line-height: 1.6;
+                line-height: 1.7;
                 text-align: center;
-                font-weight: 600;
+                font-weight: 700;
             }
             .sign-inner-body img {
                 max-width: 100%;
                 height: auto;
-                border-radius: 12px;
-                margin-top: 15px;
-                border: 3px solid rgba(0,0,0,0.05);
+                border-radius: 15px;
+                margin-top: 20px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             }
             .sign-pole {
-                width: 22px;
-                height: 90px;
-                background: linear-gradient(90deg, #4B2C20 0%, #7d4d3a 50%, #4B2C20 100%);
+                width: 24px;
+                height: 100px;
+                background: linear-gradient(90deg, #3d241a 0%, #6d412e 50%, #3d241a 100%);
                 border: 4px solid #1a1a2e;
                 border-top: none;
-                border-radius: 0 0 10px 10px;
+                border-radius: 0 0 12px 12px;
+                box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
             }
             .close-notification-new {
                 position: absolute;
-                top: -22px;
-                left: -22px;
+                top: -25px;
+                left: -25px;
                 background: #e07b39;
                 color: white;
-                border: 4px solid #1a1a2e;
+                border: 5px solid #1a1a2e;
                 border-radius: 50%;
-                width: 45px;
-                height: 45px;
+                width: 50px;
+                height: 50px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
-                font-size: 20px;
+                font-size: 22px;
                 transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 z-index: 12;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             }
             .close-notification-new:hover {
-                transform: scale(1.15) rotate(90deg);
+                transform: scale(1.1) rotate(90deg);
                 background: #1a1a2e;
-                box-shadow: 0 5px 15px rgba(224, 123, 57, 0.4);
             }
 
             /* Animations */
             @keyframes armWaving {
-                0%, 100% { transform: rotate(-8deg); }
-                50% { transform: rotate(12deg); }
+                0%, 100% { transform: rotate(-5deg); }
+                50% { transform: rotate(10deg); }
             }
             .arm-waving {
-                animation: armWaving 1.5s ease-in-out infinite;
-                transform-origin: 150px 175px;
+                animation: armWaving 1.8s ease-in-out infinite;
+                transform-origin: 162.5px 180px;
             }
             @keyframes floatSign {
-                0%, 100% { transform: translateY(0) rotate(-0.5deg); }
-                50% { transform: translateY(-12px) rotate(0.5deg); }
+                0%, 100% { transform: translateY(0) rotate(-0.3deg); }
+                50% { transform: translateY(-15px) rotate(0.3deg); }
             }
 
             /* Mobile Adjustments */
             @media (max-width: 768px) {
                 .site-notification-wrapper {
-                    bottom: 10px;
-                    right: 10px;
+                    bottom: 15px;
+                    right: 15px;
                 }
                 .character-svg {
-                    width: 180px;
-                    margin-left: -60px;
-                    transform: translateX(10px);
+                    width: 200px;
+                    margin-left: -70px;
+                    transform: translateX(15px);
                 }
                 .sign-board-content {
                     min-width: 280px;
-                    padding: 20px;
+                    padding: 25px;
                     border-width: 4px;
                 }
                 .sign-inner-body {
                     font-size: 16px;
                 }
                 .close-notification-new {
-                    width: 38px;
-                    height: 38px;
+                    width: 40px;
+                    height: 40px;
                     font-size: 16px;
-                    top: -15px;
-                    left: -15px;
+                    top: -18px;
+                    left: -18px;
                     border-width: 3px;
                 }
                 .sign-pole {
-                    height: 50px;
-                    width: 16px;
-                    border-width: 3px;
+                    height: 60px;
+                    width: 18px;
                 }
             }
+        </style>
+
+        <script>
+            function closeSiteNotification() {
+                document.getElementById('site-notification').classList.add('d-none');
+                sessionStorage.setItem('site_notification_closed', 'true');
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                if (!sessionStorage.getItem('site_notification_closed')) {
+                    document.getElementById('site-notification').classList.remove('d-none');
+                }
+            });
+        </script>
+    @endif
         </style>
 
         <script>
