@@ -289,38 +289,44 @@ body{
         <style>
             .site-notification-wrapper {
                 position: fixed;
-                bottom: 30px;
-                right: 30px;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+                backdrop-filter: blur(8px); /* Blurred backdrop */
                 z-index: 10001;
-                pointer-events: none;
-                width: auto;
-                max-width: 98vw;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+                pointer-events: auto;
             }
             .notification-character-container {
                 display: flex;
-                align-items: flex-end;
-                justify-content: flex-end;
-                pointer-events: auto;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
                 position: relative;
+                width: 100%;
+                max-width: 800px;
             }
             .character-svg {
-                width: 320px;
+                width: 250px;
                 height: auto;
-                filter: drop-shadow(0 20px 35px rgba(0,0,0,0.3));
-                margin-left: -110px;
-                order: 2;
+                filter: drop-shadow(0 20px 35px rgba(0,0,0,0.4));
+                margin-bottom: -100px; /* Overlap with sign pole */
                 z-index: 10;
-                transform: translateX(30px);
+                position: relative;
             }
             .notification-sign {
-                order: 1;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                margin-bottom: 50px;
                 position: relative;
                 z-index: 5;
                 animation: floatSign 4s ease-in-out infinite;
+                width: 100%;
             }
             .sign-board-content {
                 background: #fdfaf5;
@@ -329,7 +335,7 @@ body{
                 padding: 40px;
                 box-shadow: 0 30px 60px rgba(0,0,0,0.3);
                 position: relative;
-                min-width: 400px;
+                width: 100%;
                 max-width: 600px;
             }
             .sign-inner-body {
@@ -351,7 +357,7 @@ body{
             }
             .sign-pole {
                 width: 24px;
-                height: 100px;
+                height: 120px;
                 background: linear-gradient(90deg, #3d241a 0%, #6d412e 50%, #3d241a 100%);
                 border: 4px solid #1a1a2e;
                 border-top: none;
@@ -361,7 +367,7 @@ body{
             .close-notification-new {
                 position: absolute;
                 top: -25px;
-                left: -25px;
+                right: -25px;
                 background: #e07b39;
                 color: white;
                 border: 5px solid #1a1a2e;
@@ -398,17 +404,12 @@ body{
 
             /* Mobile Adjustments */
             @media (max-width: 768px) {
-                .site-notification-wrapper {
-                    bottom: 15px;
-                    right: 15px;
-                }
                 .character-svg {
-                    width: 200px;
-                    margin-left: -70px;
-                    transform: translateX(15px);
+                    width: 180px;
+                    margin-bottom: -70px;
                 }
                 .sign-board-content {
-                    min-width: 280px;
+                    min-width: unset;
                     padding: 25px;
                     border-width: 4px;
                 }
@@ -420,11 +421,11 @@ body{
                     height: 40px;
                     font-size: 16px;
                     top: -18px;
-                    left: -18px;
+                    right: -18px;
                     border-width: 3px;
                 }
                 .sign-pole {
-                    height: 60px;
+                    height: 80px;
                     width: 18px;
                 }
             }
