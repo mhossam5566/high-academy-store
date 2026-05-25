@@ -209,151 +209,175 @@ body{
 
 <body class="no-scroll" style="font-family: --font-family-sans-serif !important;">
     @if($siteNotification)
-        <div id="site-notification" class="site-notification d-none">
-            <div class="notification-container">
-                <div class="notification-header">
-                    <div class="nav-logo">
-                        <span class="logo-high">High</span>
-                        <span class="logo-academy">Academy</span>
-                    </div>
-                    <button type="button" class="close-notification" onclick="closeSiteNotification()">
-                        <i class="fas fa-times"></i>
-                    </button>
+        <div id="site-notification" class="site-notification-wrapper d-none">
+            <div class="notification-character-container">
+                <!-- Cartoon Child -->
+                <div class="character-svg">
+                    <svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Legs -->
+                        <rect x="80" y="210" width="15" height="30" fill="#1a1a2e" />
+                        <rect x="105" y="210" width="15" height="30" fill="#1a1a2e" />
+                        <!-- Shoes -->
+                        <path d="M80 240 h-10 q-5 0 -5 -5 v-5 h20 Z" fill="#333" />
+                        <path d="M105 240 h15 q5 0 5 -5 v-5 h-20 Z" fill="#333" />
+                        <!-- Body/Shirt -->
+                        <rect x="75" y="150" width="50" height="70" rx="10" fill="#e07b39" />
+                        <!-- Waving Arm (Right) -->
+                        <g class="arm-waving">
+                            <rect x="125" y="160" width="12" height="50" rx="6" fill="#FFDBAC" transform="rotate(-40 125 160)" />
+                            <circle cx="160" cy="135" r="10" fill="#FFDBAC" />
+                        </g>
+                        <!-- Holding Arm (Left) -->
+                        <g class="arm-holding">
+                            <rect x="40" y="160" width="12" height="60" rx="6" fill="#FFDBAC" transform="rotate(40 65 160)" />
+                        </g>
+                        <!-- Head -->
+                        <circle cx="100" cy="115" r="40" fill="#FFDBAC" />
+                        <!-- Hair -->
+                        <path d="M60 115 Q60 65 100 65 Q140 65 140 115 L140 105 Q140 75 100 75 Q60 75 60 105 Z" fill="#4B2C20" />
+                        <!-- Eyes -->
+                        <circle cx="88" cy="110" r="4" fill="#333" />
+                        <circle cx="112" cy="110" r="4" fill="#333" />
+                        <!-- Smile -->
+                        <path d="M88 135 Q100 148 112 135" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round" />
+                    </svg>
                 </div>
-                <div class="notification-body">
-                    {!! $siteNotification->content !!}
+
+                <!-- Sign Board (The Banner) -->
+                <div class="notification-sign">
+                    <div class="sign-pole"></div>
+                    <div class="sign-board-content">
+                        <button type="button" class="close-notification-new" onclick="closeSiteNotification()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="sign-inner-body">
+                            {!! $siteNotification->content !!}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <style>
-            .site-notification {
+            .site-notification-wrapper {
                 position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.6);
+                bottom: 20px;
+                right: 20px;
                 z-index: 10001;
+                pointer-events: none; /* Allow clicking through background */
+                width: auto;
+                max-width: 90vw;
+            }
+            .notification-character-container {
                 display: flex;
-                justify-content: center;
-                align-items: center; /* Center vertically */
+                align-items: flex-end;
+                justify-content: flex-end;
+                pointer-events: auto; /* Enable clicks on character and sign */
+                position: relative;
+            }
+            .character-svg {
+                width: 150px;
+                height: auto;
+                filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+                margin-left: -40px;
+                order: 2;
+                z-index: 2;
+            }
+            .notification-sign {
+                order: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 60px;
+                position: relative;
+                z-index: 1;
+                animation: floatSign 3s ease-in-out infinite;
+            }
+            .sign-board-content {
+                background: #ffffff;
+                border: 4px solid #1a1a2e;
+                border-radius: 15px;
                 padding: 20px;
-                font-family: 'Cairo', sans-serif;
-                backdrop-filter: blur(5px);
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                position: relative;
+                min-width: 250px;
+                max-width: 400px;
             }
-            .notification-container {
-                width: 100%;
-                max-width: 1000px; /* Increased from 600px for PC */
-                background: #ffffff; 
-                border-radius: 20px;
-                box-shadow: 0 25px 80px rgba(0,0,0,0.4);
-                overflow: hidden;
-                border: 1px solid rgba(0, 0, 0, 0.1);
-                border-top: 6px solid #e07b39; /* Site Orange Accent */
-                animation: popupShow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            }
-            .notification-header {
-                padding: 20px 30px;
-                background: #1a1a2e; /* Site Navy Background */
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 2px solid rgba(224, 123, 57, 0.3);
-            }
-            .notification-header .nav-logo {
-                display: inline-flex;
-                align-items: center;
-                text-decoration: none;
-                direction: ltr;
-            }
-            .notification-header .logo-high {
-                font-size: 16px;
-                font-weight: 800;
-                text-transform: uppercase;
-                background: #fff;
-                color: #1a1a2e;
-                padding: 4px 10px;
-                border-radius: 6px 0 0 6px;
-            }
-            .notification-header .logo-academy {
-                font-size: 16px;
-                font-weight: 800;
-                text-transform: uppercase;
-                background: #e07b39; /* Site Orange */
-                color: #fff;
-                padding: 4px 10px;
-                border-radius: 0 6px 6px 0;
-            }
-            .notification-body {
-                padding: 40px 50px;
-                color: #1a1a2e; /* Navy text for better consistency */
-                text-align: center;
-                max-height: 80vh;
+            .sign-inner-body {
+                max-height: 250px;
                 overflow-y: auto;
-                font-size: 18px;
+                font-family: 'Cairo', sans-serif;
+                font-size: 15px;
+                color: #1a1a2e;
+                line-height: 1.5;
+                text-align: center;
             }
-            .notification-body img {
+            .sign-inner-body img {
                 max-width: 100%;
                 height: auto;
-                border-radius: 15px;
-                margin: 20px 0;
-                box-shadow: 0 8px 30px rgba(224, 123, 57, 0.15); /* Orange-tinted shadow */
-                border: 1px solid rgba(224, 123, 57, 0.1);
+                border-radius: 8px;
+                margin-top: 10px;
             }
-            .close-notification {
-                background: rgba(255, 255, 255, 0.1);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                border-radius: 12px;
-                width: 42px;
-                height: 42px;
+            .sign-pole {
+                width: 12px;
+                height: 40px;
+                background: #4B2C20;
+                margin-top: -4px;
+                border-radius: 0 0 5px 5px;
+            }
+            .close-notification-new {
+                position: absolute;
+                top: -15px;
+                left: -15px;
+                background: #e07b39;
+                color: white;
+                border: 2px solid #1a1a2e;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
-                color: #fff;
-                font-size: 18px;
+                font-size: 14px;
                 transition: all 0.3s;
+                z-index: 3;
             }
-            .close-notification:hover {
-                background: #e07b39;
-                border-color: #e07b39;
-                transform: rotate(90deg) scale(1.1);
+            .close-notification-new:hover {
+                transform: scale(1.1) rotate(90deg);
+                background: #1a1a2e;
             }
-            @keyframes popupShow {
-                from {
-                    transform: scale(0.8);
-                    opacity: 0;
-                }
-                to {
-                    transform: scale(1);
-                    opacity: 1;
-                }
+
+            /* Animations */
+            @keyframes armWaving {
+                0%, 100% { transform: rotate(-40deg); }
+                50% { transform: rotate(-10deg); }
             }
-            @media (max-width: 992px) { /* Tablet adjustments */
-                .notification-container {
-                    max-width: 85%;
-                }
-                .notification-body {
-                    padding: 30px 40px;
-                }
+            .arm-waving {
+                animation: armWaving 1.5s ease-in-out infinite;
+                transform-origin: 125px 160px;
             }
-            @media (max-width: 768px) { /* Mobile adjustments */
-                .notification-container {
-                    width: 95%;
-                    border-radius: 15px;
+            @keyframes floatSign {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+
+            /* Mobile Adjustments */
+            @media (max-width: 768px) {
+                .site-notification-wrapper {
+                    bottom: 10px;
+                    right: 10px;
                 }
-                .notification-body {
-                    padding: 20px;
-                    font-size: 16px;
+                .character-svg {
+                    width: 100px;
+                    margin-left: -25px;
                 }
-                .notification-header {
-                    padding: 15px 20px;
+                .sign-board-content {
+                    min-width: 200px;
+                    padding: 15px;
                 }
-                .close-notification {
-                    width: 36px;
-                    height: 36px;
-                    font-size: 16px;
+                .notification-sign {
+                    margin-bottom: 40px;
                 }
             }
         </style>
