@@ -276,10 +276,10 @@ body{
                 position: relative;
             }
             .character-svg {
-                width: 150px;
+                width: 220px;
                 height: auto;
                 filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
-                margin-left: -40px;
+                margin-left: -60px;
                 order: 2;
                 z-index: 2;
             }
@@ -288,7 +288,7 @@ body{
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                margin-bottom: 60px;
+                margin-bottom: 90px;
                 position: relative;
                 z-index: 1;
                 animation: floatSign 3s ease-in-out infinite;
@@ -296,20 +296,20 @@ body{
             .sign-board-content {
                 background: #ffffff;
                 border: 4px solid #1a1a2e;
-                border-radius: 15px;
-                padding: 20px;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                border-radius: 20px;
+                padding: 25px;
+                box-shadow: 0 20px 45px rgba(0,0,0,0.25);
                 position: relative;
-                min-width: 250px;
-                max-width: 400px;
+                min-width: 320px;
+                max-width: 500px;
             }
             .sign-inner-body {
-                max-height: 250px;
+                max-height: 300px;
                 overflow-y: auto;
                 font-family: 'Cairo', sans-serif;
-                font-size: 15px;
+                font-size: 17px;
                 color: #1a1a2e;
-                line-height: 1.5;
+                line-height: 1.6;
                 text-align: center;
             }
             .sign-inner-body img {
@@ -369,15 +369,15 @@ body{
                     right: 10px;
                 }
                 .character-svg {
-                    width: 100px;
-                    margin-left: -25px;
+                    width: 140px;
+                    margin-left: -35px;
                 }
                 .sign-board-content {
-                    min-width: 200px;
-                    padding: 15px;
+                    min-width: 240px;
+                    padding: 18px;
                 }
                 .notification-sign {
-                    margin-bottom: 40px;
+                    margin-bottom: 55px;
                 }
             }
         </style>
