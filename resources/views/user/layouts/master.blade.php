@@ -221,67 +221,6 @@ body{
                             {!! $siteNotification->content !!}
                         </div>
                     </div>
-                    <!-- Pole -->
-                    <div class="sign-pole"></div>
-
-                    <!-- Cute Eid Sheep SVG -->
-                    <div class="character-svg sheep-svg">
-                        <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Fluffy Body (Cloud shape) -->
-                            <g fill="#ffffff" stroke="#e0e0e0" stroke-width="2">
-                                <circle cx="160" cy="180" r="50" />
-                                <circle cx="120" cy="170" r="45" />
-                                <circle cx="200" cy="170" r="45" />
-                                <circle cx="140" cy="140" r="40" />
-                                <circle cx="180" cy="140" r="40" />
-                                <circle cx="160" cy="210" r="40" />
-                            </g>
-                            
-                            <!-- Legs (Black/Dark Gray) -->
-                            <rect x="135" y="220" width="12" height="40" rx="6" fill="#333333" />
-                            <rect x="175" y="220" width="12" height="40" rx="6" fill="#333333" />
-                            
-                            <!-- Hooves -->
-                            <path d="M135 260 h12 v5 a3 3 0 0 1 -3 3 h-6 a3 3 0 0 1 -3 -3 z" fill="#1a1a1a" />
-                            <path d="M175 260 h12 v5 a3 3 0 0 1 -3 3 h-6 a3 3 0 0 1 -3 -3 z" fill="#1a1a1a" />
-
-                            <!-- Waving Leg (Right) -->
-                            <g class="sheep-leg-waving">
-                                <rect x="210" y="160" width="12" height="50" rx="6" fill="#333333" transform="rotate(-30 210 160)" />
-                                <path d="M245 140 h12 v8 a3 3 0 0 1 -3 3 h-6 a3 3 0 0 1 -3 -3 z" fill="#1a1a1a" transform="rotate(-30 210 160)" />
-                            </g>
-
-                            <!-- Holding Leg (Left) -->
-                            <g class="sheep-leg-holding">
-                                <rect x="100" y="160" width="12" height="60" rx="6" fill="#333333" transform="rotate(60 110 160)" />
-                                <!-- Hoof Grabbing fingers effect -->
-                                <g transform="translate(140, 150)">
-                                    <rect x="0" y="0" width="40" height="45" rx="12" fill="#333333" stroke="#1a1a2e" stroke-width="2" />
-                                    <path d="M35 10 v25" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" />
-                                </g>
-                            </g>
-
-                            <!-- Sheep Head -->
-                            <g transform="translate(160, 110)">
-                                <!-- Head shape -->
-                                <ellipse cx="0" cy="0" rx="35" ry="40" fill="#444444" />
-                                <!-- Ears -->
-                                <path d="M-35 -10 Q-50 -30 -40 -40 Q-30 -50 -25 -15" fill="#444444" />
-                                <path d="M35 -10 Q50 -30 40 -40 Q30 -50 25 -15" fill="#444444" />
-                                <!-- Fluffy Hair on top -->
-                                <circle cx="-10" cy="-35" r="12" fill="#ffffff" />
-                                <circle cx="10" cy="-35" r="12" fill="#ffffff" />
-                                <circle cx="0" cy="-42" r="10" fill="#ffffff" />
-                                <!-- Eyes -->
-                                <circle cx="-12" cy="-5" r="5" fill="white" />
-                                <circle cx="-11" cy="-5" r="2" fill="black" />
-                                <circle cx="12" cy="-5" r="5" fill="white" />
-                                <circle cx="13" cy="-5" r="2" fill="black" />
-                                <!-- Nose/Mouth -->
-                                <path d="M-5 15 Q0 22 5 15" stroke="#ff9999" stroke-width="2" fill="none" stroke-linecap="round" />
-                            </g>
-                        </svg>
-                    </div>
                 </div>
             </div>
         </div>
@@ -343,22 +282,6 @@ body{
                 border-radius: 15px;
                 margin-top: 20px;
             }
-            .sign-pole {
-                width: 24px;
-                height: 100px;
-                background: linear-gradient(90deg, #3d241a 0%, #6d412e 50%, #3d241a 100%);
-                border: 4px solid #1a1a2e;
-                border-top: none;
-                margin-bottom: -40px; /* Overlap with sheep */
-                z-index: 4;
-            }
-            .character-svg {
-                width: 220px;
-                height: auto;
-                filter: drop-shadow(0 20px 35px rgba(0,0,0,0.4));
-                z-index: 10;
-                position: relative;
-            }
             .close-notification-new {
                 position: absolute;
                 top: -25px;
@@ -383,14 +306,6 @@ body{
             }
 
             /* Animations */
-            @keyframes sheepWaving {
-                0%, 100% { transform: rotate(-30deg); }
-                50% { transform: rotate(0deg); }
-            }
-            .sheep-leg-waving {
-                animation: sheepWaving 1.5s ease-in-out infinite;
-                transform-origin: 210px 160px;
-            }
             @keyframes floatSign {
                 0%, 100% { transform: translateY(0); }
                 50% { transform: translateY(-15px); }
@@ -398,9 +313,6 @@ body{
 
             /* Mobile Adjustments */
             @media (max-width: 768px) {
-                .character-svg {
-                    width: 160px;
-                }
                 .sign-board-content {
                     padding: 25px;
                 }
@@ -413,10 +325,6 @@ body{
                     font-size: 16px;
                     top: -15px;
                     right: -15px;
-                }
-                .sign-pole {
-                    height: 60px;
-                    margin-bottom: -30px;
                 }
             }
         </style>
