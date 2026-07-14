@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\VoucherOrderController;
 use App\Http\Controllers\Admin\MainCategoriesController;
 use App\Http\Controllers\Admin\ShippingMethodController;
 use App\Http\Controllers\Admin\SiteNotificationController;
+use App\Http\Controllers\Admin\SettingController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 /*
@@ -252,4 +253,8 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::put('cities/{city}', [CityController::class, 'update'])->name('cities.update');
     Route::delete('cities/{city}', [CityController::class, 'destroy'])->name('cities.destroy');
     Route::post('/cities/import-json', [CityController::class, 'importFromJson'])->name('cities.import-json');
+
+    // Settings Management
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings');
+    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 });

@@ -361,6 +361,14 @@
                     "slug": "dashboard.site_notifications.create"
                 }
             ]
+        },
+        {
+            "name": "إعدادات الموقع",
+            "icon": "menu-icon tf-icons ti ti-settings",
+            "slug": [
+                "dashboard.settings"
+            ],
+            "url": "/dashboard/settings"
         }
     ]
 }

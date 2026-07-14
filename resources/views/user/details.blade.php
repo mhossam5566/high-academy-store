@@ -651,7 +651,7 @@ $brands = $product->brands->title ?? 'غير محدد';
                             <!-- WhatsApp Follow -->
                             @if ($product->state == 3)
                                 <div class="detail-whatsapp-follow">
-                                    <a href="https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23"
+                                    <a href="{{ \App\Models\Setting::get('whatsapp_channel', 'https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23') }}"
                                         class="detail-whatsapp-btn" target="_blank" rel="noopener noreferrer">
                                         <i class="fab fa-whatsapp fa-lg"></i>
                                         <span>تابعنا على واتساب للحصول على التحديثات</span>

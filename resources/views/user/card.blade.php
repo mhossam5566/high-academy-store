@@ -1290,7 +1290,7 @@
         <div class="contact-strip" style="margin-top:20px;">
             <p>لو قابلتك أي مشكلة تواصل معنا</p>
             <div class="contact-btns">
-                <a href="https://wa.me/+201550234324" target="_blank" class="btn-contact btn-wa">📲 واتساب</a>
+                <a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '201550234324') }}" target="_blank" class="btn-contact btn-wa">📲 واتساب</a>
                 <a href="https://www.facebook.com/highacademy2?mibextid=ZbWKwL" target="_blank"
                     class="btn-contact btn-fb">📘 فيس بوك</a>
             </div>

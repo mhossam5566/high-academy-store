@@ -72,7 +72,7 @@
             {{-- WhatsApp Follow Button --}}
             @if ($item->state == 3)
                 <div class="whatsapp-follow">
-                    <a href="https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23" class="whatsapp-btn"
+                    <a href="{{ \App\Models\Setting::get('whatsapp_channel', 'https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23') }}" class="whatsapp-btn"
                         target="_blank" rel="noopener noreferrer">
                         <i class="fab fa-whatsapp"></i> تابعنا على واتساب
                     </a>

@@ -1,12 +1,7 @@
-<style>
-    .email {
-        border-radius: 0px 9px 0px 0px !important;
-    }
-
-    .email-btn {
-        border-radius: 0px 0px 0px 9px !important;
-    }
-</style>
+@php
+    $whatsappNumber = \App\Models\Setting::get('whatsapp_number', '201550234324');
+    $whatsappDisplay = (str_starts_with($whatsappNumber, '20') && strlen($whatsappNumber) === 12) ? '0' . substr($whatsappNumber, 2) : $whatsappNumber;
+@endphp
 
 <footer class="container-fluid bg-dark text-secondary mt-5 pt-5" style="direction: rtl; text-align: right;">
     <section class="row px-xl-5 pt-2">
@@ -17,7 +12,7 @@
 
                 <a class="btn btn-primary btn-square mr-2" href="https://www.facebook.com/highacademy2?mibextid=ZbWKwL"><i
                         class="fab fa-facebook-f"></i></a>
-                <a class="btn btn-primary btn-square mr-2" href="https://wsend.co/201550234324"><i
+                <a class="btn btn-primary btn-square mr-2" href="https://wa.me/{{ $whatsappNumber }}"><i
                         class="fab fa-whatsapp"></i></a>
 
             </section>
@@ -28,7 +23,7 @@
                     المنوفية - شبين الكوم </a></p>
             <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>Highacademy12@gmail.com</p>
             <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>01060683708</p>
-            <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>01550234324</p>
+            <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>{{ $whatsappDisplay }}</p>
             <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>01095641568</p>
 
         </section>
@@ -87,7 +82,7 @@
                         <a class="btn btn-primary btn-square mr-2"
                             href="https://www.facebook.com/highacademy2?mibextid=ZbWKwL"><i
                                 class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-primary btn-square mr-2" href="https://wsend.co/201550234324"><i
+                        <a class="btn btn-primary btn-square mr-2" href="https://wa.me/{{ $whatsappNumber }}"><i
                                 class="fab fa-whatsapp"></i></a>
 
                     </section>

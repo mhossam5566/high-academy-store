@@ -706,11 +706,11 @@
                     <span style="color:#1877f2; font-size:15px;"><i class="fab fa-facebook-f"></i></span>
                     فيسبوك
                 </a>
-                <a href="https://wa.me/201550234324" target="_blank" class="sidebar-dropdown-link">
+                <a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '201550234324') }}" target="_blank" class="sidebar-dropdown-link">
                     <span style="color:#25d366; font-size:15px;"><i class="fab fa-whatsapp"></i></span>
                     واتساب
                 </a>
-                <a href="https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23" target="_blank"
+                <a href="{{ \App\Models\Setting::get('whatsapp_channel', 'https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23') }}" target="_blank"
                     class="sidebar-dropdown-link">
                     <span style="color:#25d366; font-size:15px;"><i class="fab fa-whatsapp"></i></span>
                     قناة واتساب
