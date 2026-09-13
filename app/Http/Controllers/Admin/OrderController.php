@@ -910,8 +910,9 @@ class OrderController extends Controller
             abort(403, 'غير مصرح لك بالوصول لصفحة الحجز من المكتبة');
         }
 
-        // Fetch products that are active and not deleted
+        // Fetch ONLY products that can be booked/pre-ordered (state = 2: يمكن حجزه)
         $products = Product::where('is_deleted', 0)
+            ->where('state', '2')
             ->with(['translations', 'brands', 'sliders', 'category'])
             ->orderBy('id', 'desc')
             ->get();
