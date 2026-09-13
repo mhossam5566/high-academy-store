@@ -158,11 +158,20 @@
                     </div>
                     <div class="card-body pt-4">
                         {{-- Product Search Selector --}}
+                        @if($products->isEmpty())
+                            <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+                                <i class="ti ti-alert-circle fs-4 me-2"></i>
+                                <div>
+                                    <strong>تنبيه:</strong> لا توجد كتب مفعلة للحجز المسبق حالياً في النظام (الكتب التي حالتها: <strong>يمكن حجزه</strong>).
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="row g-2 align-items-end mb-4">
                             <div class="col-md-8">
-                                <label class="form-label fw-semibold">ابحث عن الكتاب أو المدرس أو الصف لإضافته للطلب</label>
+                                <label class="form-label fw-semibold">ابحث عن كتاب متاح للحجز المسبق (اسم الكتاب / المدرس / الصف)</label>
                                 <select id="productSelector" class="form-select select2-products">
-                                    <option value="">-- اختر كتاب لإضافته --</option>
+                                    <option value="">-- اختر من الكتب المتاحة للحجز المسبق --</option>
                                     @foreach ($products as $product)
                                         @php
                                             $prodPrice = $product->final_price ?? $product->price ?? 0;
@@ -180,7 +189,7 @@
                                             {{ $product->short_name ?: $product->name }} 
                                             @if($brand) - [مدرس: {{ $brand }}] @endif
                                             @if($stage) - [{{ $stage }}] @endif
-                                            ({{ $prodPrice }} ج.م) - المخزون: {{ $stock }}
+                                            ({{ $prodPrice }} ج.م) - المتاح: {{ $stock }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -190,7 +199,7 @@
                                 <input type="number" id="quickQuantity" class="form-control text-center" value="1" min="1" max="99">
                             </div>
                             <div class="col-md-2">
-                                <button type="button" id="btnAddProduct" class="btn btn-success w-100">
+                                <button type="button" id="btnAddProduct" class="btn btn-success w-100" {{ $products->isEmpty() ? 'disabled' : '' }}>
                                     <i class="ti ti-plus me-1"></i>إضافة
                                 </button>
                             </div>
