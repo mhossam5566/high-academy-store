@@ -163,14 +163,27 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::post('/vouchers/update/{id}', [VoucherController::class, 'update'])->name('vouchers.update');
     Route::post('/vouchers/destroy', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
 
-    // Slider Section
-    Route::get('/minadmin', [MinAdminController::class, 'index'])->name('minadmin');
-    Route::get('/minadmins/create', [MinAdminController::class, 'create'])->name('create.minadmin');
-    Route::get('minadmin/datatable', [MinAdminController::class, 'datatable'])->name('minadmin.datatable');
-    Route::post('/store/minadmins', [MinAdminController::class, 'store'])->name('store.minadmin');
-    Route::get('minadmin/edit/{id}', [MinAdminController::class, 'edit'])->name('minadmin.edit');
-    Route::post('minadmin/update', [MinAdminController::class, 'update'])->name('minadmin.update');
-    Route::post('minadmin/destroy', [MinAdminController::class, 'destroy'])->name('minadmin.destroy');
+    // Roles & Permissions Management
+    Route::prefix('roles')->name('roles.')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name('index');
+        Route::get('/datatable', [RoleController::class, 'datatable'])->name('datatable');
+        Route::get('/create', [RoleController::class, 'create'])->name('create');
+        Route::post('/store', [RoleController::class, 'store'])->name('store');
+        Route::get('/edit/{role}', [RoleController::class, 'edit'])->name('edit');
+        Route::put('/update/{role}', [RoleController::class, 'update'])->name('update');
+        Route::delete('/destroy/{role}', [RoleController::class, 'destroy'])->name('destroy');
+    });
+
+    // Admins Management
+    Route::prefix('admins')->name('admins.')->group(function () {
+        Route::get('/', [AdminManagementController::class, 'index'])->name('index');
+        Route::get('/datatable', [AdminManagementController::class, 'datatable'])->name('datatable');
+        Route::get('/create', [AdminManagementController::class, 'create'])->name('create');
+        Route::post('/store', [AdminManagementController::class, 'store'])->name('store');
+        Route::get('/edit/{admin}', [AdminManagementController::class, 'edit'])->name('edit');
+        Route::put('/update/{admin}', [AdminManagementController::class, 'update'])->name('update');
+        Route::delete('/destroy/{admin}', [AdminManagementController::class, 'destroy'])->name('destroy');
+    });
 
 
     Route::get('/offers', [OfferController::class, 'index'])->name('offers');

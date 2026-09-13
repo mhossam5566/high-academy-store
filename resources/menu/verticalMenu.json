@@ -4,7 +4,56 @@
             "url": "/dashboard",
             "name": "لوحة التحكم",
             "icon": "menu-icon tf-icons ti ti-home",
-            "slug": "dashboard.index"
+            "slug": "dashboard.index",
+            "permission": "view_dashboard"
+        },
+        {
+            "name": "إدارة المديرين",
+            "icon": "menu-icon tf-icons ti ti-users",
+            "slug": [
+                "dashboard.admins.index",
+                "dashboard.admins.create",
+                "dashboard.admins.edit"
+            ],
+            "permission": "view_admins",
+            "submenu": [
+                {
+                    "url": "/dashboard/admins",
+                    "name": "قائمة المديرين",
+                    "slug": "dashboard.admins.index",
+                    "permission": "view_admins"
+                },
+                {
+                    "url": "/dashboard/admins/create",
+                    "name": "إضافة مدير جديد",
+                    "slug": "dashboard.admins.create",
+                    "permission": "create_admins"
+                }
+            ]
+        },
+        {
+            "name": "الأدوار والصلاحيات",
+            "icon": "menu-icon tf-icons ti ti-shield-lock",
+            "slug": [
+                "dashboard.roles.index",
+                "dashboard.roles.create",
+                "dashboard.roles.edit"
+            ],
+            "permission": "view_roles",
+            "submenu": [
+                {
+                    "url": "/dashboard/roles",
+                    "name": "قائمة الأدوار",
+                    "slug": "dashboard.roles.index",
+                    "permission": "view_roles"
+                },
+                {
+                    "url": "/dashboard/roles/create",
+                    "name": "إضافة دور جديد",
+                    "slug": "dashboard.roles.create",
+                    "permission": "create_roles"
+                }
+            ]
         },
         {
             "name": "المراحل التعليمية",
@@ -13,16 +62,19 @@
                 "dashboard.education_stages",
                 "dashboard.create.education_stages"
             ],
+            "permission": "view_stages",
             "submenu": [
                 {
                     "url": "/dashboard/education-stages",
                     "name": "المراحل التعليمية",
-                    "slug": "dashboard.education_stages"
+                    "slug": "dashboard.education_stages",
+                    "permission": "view_stages"
                 },
                 {
                     "url": "/dashboard/stages/create",
                     "name": "إضافة مرحلة تعليمية",
-                    "slug": "dashboard.create.education_stages"
+                    "slug": "dashboard.create.education_stages",
+                    "permission": "create_stages"
                 }
             ]
         },
@@ -33,36 +85,19 @@
                 "dashboard.slider",
                 "dashboard.create.slider"
             ],
+            "permission": "view_sliders",
             "submenu": [
                 {
                     "url": "/dashboard/sliders",
                     "name": "الصفوف الدراسية",
-                    "slug": "dashboard.slider"
+                    "slug": "dashboard.slider",
+                    "permission": "view_sliders"
                 },
                 {
                     "url": "/dashboard/sliders/create",
                     "name": "إضافة صف دراسي",
-                    "slug": "dashboard.create.slider"
-                }
-            ]
-        },
-        {
-            "name": "حسابات الأدمن الفرعي",
-            "icon": "menu-icon tf-icons ti ti-users-group",
-            "slug": [
-                "dashboard.minadmin",
-                "dashboard.create.minadmin"
-            ],
-            "submenu": [
-                {
-                    "url": "/dashboard/minadmin",
-                    "name": "الحسابات",
-                    "slug": "dashboard.minadmin"
-                },
-                {
-                    "url": "/dashboard/minadmins/create",
-                    "name": "إضافة حساب جديد",
-                    "slug": "dashboard.create.minadmin"
+                    "slug": "dashboard.create.slider",
+                    "permission": "create_sliders"
                 }
             ]
         },
@@ -70,7 +105,8 @@
             "url": "/dashboard/voucher_order",
             "name": "طلبات الكوبونات",
             "icon": "menu-icon tf-icons ti ti-ticket",
-            "slug": "dashboard.voucher_order"
+            "slug": "dashboard.voucher_order",
+            "permission": "view_voucher_orders"
         },
         {
             "name": "المواد",
@@ -79,16 +115,19 @@
                 "dashboard.category",
                 "dashboard.create.category"
             ],
+            "permission": "view_categories",
             "submenu": [
                 {
                     "url": "/dashboard/categories",
                     "name": "المواد",
-                    "slug": "dashboard.category"
+                    "slug": "dashboard.category",
+                    "permission": "view_categories"
                 },
                 {
                     "url": "/dashboard/categories/create",
                     "name": "إضافة مادة",
-                    "slug": "dashboard.create.category"
+                    "slug": "dashboard.create.category",
+                    "permission": "create_categories"
                 }
             ]
         },
@@ -99,16 +138,19 @@
                 "dashboard.coupons",
                 "dashboard.coupons.add"
             ],
+            "permission": "view_coupons",
             "submenu": [
                 {
                     "url": "/dashboard/coupons",
                     "name": "الكوبونات",
-                    "slug": "dashboard.coupons"
+                    "slug": "dashboard.coupons",
+                    "permission": "view_coupons"
                 },
                 {
                     "url": "/dashboard/coupons/add",
                     "name": "إضافة كوبون",
-                    "slug": "dashboard.coupons.add"
+                    "slug": "dashboard.coupons.add",
+                    "permission": "create_coupons"
                 }
             ]
         },
@@ -119,16 +161,19 @@
                 "dashboard.product",
                 "dashboard.create.product"
             ],
+            "permission": "view_products",
             "submenu": [
                 {
                     "url": "/dashboard/products",
                     "name": "الكتب",
-                    "slug": "dashboard.product"
+                    "slug": "dashboard.product",
+                    "permission": "view_products"
                 },
                 {
                     "url": "/dashboard/products/create",
                     "name": "إضافة كتاب",
-                    "slug": "dashboard.create.product"
+                    "slug": "dashboard.create.product",
+                    "permission": "create_products"
                 }
             ]
         },
@@ -139,16 +184,19 @@
                 "dashboard.main_categories",
                 "dashboard.create.main_categories"
             ],
+            "permission": "view_main_categories",
             "submenu": [
                 {
                     "url": "/dashboard/main_categories",
                     "name": "الأقسام",
-                    "slug": "dashboard.main_categories"
+                    "slug": "dashboard.main_categories",
+                    "permission": "view_main_categories"
                 },
                 {
                     "url": "/dashboard/main_categories/create",
                     "name": "إضافة قسم",
-                    "slug": "dashboard.create.main_categories"
+                    "slug": "dashboard.create.main_categories",
+                    "permission": "create_main_categories"
                 }
             ]
         },
@@ -159,16 +207,19 @@
                 "dashboard.teachers",
                 "dashboard.create.teachers"
             ],
+            "permission": "view_teachers",
             "submenu": [
                 {
                     "url": "/dashboard/teachers",
                     "name": "المدرسين",
-                    "slug": "dashboard.teachers"
+                    "slug": "dashboard.teachers",
+                    "permission": "view_teachers"
                 },
                 {
                     "url": "/dashboard/teachers/create",
                     "name": "إضافة مدرس",
-                    "slug": "dashboard.create.teachers"
+                    "slug": "dashboard.create.teachers",
+                    "permission": "create_teachers"
                 }
             ]
         },
@@ -179,26 +230,31 @@
                 "dashboard.orders",
                 "dashboard.orders.barcode"
             ],
+            "permission": "view_orders",
             "submenu": [
                 {
                     "url": "/dashboard/orders",
                     "name": "كل الطلبات",
-                    "slug": "dashboard.orders"
+                    "slug": "dashboard.orders",
+                    "permission": "view_orders"
                 },
                 {
                     "url": "/dashboard/orders?state=reserved",
                     "name": "الطلبات المحجوزة",
-                    "slug": "dashboard.orders"
+                    "slug": "dashboard.orders",
+                    "permission": "view_orders"
                 },
                 {
                     "url": "/dashboard/orders?state=pending",
                     "name": "الطلبات المعلقة",
-                    "slug": "dashboard.orders"
+                    "slug": "dashboard.orders",
+                    "permission": "view_orders"
                 },
                 {
                     "url": "/dashboard/orders/barcode",
                     "name": "الباركود",
-                    "slug": "dashboard.orders.barcode"
+                    "slug": "dashboard.orders.barcode",
+                    "permission": "barcode_orders"
                 }
             ]
         },
@@ -209,16 +265,19 @@
                 "dashboard.offers",
                 "dashboard.create.offers"
             ],
+            "permission": "view_offers",
             "submenu": [
                 {
                     "url": "/dashboard/offers",
                     "name": "العروض",
-                    "slug": "dashboard.offers"
+                    "slug": "dashboard.offers",
+                    "permission": "view_offers"
                 },
                 {
                     "url": "/dashboard/offers/create",
                     "name": "إضافة عرض",
-                    "slug": "dashboard.create.offers"
+                    "slug": "dashboard.create.offers",
+                    "permission": "create_offers"
                 }
             ]
         },
@@ -229,16 +288,19 @@
                 "dashboard.discount",
                 "dashboard.discount.create"
             ],
+            "permission": "view_discounts",
             "submenu": [
                 {
                     "url": "/dashboard/discount",
                     "name": "الخصومات",
-                    "slug": "dashboard.discount"
+                    "slug": "dashboard.discount",
+                    "permission": "view_discounts"
                 },
                 {
                     "url": "/dashboard/discount/create",
                     "name": "إضافة خصم",
-                    "slug": "dashboard.discount.create"
+                    "slug": "dashboard.discount.create",
+                    "permission": "create_discounts"
                 }
             ]
         },
@@ -249,16 +311,19 @@
                 "dashboard.shipping-methods",
                 "dashboard.shipping-methods.create"
             ],
+            "permission": "view_shipping_methods",
             "submenu": [
                 {
                     "url": "/dashboard/shipping-methods",
                     "name": "طرق الشحن",
-                    "slug": "dashboard.shipping-methods"
+                    "slug": "dashboard.shipping-methods",
+                    "permission": "view_shipping_methods"
                 },
                 {
                     "url": "/dashboard/shipping-methods/create",
                     "name": "إضافة طريقة شحن",
-                    "slug": "dashboard.shipping-methods.create"
+                    "slug": "dashboard.shipping-methods.create",
+                    "permission": "create_shipping_methods"
                 }
             ]
         },
@@ -269,16 +334,19 @@
                 "dashboard.search-keywords",
                 "dashboard.search-keywords.create"
             ],
+            "permission": "view_search_keywords",
             "submenu": [
                 {
                     "url": "/dashboard/search-keywords",
                     "name": "كلمات البحث",
-                    "slug": "dashboard.search-keywords"
+                    "slug": "dashboard.search-keywords",
+                    "permission": "view_search_keywords"
                 },
                 {
                     "url": "/dashboard/search-keywords/create",
                     "name": "إضافة كلمة بحث",
-                    "slug": "dashboard.search-keywords.create"
+                    "slug": "dashboard.search-keywords.create",
+                    "permission": "create_search_keywords"
                 }
             ]
         },
@@ -289,16 +357,19 @@
                 "dashboard.faqs",
                 "dashboard.faqs.create"
             ],
+            "permission": "view_faqs",
             "submenu": [
                 {
                     "url": "/dashboard/faqs",
                     "name": "الأسئلة الشائعة",
-                    "slug": "dashboard.faqs"
+                    "slug": "dashboard.faqs",
+                    "permission": "view_faqs"
                 },
                 {
                     "url": "/dashboard/faqs/create",
                     "name": "إضافة سؤال جديد",
-                    "slug": "dashboard.faqs.create"
+                    "slug": "dashboard.faqs.create",
+                    "permission": "create_faqs"
                 }
             ]
         },
@@ -309,16 +380,19 @@
                 "dashboard.governorates.index",
                 "dashboard.governorates.create"
             ],
+            "permission": "view_governorates",
             "submenu": [
                 {
                     "url": "/dashboard/governorates",
                     "name": "المحافظات",
-                    "slug": "dashboard.governorates.index"
+                    "slug": "dashboard.governorates.index",
+                    "permission": "view_governorates"
                 },
                 {
                     "url": "/dashboard/governorates/create",
                     "name": "إضافة محافظة",
-                    "slug": "dashboard.governorates.create"
+                    "slug": "dashboard.governorates.create",
+                    "permission": "create_governorates"
                 }
             ]
         },
@@ -329,16 +403,19 @@
                 "dashboard.cities.index",
                 "dashboard.cities.create"
             ],
+            "permission": "view_cities",
             "submenu": [
                 {
                     "url": "/dashboard/cities",
                     "name": "المدن",
-                    "slug": "dashboard.cities.index"
+                    "slug": "dashboard.cities.index",
+                    "permission": "view_cities"
                 },
                 {
                     "url": "/dashboard/cities/create",
                     "name": "إضافة مدينة",
-                    "slug": "dashboard.cities.create"
+                    "slug": "dashboard.cities.create",
+                    "permission": "create_cities"
                 }
             ]
         },
@@ -349,16 +426,19 @@
                 "dashboard.site_notifications.index",
                 "dashboard.site_notifications.create"
             ],
+            "permission": "view_notifications",
             "submenu": [
                 {
                     "url": "/dashboard/site-notifications",
                     "name": "كل التنبيهات",
-                    "slug": "dashboard.site_notifications.index"
+                    "slug": "dashboard.site_notifications.index",
+                    "permission": "view_notifications"
                 },
                 {
                     "url": "/dashboard/site-notifications/create",
                     "name": "إضافة تنبيه جديد",
-                    "slug": "dashboard.site_notifications.create"
+                    "slug": "dashboard.site_notifications.create",
+                    "permission": "create_notifications"
                 }
             ]
         },
@@ -368,7 +448,8 @@
             "slug": [
                 "dashboard.settings"
             ],
-            "url": "/dashboard/settings"
+            "url": "/dashboard/settings",
+            "permission": "view_settings"
         }
     ]
 }

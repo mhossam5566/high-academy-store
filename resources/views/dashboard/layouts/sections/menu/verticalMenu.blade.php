@@ -25,61 +25,78 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
+        @php
+            $currentAdmin = auth('admin')->user();
+        @endphp
         @foreach ($menuData[0]->menu as $menu)
-            {{-- adding active and open class if child is active --}}
+            {{-- Check permissions if defined --}}
+            @php
+                $hasMenuPermission = true;
+                if ($currentAdmin && isset($menu->permission)) {
+                    if (!$currentAdmin->hasRole('Super Admin')) {
+                        if (is_array($menu->permission)) {
+                            $hasMenuPermission = $currentAdmin->hasAnyPermission($menu->permission);
+                        } else {
+                            $hasMenuPermission = $currentAdmin->can($menu->permission);
+                        }
+                    }
+                }
+            @endphp
 
-            {{-- menu headers --}}
-            @if (isset($menu->menuHeader))
-                <li class="menu-header small text-uppercase">
-                    <span class="menu-header-text">{{ $menu->menuHeader }}</span>
-                </li>
-            @else
-                {{-- active menu method --}}
-                @php
-                    $activeClass = null;
-                    $currentRouteName = Route::currentRouteName();
+            @if ($hasMenuPermission)
+                {{-- menu headers --}}
+                @if (isset($menu->menuHeader))
+                    <li class="menu-header small text-uppercase">
+                        <span class="menu-header-text">{{ $menu->menuHeader }}</span>
+                    </li>
+                @else
+                    {{-- active menu method --}}
+                    @php
+                        $activeClass = null;
+                        $currentRouteName = Route::currentRouteName();
 
-                    if ($currentRouteName === $menu->slug) {
-                        $activeClass = 'active';
-                    } elseif (isset($menu->submenu)) {
-                        if (gettype($menu->slug) === 'array') {
-                            foreach ($menu->slug as $slug) {
-                                if (str_contains($currentRouteName, $slug) and strpos($currentRouteName, $slug) === 0) {
+                        if ($currentRouteName === $menu->slug) {
+                            $activeClass = 'active';
+                        } elseif (isset($menu->submenu)) {
+                            if (gettype($menu->slug) === 'array') {
+                                foreach ($menu->slug as $slug) {
+                                    if (str_contains($currentRouteName, $slug) and strpos($currentRouteName, $slug) === 0) {
+                                        $activeClass = 'active open';
+                                    }
+                                }
+                            } else {
+                                if (
+                                    str_contains($currentRouteName, $menu->slug) and
+                                    strpos($currentRouteName, $menu->slug) === 0
+                                ) {
                                     $activeClass = 'active open';
                                 }
                             }
-                        } else {
-                            if (
-                                str_contains($currentRouteName, $menu->slug) and
-                                strpos($currentRouteName, $menu->slug) === 0
-                            ) {
-                                $activeClass = 'active open';
-                            }
                         }
-                    }
-                @endphp
+                    @endphp
 
-                {{-- main menu --}}
-                <li class="menu-item {{ $activeClass }}">
-                    <a href="{{ isset($menu->url) ? url($menu->url) : 'javascript:void(0);' }}"
-                        class="{{ isset($menu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}"
-                        @if (isset($menu->target) and !empty($menu->target)) target="_blank" @endif>
-                        @isset($menu->icon)
-                            <i class="{{ $menu->icon }}"></i>
-                        @endisset
-                        <div>
-                            {{ $menu->name ?? '' }}
-                        </div>
-                        @isset($menu->badge)
-                            <div class="badge bg-{{ $menu->badge[0] }} rounded-pill ms-auto">{{ $menu->badge[1] }}</div>
-                        @endisset
-                    </a>
+                    {{-- main menu --}}
+                    <li class="menu-item {{ $activeClass }}">
+                        <a href="{{ isset($menu->url) ? url($menu->url) : 'javascript:void(0);' }}"
+                            class="{{ isset($menu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}"
+                            @if (isset($menu->target) and !empty($menu->target)) target="_blank" @endif>
+                            @isset($menu->icon)
+                                <i class="{{ $menu->icon }}"></i>
+                            @endisset
+                            <div>
+                                {{ $menu->name ?? '' }}
+                            </div>
+                            @isset($menu->badge)
+                                <div class="badge bg-{{ $menu->badge[0] }} rounded-pill ms-auto">{{ $menu->badge[1] }}</div>
+                            @endisset
+                        </a>
 
-                    {{-- submenu --}}
-                    @isset($menu->submenu)
-                        @include('dashboard.layouts.sections.menu.submenu', ['menu' => $menu->submenu])
-                    @endisset
-                </li>
+                        {{-- submenu --}}
+                        @isset($menu->submenu)
+                            @include('dashboard.layouts.sections.menu.submenu', ['menu' => $menu->submenu])
+                        @endisset
+                    </li>
+                @endif
             @endif
         @endforeach
     </ul>
