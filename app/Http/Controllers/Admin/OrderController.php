@@ -17,9 +17,10 @@ use App\Services\WhatsappService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Exports\BarcodeOrdersExport;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\User;
+use App\Models\OrderDetail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -894,5 +895,181 @@ class OrderController extends Controller
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Show the library booking form for creating an in-person order.
+     */
+    public function createLibraryOrder()
+    {
+        $admin = auth('admin')->user();
+        if ($admin && !$admin->hasRole('Super Admin') && !$admin->can('create_library_orders')) {
+            abort(403, 'غير مصرح لك بالوصول لصفحة الحجز من المكتبة');
+        }
+
+        // Fetch products that are active and not deleted
+        $products = Product::where('is_deleted', 0)
+            ->with(['translations', 'brands', 'sliders', 'category'])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        // Fetch shipping methods
+        $shippingMethods = ShippingMethod::all();
+
+        return view('dashboard.pages.order.library_booking', compact('products', 'shippingMethods'));
+    }
+
+    /**
+     * Store a library booking order created by the admin.
+     */
+    public function storeLibraryOrder(Request $request)
+    {
+        $admin = auth('admin')->user();
+        if ($admin && !$admin->hasRole('Super Admin') && !$admin->can('create_library_orders')) {
+            abort(403, 'غير مصرح لك بإنشاء طلبات الحجز من المكتبة');
+        }
+
+        $request->validate([
+            'student_name' => 'required|string|max:191',
+            'mobile' => ['required', 'string', 'regex:/^(010|011|012|015)[0-9]{8}$/'],
+            'temp_mobile' => ['nullable', 'string', 'regex:/^(010|011|012|015)[0-9]{8}$/'],
+            'shipping_method_id' => 'nullable|exists:shipping_methods,id',
+            'payment_method' => 'required|string',
+            'status' => 'required|in:success,reserved,new,pending',
+            'is_paid' => 'required|in:0,1',
+            'discount' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'nullable|numeric|min:0',
+        ], [
+            'student_name.required' => 'اسم الطالب مطلوب',
+            'mobile.required' => 'رقم هاتف الطالب مطلوب',
+            'mobile.regex' => 'رقم الهاتف يجب أن يكون رقم مصري صحيح مكون من 11 رقم (010/011/012/015)',
+            'temp_mobile.regex' => 'رقم الهاتف الإضافي يجب أن يكون رقم مصري صحيح مكون من 11 رقم',
+            'items.required' => 'يجب اختيار كتاب واحد على الأقل',
+            'items.min' => 'يجب اختيار كتاب واحد على الأقل',
+        ]);
+
+        return DB::transaction(function () use ($request) {
+            $mobile = $request->mobile;
+
+            // 1. Find or create the user account for the student
+            $user = User::where('phone', $mobile)
+                ->orWhere('email', $mobile . '@student.library')
+                ->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'name' => $request->student_name,
+                    'phone' => $mobile,
+                    'email' => $mobile . '@student.library',
+                    'password' => Hash::make($mobile),
+                    'address' => $request->notes ?? 'حجز من المكتبة',
+                ]);
+            }
+
+            // 2. Shipping method calculation
+            $shippingMethod = null;
+            if ($request->filled('shipping_method_id')) {
+                $shippingMethod = ShippingMethod::find($request->shipping_method_id);
+            }
+            if (!$shippingMethod) {
+                $shippingMethod = ShippingMethod::where('type', 'branch')->first() ?? ShippingMethod::first();
+            }
+
+            $deliveryFee = ($shippingMethod && $shippingMethod->type !== 'branch') ? (float) ($shippingMethod->fee ?? 0) : 0;
+
+            // 3. Process products & calculate totals
+            $amount = 0;
+            $itemsData = [];
+
+            foreach ($request->items as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                $qty = (int) $item['quantity'];
+                
+                $unitPrice = isset($item['price']) && $item['price'] !== '' && is_numeric($item['price'])
+                    ? (float) $item['price']
+                    : (float) ($product->final_price ?? $product->price ?? 0);
+
+                $itemTotal = $unitPrice * $qty;
+                $amount += $itemTotal;
+
+                $itemsData[] = [
+                    'product' => $product,
+                    'quantity' => $qty,
+                    'price' => $unitPrice,
+                    'total_price' => $itemTotal,
+                ];
+            }
+
+            $discount = (float) ($request->discount ?? 0);
+            $total = max(0, ($amount + $deliveryFee) - $discount);
+
+            // 4. Generate unique order code
+            $code = '#' . Str::upper(Str::random(8));
+            while (Order::where('code', $code)->exists()) {
+                $code = '#' . Str::upper(Str::random(8));
+            }
+
+            $shippingName = $shippingMethod ? $shippingMethod->name : 'استلام من المكتبة';
+            $shippingAddress = $shippingMethod ? ($shippingMethod->address ?? $shippingMethod->name) : 'المكتبة';
+
+            // 5. Create Order
+            $order = Order::create([
+                'user_id' => $user->id,
+                'name' => $request->student_name,
+                'mobile' => $mobile,
+                'temp_mobile' => $request->temp_mobile,
+                'address' => $shippingAddress,
+                'address2' => $request->notes,
+                'governorate_id' => $shippingMethod?->government ?? null,
+                'date' => now(),
+                'status' => $request->status,
+                'is_paid' => (int) $request->is_paid,
+                'code' => $code,
+                'amount' => $amount,
+                'delivery_fee' => $deliveryFee,
+                'total' => $total,
+                'shipping_method' => $shippingMethod?->id,
+                'shipping_method_id' => $shippingMethod?->id,
+                'shipping_name' => $shippingName,
+                'shipping_address' => $shippingAddress,
+                'method' => $request->payment_method,
+                'tracker' => ($request->status === 'success' || $request->is_paid == 1) ? 'delivered' : 'new',
+            ]);
+
+            // 6. Create Order Details & update inventory
+            foreach ($itemsData as $item) {
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product']->id,
+                    'amout' => $item['quantity'],
+                    'price' => $item['price'],
+                    'total_price' => $item['total_price'],
+                ]);
+
+                // Deduct inventory if stock is tracked
+                $prod = $item['product'];
+                if ($prod->quantity !== null) {
+                    $prod->quantity = max(0, $prod->quantity - $item['quantity']);
+                    if ($prod->state != 2) {
+                        $prod->state = ($prod->quantity > 0) ? 1 : 0;
+                    }
+                    $prod->save();
+                }
+            }
+
+            // Optional WhatsApp notification
+            try {
+                $this->sendOrderStatusWhatsapp($order, $order->status);
+            } catch (\Exception $e) {
+                Log::warning('WhatsApp notification failed for library booking', ['error' => $e->getMessage()]);
+            }
+
+            return redirect()->route('dashboard.orders.details', $order->id)
+                ->with('success', "تم إنشاء حجز المكتبة بنجاح برقم الطلب #{$order->id} ({$order->code})");
+        });
     }
 }

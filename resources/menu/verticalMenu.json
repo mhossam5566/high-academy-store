@@ -228,10 +228,20 @@
             "icon": "menu-icon tf-icons ti ti-shopping-bag",
             "slug": [
                 "dashboard.orders",
+                "dashboard.orders.library_booking",
                 "dashboard.orders.barcode"
             ],
-            "permission": "view_orders",
+            "permission": [
+                "view_orders",
+                "create_library_orders"
+            ],
             "submenu": [
+                {
+                    "url": "/dashboard/orders/library-booking",
+                    "name": "الحجز من المكتبة",
+                    "slug": "dashboard.orders.library_booking",
+                    "permission": "create_library_orders"
+                },
                 {
                     "url": "/dashboard/orders",
                     "name": "كل الطلبات",

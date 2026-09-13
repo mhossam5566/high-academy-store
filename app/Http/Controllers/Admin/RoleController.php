@@ -69,6 +69,7 @@ class RoleController extends Controller
             ],
             'الطلبات' => [
                 'view_orders' => 'عرض كل الطلبات',
+                'create_library_orders' => 'الحجز من المكتبة (إنشاء طلب يدوي)',
                 'edit_orders' => 'تعديل حالة وتفاصيل الطلب',
                 'export_orders' => 'تصدير الطلبات (Excel / PDF)',
                 'barcode_orders' => 'إدارة باركود الطلبات',
