@@ -69,10 +69,12 @@ class RoleController extends Controller
             ],
             'الطلبات' => [
                 'view_orders' => 'عرض كل الطلبات',
-                'create_library_orders' => 'الحجز من المكتبة (إنشاء طلب يدوي)',
                 'edit_orders' => 'تعديل حالة وتفاصيل الطلب',
                 'export_orders' => 'تصدير الطلبات (Excel / PDF)',
                 'barcode_orders' => 'إدارة باركود الطلبات',
+            ],
+            'الحجز من المكتبة' => [
+                'create_library_orders' => 'الوصول لصفحة الحجز من المكتبة وإنشاء الطلبات يدوياً للطلاب',
             ],
             'أكواد المدرسين (الكوبونات)' => [
                 'view_coupons' => 'عرض أكواد المدرسين',
@@ -179,14 +181,34 @@ class RoleController extends Controller
             ->toJson();
     }
 
+    /**
+     * Ensure all grouped permissions exist in DB for admin guard
+     */
+    public static function ensurePermissionsExist(): void
+    {
+        try {
+            $grouped = self::getPermissionsGrouped();
+            foreach ($grouped as $group => $perms) {
+                foreach ($perms as $permName => $label) {
+                    Permission::findOrCreate($permName, 'admin');
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently continue if DB connection isn't ready
+        }
+    }
+
     public function create()
     {
+        self::ensurePermissionsExist();
         $permissionsGrouped = self::getPermissionsGrouped();
         return view('dashboard.pages.roles.create', compact('permissionsGrouped'));
     }
 
     public function store(Request $request)
     {
+        self::ensurePermissionsExist();
+
         $request->validate([
             'name' => 'required|string|max:100|unique:roles,name,NULL,id,guard_name,admin',
             'permissions' => 'nullable|array',
@@ -214,6 +236,7 @@ class RoleController extends Controller
             abort(404);
         }
 
+        self::ensurePermissionsExist();
         $permissionsGrouped = self::getPermissionsGrouped();
         $rolePermissions = $role->permissions->pluck('name')->toArray();
 
@@ -225,6 +248,8 @@ class RoleController extends Controller
         if ($role->guard_name !== 'admin') {
             abort(404);
         }
+
+        self::ensurePermissionsExist();
 
         $request->validate([
             'name' => 'required|string|max:100|unique:roles,name,' . $role->id . ',id,guard_name,admin',
