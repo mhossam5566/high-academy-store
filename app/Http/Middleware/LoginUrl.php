@@ -19,8 +19,6 @@ class LoginUrl
     {
         if (auth('admin')->check()) {
             return redirect(route('dashboard.index'));
-        } elseif (auth('mini_admin')->check()) {
-            return redirect(route('dashboard.miniadmin'));
         }
 
         return $next($request);

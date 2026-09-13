@@ -2,7 +2,6 @@
 
 use App\Models\User;
 use App\Models\Admin;
-use App\Models\MiniAdmin;
 
 return [
 
@@ -49,10 +48,6 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
-        'mini_admin' => [
-            'driver' => 'session',
-            'provider' => 'mini_admins',
-        ],
         'api' => [
             'driver' => 'jwt',
             'provider' => 'admins',
@@ -86,10 +81,6 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => Admin::class,
-        ],
-        'mini_admins' => [
-            'driver' => 'eloquent',
-            'model' => MiniAdmin::class,
         ],
 
         // 'users' => [
