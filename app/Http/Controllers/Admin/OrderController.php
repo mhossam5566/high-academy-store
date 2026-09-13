@@ -140,7 +140,7 @@ class OrderController extends Controller
                 return $row->barcode;
             })
             ->addColumn('addbarcode', function ($row) {
-                return '<a href=' . route('dashboard.order.editbarcode', $row->id) . ' type="button" class="btn btn-sm btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
+                return '<a href=' . route('dashboard.orders.editbarcode', $row->id) . ' type="button" class="btn btn-sm btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
             })
             ->addColumn('admin_addbarcode', function ($row) {
                 // Don't show barcode button for branch orders
