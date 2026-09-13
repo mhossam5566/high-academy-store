@@ -937,9 +937,9 @@ class OrderController extends Controller
             'mobile' => ['required', 'string', 'regex:/^(010|011|012|015)[0-9]{8}$/'],
             'temp_mobile' => ['nullable', 'string', 'regex:/^(010|011|012|015)[0-9]{8}$/'],
             'shipping_method_id' => 'nullable|exists:shipping_methods,id',
-            'payment_method' => 'required|string',
-            'status' => 'required|in:success,reserved,new,pending',
-            'is_paid' => 'required|in:0,1',
+            'payment_type' => 'required|in:full,deposit,later',
+            'deposit_amount' => 'nullable|numeric|min:0',
+            'status' => 'nullable|in:success,reserved,new,pending',
             'discount' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string|max:1000',
             'items' => 'required|array|min:1',
@@ -1010,7 +1010,41 @@ class OrderController extends Controller
             $discount = (float) ($request->discount ?? 0);
             $total = max(0, ($amount + $deliveryFee) - $discount);
 
-            // 4. Generate unique order code
+            // 4. Handle Payment Type (Full Cash, Deposit, or Later on delivery)
+            $paymentType = $request->payment_type ?? 'full';
+            $paidAmount = 0;
+            $remainingAmount = 0;
+            $isPaid = 0;
+            $orderStatus = $request->status ?? 'reserved';
+            $methodString = 'كاش بالمكتبة';
+
+            if ($paymentType === 'full') {
+                $paidAmount = $total;
+                $remainingAmount = 0;
+                $isPaid = 1;
+                $orderStatus = $request->status ?: 'success';
+                $paymentInfo = "مدفوع كاش بالكامل ({$total} ج.م)";
+            } elseif ($paymentType === 'deposit') {
+                $paidAmount = min($total, max(0, (float) ($request->deposit_amount ?? 0)));
+                $remainingAmount = max(0, $total - $paidAmount);
+                $isPaid = ($remainingAmount <= 0) ? 1 : 0;
+                $orderStatus = $request->status ?: ($isPaid ? 'success' : 'reserved');
+                $methodString = 'كاش بالمكتبة (عربون)';
+                $paymentInfo = "مدفوع عربون: {$paidAmount} ج.م | متبقي عند الاستلام: {$remainingAmount} ج.م";
+            } else {
+                // later / no deposit
+                $paidAmount = 0;
+                $remainingAmount = $total;
+                $isPaid = 0;
+                $orderStatus = $request->status ?: 'reserved';
+                $methodString = 'كاش عند الاستلام بالمكتبة';
+                $paymentInfo = "حجز - الدفع بالكامل عند الاستلام ({$total} ج.م)";
+            }
+
+            // Combine admin notes with deposit/payment summary
+            $notes = $request->notes ? trim($request->notes) . " | " . $paymentInfo : $paymentInfo;
+
+            // 5. Generate unique order code
             $code = '#' . Str::upper(Str::random(8));
             while (Order::where('code', $code)->exists()) {
                 $code = '#' . Str::upper(Str::random(8));
@@ -1019,18 +1053,18 @@ class OrderController extends Controller
             $shippingName = $shippingMethod ? $shippingMethod->name : 'استلام من المكتبة';
             $shippingAddress = $shippingMethod ? ($shippingMethod->address ?? $shippingMethod->name) : 'المكتبة';
 
-            // 5. Create Order
+            // 6. Create Order
             $order = Order::create([
                 'user_id' => $user->id,
                 'name' => $request->student_name,
                 'mobile' => $mobile,
                 'temp_mobile' => $request->temp_mobile,
                 'address' => $shippingAddress,
-                'address2' => $request->notes,
+                'address2' => $notes,
                 'governorate_id' => $shippingMethod?->government ?? null,
                 'date' => now(),
-                'status' => $request->status,
-                'is_paid' => (int) $request->is_paid,
+                'status' => $orderStatus,
+                'is_paid' => $isPaid,
                 'code' => $code,
                 'amount' => $amount,
                 'delivery_fee' => $deliveryFee,
@@ -1039,8 +1073,8 @@ class OrderController extends Controller
                 'shipping_method_id' => $shippingMethod?->id,
                 'shipping_name' => $shippingName,
                 'shipping_address' => $shippingAddress,
-                'method' => $request->payment_method,
-                'tracker' => ($request->status === 'success' || $request->is_paid == 1) ? 'delivered' : 'new',
+                'method' => $methodString,
+                'tracker' => ($orderStatus === 'success' || $isPaid == 1) ? 'delivered' : 'new',
             ]);
 
             // 6. Create Order Details & update inventory

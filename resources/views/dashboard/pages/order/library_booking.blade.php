@@ -33,6 +33,21 @@
             font-size: 0.75rem;
             padding: 0.25rem 0.5rem;
         }
+        .payment-option-card {
+            border: 2px solid #e7e7e8;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .payment-option-card:hover {
+            border-color: #7367f0;
+            background-color: rgba(115, 103, 240, 0.02);
+        }
+        .payment-option-card.active {
+            border-color: #7367f0;
+            background-color: rgba(115, 103, 240, 0.06);
+        }
     </style>
 @endsection
 
@@ -120,12 +135,12 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold" for="notes">
-                                    ملاحظات على الطلب <span class="text-muted">(اختياري)</span>
+                                    ملاحظات إضافية <span class="text-muted">(اختياري)</span>
                                 </label>
                                 <div class="input-group input-group-merge">
                                     <span class="input-group-text"><i class="ti ti-notes"></i></span>
                                     <input type="text" id="notes" name="notes" 
-                                           class="form-control" placeholder="أي تفاصيل خاصة بالحجز أو الاستلام"
+                                           class="form-control" placeholder="أي ملاحظات خاصة بالطلب أو الطالب"
                                            value="{{ old('notes') }}" autocomplete="off">
                                 </div>
                             </div>
@@ -154,14 +169,12 @@
                                             $stock = $product->quantity ?? 0;
                                             $stage = $product->sliders->name ?? '';
                                             $brand = $product->brands->name ?? '';
-                                            $cat = $product->category->name ?? '';
                                         @endphp
                                         <option value="{{ $product->id }}" 
                                                 data-name="{{ $product->name }}"
                                                 data-short-name="{{ $product->short_name ?: $product->name }}"
                                                 data-price="{{ $prodPrice }}"
                                                 data-stock="{{ $stock }}"
-                                                data-image="{{ $product->image_path }}"
                                                 data-brand="{{ $brand }}"
                                                 data-stage="{{ $stage }}">
                                             {{ $product->short_name ?: $product->name }} 
@@ -208,18 +221,18 @@
                     </div>
                 </div>
 
-                {{-- Delivery & Pickup Method --}}
+                {{-- Delivery & Pickup Branch Card --}}
                 <div class="card mb-4 shadow-sm border-0">
                     <div class="card-header bg-label-info py-3">
                         <h5 class="card-title mb-0 d-flex align-items-center text-info">
-                            <i class="ti ti-map-pin me-2 fs-4"></i>مكان وطريقة الاستلام
+                            <i class="ti ti-map-pin me-2 fs-4"></i>فرع الاستلام
                         </h5>
                     </div>
                     <div class="card-body pt-4">
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label fw-semibold" for="shipping_method_id">
-                                    فرع الاستلام / المكتبة <span class="required-star">*</span>
+                                    المكتبة / فرع الاستلام <span class="required-star">*</span>
                                 </label>
                                 <select name="shipping_method_id" id="shipping_method_id" class="form-select">
                                     @foreach ($shippingMethods as $method)
@@ -247,50 +260,82 @@
                 <div class="card summary-card shadow-sm border-0">
                     <div class="card-header bg-primary text-white py-3">
                         <h5 class="card-title mb-0 text-white d-flex align-items-center">
-                            <i class="ti ti-receipt me-2 fs-4"></i>بيانات الدفع والملخص
+                            <i class="ti ti-cash me-2 fs-4"></i>الدفع بالمكتبة كاش
                         </h5>
                     </div>
                     <div class="card-body pt-4">
-                        {{-- Payment Method --}}
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="payment_method">
-                                طريقة الدفع <span class="required-star">*</span>
-                            </label>
-                            <select name="payment_method" id="payment_method" class="form-select" required>
-                                <option value="كاش بالمكتبة" selected>💵 كاش بالمكتبة (Cash)</option>
-                                <option value="InstaPay">📱 إنستاباي (InstaPay)</option>
-                                <option value="فودافون كاش">📲 فودافون كاش (Vodafone Cash)</option>
-                                <option value="محفظة إلكترونية">💳 محفظة إلكترونية</option>
-                                <option value="دفع عند الاستلام">🚚 دفع عند الاستلام</option>
-                            </select>
+                        {{-- Payment Method Notice --}}
+                        <div class="alert alert-label-primary py-2 px-3 mb-3 d-flex align-items-center">
+                            <i class="ti ti-cash me-2 fs-5"></i>
+                            <span class="fw-semibold">وسيلة الدفع: كاش بالمكتبة</span>
                         </div>
 
-                        {{-- Payment Status --}}
+                        {{-- Payment Type Selector --}}
                         <div class="mb-3">
-                            <label class="form-label fw-semibold" for="is_paid">
-                                حالة الدفع <span class="required-star">*</span>
+                            <label class="form-label fw-bold">نظام الدفع <span class="required-star">*</span></label>
+                            
+                            <div class="d-flex flex-column gap-2">
+                                <label class="payment-option-card active" for="pay_full">
+                                    <div class="d-flex align-items-center">
+                                        <input class="form-check-input me-2" type="radio" name="payment_type" id="pay_full" value="full" checked>
+                                        <div>
+                                            <div class="fw-bold text-dark">دفع كامل المبلغ كاش</div>
+                                            <small class="text-muted">تحصيل كامل قيمة الطلب الآن</small>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label class="payment-option-card" for="pay_deposit">
+                                    <div class="d-flex align-items-center">
+                                        <input class="form-check-input me-2" type="radio" name="payment_type" id="pay_deposit" value="deposit">
+                                        <div>
+                                            <div class="fw-bold text-primary">دفع عربون جزئي</div>
+                                            <small class="text-muted">دفع جزء من المبلغ والباقي عند الاستلام</small>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label class="payment-option-card" for="pay_later">
+                                    <div class="d-flex align-items-center">
+                                        <input class="form-check-input me-2" type="radio" name="payment_type" id="pay_later" value="later">
+                                        <div>
+                                            <div class="fw-bold text-secondary">حجز بدون دفع الآن</div>
+                                            <small class="text-muted">دفع كامل المبلغ عند الاستلام بالمكتبة</small>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- Deposit Amount Input (Shown when deposit is selected) --}}
+                        <div class="mb-3" id="depositSection" style="display: none;">
+                            <label class="form-label fw-bold text-primary" for="deposit_amount">
+                                قيمة العربون المدفوع (جنيه) <span class="required-star">*</span>
                             </label>
-                            <select name="is_paid" id="is_paid" class="form-select" required>
-                                <option value="1" selected>✅ تم الدفع بالمكتبة (مدفوع)</option>
-                                <option value="0">⏳ غير مدفوع (مؤجل / عند الاستلام)</option>
-                            </select>
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-text"><i class="ti ti-cash"></i></span>
+                                <input type="number" id="deposit_amount" name="deposit_amount" 
+                                       class="form-control form-control-lg fw-bold text-primary" 
+                                       placeholder="أدخل قيمة العربون" min="1" step="1" value="50">
+                                <span class="input-group-text">ج.م</span>
+                            </div>
+                            <small class="text-muted">المبلغ الذي قام الطالب بدفعه في المكتبة كعربون حجز</small>
                         </div>
 
                         {{-- Order Status --}}
                         <div class="mb-3">
                             <label class="form-label fw-semibold" for="status">
-                                حالة الطلب <span class="required-star">*</span>
+                                حالة الطلب
                             </label>
-                            <select name="status" id="status" class="form-select" required>
+                            <select name="status" id="status" class="form-select">
                                 <option value="success" selected>🟢 طلب ناجح ومستلم (Success)</option>
                                 <option value="reserved">🔵 طلب محجوز (Reserved)</option>
                                 <option value="new">🟡 طلب جديد (New)</option>
-                                <option value="pending">🟠 طلب معلق (Pending)</option>
                             </select>
                         </div>
 
                         {{-- Discount Input --}}
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label fw-semibold" for="discount">
                                 خصم إضافي (جنيه) <span class="text-muted">(اختياري)</span>
                             </label>
@@ -299,6 +344,7 @@
                                 <input type="number" id="discount" name="discount" 
                                        class="form-control" placeholder="0" min="0" step="0.5"
                                        value="{{ old('discount', 0) }}">
+                                <span class="input-group-text">ج.م</span>
                             </div>
                         </div>
 
@@ -313,14 +359,26 @@
                             <span class="text-muted">الخصم:</span>
                             <span class="text-danger fw-semibold" id="discountDisplay">- 0.00 ج.م</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">رسوم الاستلام / الشحن:</span>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">رسوم الفرع:</span>
                             <span class="text-muted" id="deliveryDisplay">0.00 ج.م</span>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center bg-label-primary p-3 rounded mb-4">
-                            <span class="fw-bold fs-5 text-primary">المبلغ الإجمالي:</span>
-                            <span class="fw-bold fs-4 text-primary" id="grandTotalDisplay">0.00 ج.م</span>
+                        <div class="d-flex justify-content-between align-items-center bg-label-primary p-2 rounded mb-3">
+                            <span class="fw-bold text-primary">المبلغ الإجمالي المطلوب:</span>
+                            <span class="fw-bold fs-5 text-primary" id="grandTotalDisplay">0.00 ج.م</span>
+                        </div>
+
+                        {{-- Paid vs Remaining Box --}}
+                        <div class="border rounded p-3 mb-4 bg-light">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-success fw-bold"><i class="ti ti-circle-check me-1"></i>المدفوع الآن:</span>
+                                <span class="fw-bold text-success fs-6" id="paidDisplay">0.00 ج.م</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-danger fw-bold"><i class="ti ti-clock me-1"></i>المتبقي عند الاستلام:</span>
+                                <span class="fw-bold text-danger fs-6" id="remainingDisplay">0.00 ج.م</span>
+                            </div>
                         </div>
 
                         {{-- Submit Button --}}
@@ -347,13 +405,23 @@ $(document).ready(function() {
 
     let selectedItems = {};
 
-    // Update is_paid / status sync
-    $('#is_paid').on('change', function() {
-        if ($(this).val() == '1' && $('#status').val() == 'pending') {
-            $('#status').val('success');
-        } else if ($(this).val() == '0' && $('#status').val() == 'success') {
+    // Payment Type Radio Handlers
+    $('input[name="payment_type"]').on('change', function() {
+        $('.payment-option-card').removeClass('active');
+        $(this).closest('.payment-option-card').addClass('active');
+
+        const val = $(this).val();
+        if (val === 'deposit') {
+            $('#depositSection').slideDown(200);
             $('#status').val('reserved');
+        } else if (val === 'later') {
+            $('#depositSection').slideUp(200);
+            $('#status').val('reserved');
+        } else {
+            $('#depositSection').slideUp(200);
+            $('#status').val('success');
         }
+        calculateTotals();
     });
 
     // Add Product button click
@@ -527,12 +595,12 @@ $(document).ready(function() {
         calculateTotals();
     });
 
-    // Shipping & discount change
-    $('#shipping_method_id, #discount').on('change input', function() {
+    // Shipping, discount, deposit change
+    $('#shipping_method_id, #discount, #deposit_amount').on('change input', function() {
         calculateTotals();
     });
 
-    // Calculate totals
+    // Calculate totals & balances
     function calculateTotals() {
         let subtotal = 0;
         Object.values(selectedItems).forEach(item => {
@@ -543,10 +611,29 @@ $(document).ready(function() {
         const shippingFee = parseFloat($('#shipping_method_id option:selected').data('fee')) || 0;
         const grandTotal = Math.max(0, (subtotal + shippingFee) - discount);
 
+        const paymentType = $('input[name="payment_type"]:checked').val() || 'full';
+        let paidAmount = 0;
+        let remainingAmount = 0;
+
+        if (paymentType === 'full') {
+            paidAmount = grandTotal;
+            remainingAmount = 0;
+        } else if (paymentType === 'deposit') {
+            const enteredDeposit = parseFloat($('#deposit_amount').val()) || 0;
+            paidAmount = Math.min(grandTotal, Math.max(0, enteredDeposit));
+            remainingAmount = Math.max(0, grandTotal - paidAmount);
+        } else {
+            // later / no deposit
+            paidAmount = 0;
+            remainingAmount = grandTotal;
+        }
+
         $('#subtotalDisplay').text(subtotal.toFixed(2) + ' ج.م');
         $('#discountDisplay').text('- ' + discount.toFixed(2) + ' ج.م');
         $('#deliveryDisplay').text(shippingFee.toFixed(2) + ' ج.م');
         $('#grandTotalDisplay').text(grandTotal.toFixed(2) + ' ج.م');
+        $('#paidDisplay').text(paidAmount.toFixed(2) + ' ج.م');
+        $('#remainingDisplay').text(remainingAmount.toFixed(2) + ' ج.م');
     }
 
     // Form submission validation
