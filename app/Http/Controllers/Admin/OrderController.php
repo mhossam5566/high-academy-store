@@ -917,8 +917,11 @@ class OrderController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        // Fetch shipping methods
-        $shippingMethods = ShippingMethod::all();
+        // Fetch ONLY library branches (type = branch)
+        $shippingMethods = ShippingMethod::where('type', 'branch')->get();
+        if ($shippingMethods->isEmpty()) {
+            $shippingMethods = ShippingMethod::all();
+        }
 
         return view('dashboard.pages.order.library_booking', compact('products', 'shippingMethods'));
     }
@@ -937,7 +940,7 @@ class OrderController extends Controller
             'student_name' => 'required|string|max:191',
             'mobile' => ['required', 'string', 'regex:/^(010|011|012|015)[0-9]{8}$/'],
             'temp_mobile' => ['nullable', 'string', 'regex:/^(010|011|012|015)[0-9]{8}$/'],
-            'shipping_method_id' => 'nullable|exists:shipping_methods,id',
+            'shipping_method_id' => 'required|exists:shipping_methods,id',
             'payment_type' => 'required|in:full,deposit,later',
             'deposit_amount' => 'nullable|numeric|min:0',
             'status' => 'nullable|in:success,reserved,new,pending',
@@ -952,6 +955,7 @@ class OrderController extends Controller
             'mobile.required' => 'رقم هاتف الطالب مطلوب',
             'mobile.regex' => 'رقم الهاتف يجب أن يكون رقم مصري صحيح مكون من 11 رقم (010/011/012/015)',
             'temp_mobile.regex' => 'رقم الهاتف الإضافي يجب أن يكون رقم مصري صحيح مكون من 11 رقم',
+            'shipping_method_id.required' => 'يرجى اختيار فرع الاستلام بالمكتبة',
             'items.required' => 'يجب اختيار كتاب واحد على الأقل',
             'items.min' => 'يجب اختيار كتاب واحد على الأقل',
         ]);
@@ -974,16 +978,13 @@ class OrderController extends Controller
                 ]);
             }
 
-            // 2. Shipping method calculation
-            $shippingMethod = null;
-            if ($request->filled('shipping_method_id')) {
-                $shippingMethod = ShippingMethod::find($request->shipping_method_id);
-            }
+            // 2. Shipping method (Library Branch pickup - always 0 delivery fee)
+            $shippingMethod = ShippingMethod::find($request->shipping_method_id);
             if (!$shippingMethod) {
                 $shippingMethod = ShippingMethod::where('type', 'branch')->first() ?? ShippingMethod::first();
             }
 
-            $deliveryFee = ($shippingMethod && $shippingMethod->type !== 'branch') ? (float) ($shippingMethod->fee ?? 0) : 0;
+            $deliveryFee = 0;
 
             // 3. Process products & calculate totals
             $amount = 0;
@@ -1075,7 +1076,7 @@ class OrderController extends Controller
                 'shipping_name' => $shippingName,
                 'shipping_address' => $shippingAddress,
                 'method' => $methodString,
-                'tracker' => ($orderStatus === 'success' || $isPaid == 1) ? 'delivered' : 'new',
+                'tracker' => ($orderStatus === 'success' || $isPaid == 1) ? 'delivered' : 'pending',
             ]);
 
             // 6. Create Order Details & update inventory

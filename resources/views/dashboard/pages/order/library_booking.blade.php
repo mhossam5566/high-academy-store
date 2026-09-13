@@ -234,31 +234,26 @@
                 <div class="card mb-4 shadow-sm border-0">
                     <div class="card-header bg-label-info py-3">
                         <h5 class="card-title mb-0 d-flex align-items-center text-info">
-                            <i class="ti ti-map-pin me-2 fs-4"></i>فرع الاستلام
+                            <i class="ti ti-building me-2 fs-4"></i>فرع المكتبة للاستلام
                         </h5>
                     </div>
                     <div class="card-body pt-4">
+                        <label class="form-label fw-bold mb-2">اختر فرع المكتبة الذي سيتم استلام الكتب منه <span class="required-star">*</span></label>
                         <div class="row g-3">
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold" for="shipping_method_id">
-                                    المكتبة / فرع الاستلام <span class="required-star">*</span>
-                                </label>
-                                <select name="shipping_method_id" id="shipping_method_id" class="form-select">
-                                    @foreach ($shippingMethods as $method)
-                                        <option value="{{ $method->id }}" 
-                                                data-fee="{{ $method->type === 'branch' ? 0 : ($method->fee ?? 0) }}"
-                                                {{ $loop->first ? 'selected' : '' }}>
-                                            {{ $method->name }} 
-                                            @if($method->type === 'branch') 
-                                                (استلام من الفرع - مجاناً)
-                                            @else
-                                                (شحن: {{ $method->fee ?? 0 }} ج.م)
+                            @foreach ($shippingMethods as $method)
+                                <div class="col-md-6">
+                                    <div class="form-check custom-option custom-option-basic p-3 border rounded h-100 {{ $loop->first ? 'border-primary bg-label-primary' : '' }}">
+                                        <input class="form-check-input" type="radio" name="shipping_method_id" id="branch_{{ $method->id }}" value="{{ $method->id }}" {{ $loop->first ? 'checked' : '' }} required>
+                                        <label class="form-check-label w-100 cursor-pointer" for="branch_{{ $method->id }}">
+                                            <span class="d-block fw-bold text-dark fs-6">{{ $method->name }}</span>
+                                            @if($method->address)
+                                                <small class="text-muted d-block mt-1"><i class="ti ti-map-pin me-1"></i>{{ $method->address }}</small>
                                             @endif
-                                            @if($method->address) - {{ $method->address }} @endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                            <span class="badge bg-label-success mt-2">استلام مباشر من الفرع</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -364,13 +359,9 @@
                             <span class="text-muted">مجموع الكتب:</span>
                             <span class="fw-semibold" id="subtotalDisplay">0.00 ج.م</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
+                        <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">الخصم:</span>
                             <span class="text-danger fw-semibold" id="discountDisplay">- 0.00 ج.م</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">رسوم الفرع:</span>
-                            <span class="text-muted" id="deliveryDisplay">0.00 ج.م</span>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center bg-label-primary p-2 rounded mb-3">
@@ -604,8 +595,14 @@ $(document).ready(function() {
         calculateTotals();
     });
 
+    // Branch Radio Handlers
+    $('input[name="shipping_method_id"]').on('change', function() {
+        $('input[name="shipping_method_id"]').closest('.custom-option').removeClass('border-primary bg-label-primary');
+        $(this).closest('.custom-option').addClass('border-primary bg-label-primary');
+    });
+
     // Shipping, discount, deposit change
-    $('#shipping_method_id, #discount, #deposit_amount').on('change input', function() {
+    $('#discount, #deposit_amount').on('change input', function() {
         calculateTotals();
     });
 
@@ -617,8 +614,7 @@ $(document).ready(function() {
         });
 
         const discount = parseFloat($('#discount').val()) || 0;
-        const shippingFee = parseFloat($('#shipping_method_id option:selected').data('fee')) || 0;
-        const grandTotal = Math.max(0, (subtotal + shippingFee) - discount);
+        const grandTotal = Math.max(0, subtotal - discount);
 
         const paymentType = $('input[name="payment_type"]:checked').val() || 'full';
         let paidAmount = 0;
@@ -639,7 +635,6 @@ $(document).ready(function() {
 
         $('#subtotalDisplay').text(subtotal.toFixed(2) + ' ج.م');
         $('#discountDisplay').text('- ' + discount.toFixed(2) + ' ج.م');
-        $('#deliveryDisplay').text(shippingFee.toFixed(2) + ' ج.م');
         $('#grandTotalDisplay').text(grandTotal.toFixed(2) + ' ج.م');
         $('#paidDisplay').text(paidAmount.toFixed(2) + ' ج.م');
         $('#remainingDisplay').text(remainingAmount.toFixed(2) + ' ج.م');
