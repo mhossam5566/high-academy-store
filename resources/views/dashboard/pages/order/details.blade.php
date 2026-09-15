@@ -98,10 +98,28 @@
                                 <td class="text-muted">العنوان التفصيلي:</td>
                                 <td>{{ $order->address2 }}</td>
                             </tr>
-                            <tr>
-                                <td class="text-muted">أقرب مكتب بريد:</td>
-                                <td>{{ $order->near_post }}</td>
-                            </tr>
+                            @if (($order->shipping && $order->shipping->type === 'branch') || in_array($order->shipping_method, ['3', '4']))
+                                <tr>
+                                    <td class="text-muted">فرع المكتبة:</td>
+                                    <td>
+                                        <span class="badge bg-label-success fs-6">
+                                            <i class="ti ti-building-store me-1"></i>{{ $order->shipping ? $order->shipping->name : ($order->shipping_name ?? $order->address) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @if ($order->shipping?->address || $order->shipping_address)
+                                    <tr>
+                                        <td class="text-muted">عنوان الفرع:</td>
+                                        <td><small class="text-dark">{{ $order->shipping?->address ?? $order->shipping_address }}</small></td>
+                                    </tr>
+                                @endif
+                            @endif
+                            @if ($order->near_post)
+                                <tr>
+                                    <td class="text-muted">أقرب مكتب بريد:</td>
+                                    <td>{{ $order->near_post }}</td>
+                                </tr>
+                            @endif
                         </table>
                     </div>
                 </div>
@@ -114,9 +132,14 @@
                                 <td class="text-muted" width="40%">نوع الشحن:</td>
                                 <td>
                                     @if ($order->shipping)
-                                        <strong>{{ $order->shipping->name }}</strong>
+                                        <strong class="text-primary">{{ $order->shipping->name }}</strong>
+                                    @elseif($order->shipping_name)
+                                        <strong class="text-primary">{{ $order->shipping_name }}</strong>
+                                    @elseif($order->shipping_method && is_numeric($order->shipping_method))
+                                        @php $m = \App\Models\ShippingMethod::find($order->shipping_method); @endphp
+                                        <strong class="text-primary">{{ $m ? $m->name : $order->shipping_method }}</strong>
                                     @elseif($order->shipping_method)
-                                        <strong>{{ $order->shipping_method }}</strong>
+                                        <strong class="text-primary">{{ $order->shipping_method }}</strong>
                                     @else
                                         —
                                     @endif

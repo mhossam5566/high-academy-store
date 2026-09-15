@@ -151,17 +151,18 @@ class OrderController extends Controller
                 return '<a href=' . route('dashboard.orders.editbarcode', $row->id) . $shipping . ' type="button" class="btn btn-sm btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
             })
             ->addColumn('shipping_method', function ($row) {
-                // return $row->shipping_name ?? $row->shipping->name;
                 if ($method = $row->shipping) {
-                    if ($method->address) {
-                        return "{$method->name}";
-                    } else {
-                        return "{$method->name}";
+                    return e($method->name);
+                }
+                if ($row->shipping_name) {
+                    return e($row->shipping_name);
+                }
+                if ($row->shipping_method && is_numeric($row->shipping_method)) {
+                    $found = \App\Models\ShippingMethod::find($row->shipping_method);
+                    if ($found) {
+                        return e($found->name);
                     }
                 }
-                //  else {
-                //     return "{$row->shipping_method}";
-                // }
                 return '—';
             })
 
@@ -1052,14 +1053,15 @@ class OrderController extends Controller
             $shippingName = $shippingMethod ? $shippingMethod->name : 'استلام من المكتبة';
             $shippingAddress = $shippingMethod ? ($shippingMethod->address ?? $shippingMethod->name) : 'المكتبة';
 
-            // 6. Create Order
+            // 6. Create Order (Exact format as website branch booking)
             $order = Order::create([
                 'user_id' => $user->id,
                 'name' => $request->student_name,
                 'mobile' => $mobile,
                 'temp_mobile' => $request->temp_mobile,
-                'address' => $shippingAddress,
+                'address' => $shippingName, // مثل الويبسايت تماماً: اسم الفرع
                 'address2' => $notes,
+                'near_post' => null, // حجز مكتبة لا يوجد به مكتب بريد
                 'governorate_id' => $shippingMethod?->government ?? null,
                 'date' => now(),
                 'status' => $orderStatus,
@@ -1068,7 +1070,7 @@ class OrderController extends Controller
                 'amount' => $amount,
                 'delivery_fee' => $deliveryFee,
                 'total' => $total,
-                'shipping_method' => $shippingMethod?->id,
+                'shipping_method' => (string) ($shippingMethod?->id),
                 'shipping_method_id' => $shippingMethod?->id,
                 'shipping_name' => $shippingName,
                 'shipping_address' => $shippingAddress,

@@ -18,6 +18,7 @@ class Order extends Model
         'near_post',
         'date',
         'status',
+        'shipping_method',
         'is_paid',
         'code',
         'total',
