@@ -1017,20 +1017,18 @@ class OrderController extends Controller
             $paidAmount = 0;
             $remainingAmount = 0;
             $isPaid = 0;
-            $orderStatus = $request->status ?? 'reserved';
+            $orderStatus = $request->status ?: 'reserved'; // الحالة الافتراضية دائماً "طلب محجوز"
             $methodString = 'كاش بالمكتبة';
 
             if ($paymentType === 'full') {
                 $paidAmount = $total;
                 $remainingAmount = 0;
                 $isPaid = 1;
-                $orderStatus = $request->status ?: 'success';
                 $paymentInfo = "مدفوع كاش بالكامل ({$total} ج.م)";
             } elseif ($paymentType === 'deposit') {
                 $paidAmount = min($total, max(0, (float) ($request->deposit_amount ?? 0)));
                 $remainingAmount = max(0, $total - $paidAmount);
                 $isPaid = ($remainingAmount <= 0) ? 1 : 0;
-                $orderStatus = $request->status ?: ($isPaid ? 'success' : 'reserved');
                 $methodString = 'كاش بالمكتبة (عربون)';
                 $paymentInfo = "مدفوع عربون: {$paidAmount} ج.م | متبقي عند الاستلام: {$remainingAmount} ج.م";
             } else {
@@ -1038,7 +1036,6 @@ class OrderController extends Controller
                 $paidAmount = 0;
                 $remainingAmount = $total;
                 $isPaid = 0;
-                $orderStatus = $request->status ?: 'reserved';
                 $methodString = 'كاش عند الاستلام بالمكتبة';
                 $paymentInfo = "حجز - الدفع بالكامل عند الاستلام ({$total} ج.م)";
             }
@@ -1076,7 +1073,7 @@ class OrderController extends Controller
                 'shipping_name' => $shippingName,
                 'shipping_address' => $shippingAddress,
                 'method' => $methodString,
-                'tracker' => ($orderStatus === 'success' || $isPaid == 1) ? 'delivered' : 'pending',
+                'tracker' => 'pending',
             ]);
 
             // 6. Create Order Details & update inventory

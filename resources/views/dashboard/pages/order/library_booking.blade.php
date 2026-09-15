@@ -332,8 +332,8 @@
                                 حالة الطلب
                             </label>
                             <select name="status" id="status" class="form-select">
-                                <option value="success" selected>🟢 طلب ناجح ومستلم (Success)</option>
-                                <option value="reserved">🔵 طلب محجوز (Reserved)</option>
+                                <option value="reserved" selected>🔵 طلب محجوز (Reserved)</option>
+                                <option value="success">🟢 طلب ناجح ومستلم (Success)</option>
                                 <option value="new">🟡 طلب جديد (New)</option>
                             </select>
                         </div>
