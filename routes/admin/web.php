@@ -43,11 +43,11 @@ Route::post('/signin', [AdminController::class, 'signin'])->name('admin.signin')
 Route::get('/register', [AdminController::class, 'register'])->name('register')->middleware('loginUrl');
 Route::post('/signup', [AdminController::class, 'signup'])->name('admin.signup');
 
-Route::get('/logout', [AdminController::class, 'adminLogout'])->name('admin.logout');
+Route::match(['get', 'post'], '/logout', [AdminController::class, 'adminLogout'])->name('admin.logout');
 
 
 Route::middleware('auth:admin')->name('dashboard.')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('index');
+    Route::match(['get', 'post'], '/', [AdminController::class, 'index'])->name('index');
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
     Route::post('/change-password', [AdminController::class, 'changePass'])->name('change.password');
     Route::Post('/update/my-account', [AdminController::class, 'AccountUpdate'])->name('update.account');

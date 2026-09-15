@@ -216,31 +216,31 @@
                 </li>
                 <li>
                     <a class="dropdown-item"
-                        href="{{ Route::has('profile.show') ? route('profile.show') : url('pages/profile-user') }}">
+                        href="{{ route('dashboard.profile') }}">
                         <i class="ti ti-user-check me-2 ti-sm"></i>
-                        <span class="align-middle">My Profile</span>
+                        <span class="align-middle">الملف الشخصي</span>
                     </a>
                 </li>
                 <li>
                     <div class="dropdown-divider"></div>
                 </li>
-                @if (Auth::check())
+                @if (auth('admin')->check() || Auth::check())
                     <li>
-                        <a class="dropdown-item" href=""
+                        <a class="dropdown-item" href="{{ route('admin.logout') }}"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <i class='ti ti-logout me-2'></i>
-                            <span class="align-middle">Logout</span>
+                            <span class="align-middle">تسجيل الخروج</span>
                         </a>
                     </li>
-                    <form method="POST" id="logout-form" action="">
+                    <form method="POST" id="logout-form" action="{{ route('admin.logout') }}" style="display: none;">
                         @csrf
                     </form>
                 @else
                     <li>
                         <a class="dropdown-item"
-                            href="{{ Route::has('login') ? route('login') : url('auth/login-basic') }}">
+                            href="{{ route('login') }}">
                             <i class='ti ti-login me-2'></i>
-                            <span class="align-middle">Login</span>
+                            <span class="align-middle">تسجيل الدخول</span>
                         </a>
                     </li>
                 @endif
