@@ -13,7 +13,8 @@
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
 
-        <!-- Header -->
+        @if ($canViewStats)
+            <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h4 class="mb-1">
@@ -626,10 +627,577 @@
             </div>
         </div>
 
+        @else
+            @php
+                $currentAdmin = auth('admin')->user();
+                $roles = $currentAdmin ? $currentAdmin->roles : collect();
+                $hasAnyPermission = false;
+            @endphp
+
+            <!-- Welcome Banner -->
+            <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 12px;">
+                <div class="card-body p-4 text-white">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar avatar-xl">
+                                @if($currentAdmin && $currentAdmin->photo)
+                                    <img src="{{ asset('images/admin/' . $currentAdmin->photo) }}" alt="Avatar" class="rounded-circle" style="width: 58px; height: 58px; object-fit: cover; border: 2px solid rgba(255,255,255,0.3);">
+                                @else
+                                    <span class="avatar-initial rounded-circle bg-primary fs-3 fw-bold" style="width: 58px; height: 58px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.3);">
+                                        {{ mb_substr($currentAdmin->name ?? 'A', 0, 1) }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div>
+                                <h4 class="text-white mb-1 fw-bold">
+                                    مرحباً بك، {{ $currentAdmin->name ?? 'المدير' }} 👋
+                                </h4>
+                                <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
+                                    @forelse($roles as $role)
+                                        <span class="badge bg-primary bg-opacity-75 px-3 py-1 text-white">
+                                            <i class="ti ti-shield-check me-1"></i>{{ $role->name }}
+                                        </span>
+                                    @empty
+                                        <span class="badge bg-secondary px-3 py-1">مدير بدون دور</span>
+                                    @endforelse
+                                    <span class="text-white-50 small ms-1">
+                                        <i class="ti ti-mail me-1"></i>{{ $currentAdmin->email ?? '' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-md-end">
+                            <span class="badge bg-light bg-opacity-10 text-white border border-light border-opacity-25 px-3 py-2">
+                                <i class="ti ti-calendar-event me-1"></i>{{ now()->locale('ar')->translatedFormat('l، d F Y') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header for Accessible Modules -->
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h5 class="mb-0 fw-bold text-primary">
+                        <i class="ti ti-apps me-2"></i>الأقسام والمهام المصرح لك بها
+                    </h5>
+                    <small class="text-muted">الوصول المباشر للوظائف المتاحة لحسابك</small>
+                </div>
+            </div>
+
+            <!-- Modules Grid Based on Admin's Permissions -->
+            <div class="row g-4 mb-4">
+
+                {{-- الحجز من المكتبة --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->can('create_library_orders')))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #10b981 !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-success">
+                                                <i class="ti ti-building-store fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-success">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">الحجز من المكتبة</h5>
+                                    <p class="text-muted small mb-3">
+                                        إنشاء وتسجيل طلبات الكتب والملازم يدوياً للطلاب الحاضرين بمقر المكتبة مع طباعة الفاتورة والباركود.
+                                    </p>
+                                </div>
+                                <div>
+                                    <a href="{{ route('dashboard.orders.library_booking') }}" class="btn btn-success w-100 fw-bold">
+                                        <i class="ti ti-plus me-1"></i>تسجيل طلب جديد من المكتبة
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- إدارة الطلبات --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->can('view_orders')))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #3b82f6 !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-primary">
+                                                <i class="ti ti-shopping-cart fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-primary">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">إدارة كل الطلبات</h5>
+                                    <p class="text-muted small mb-3">
+                                        استعراض قائمة طلبات المتجر، متابعة الحالات، وتحديث الشحن والتوصيل.
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-column gap-2">
+                                    <a href="{{ route('dashboard.orders') }}" class="btn btn-primary w-100">
+                                        <i class="ti ti-list me-1"></i>عرض قائمة الطلبات
+                                    </a>
+                                    @if ($currentAdmin->can('barcode_orders'))
+                                        <a href="{{ route('dashboard.orders.barcode') }}" class="btn btn-label-secondary w-100 btn-sm">
+                                            <i class="ti ti-barcode me-1"></i>إدارة باركود الطلبات
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- الكتب والمنتجات --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->can('view_products')))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #f59e0b !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-warning">
+                                                <i class="ti ti-books fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-warning">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">الكتب والمذكرات</h5>
+                                    <p class="text-muted small mb-3">
+                                        استعراض الكتب والملازم الدراسية، متابعة الأسعار، المخزون، والتصنيفات.
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-column gap-2">
+                                    <a href="{{ route('dashboard.product') }}" class="btn btn-warning w-100 text-white">
+                                        <i class="ti ti-book me-1"></i>عرض الكتب
+                                    </a>
+                                    @if ($currentAdmin->can('create_products'))
+                                        <a href="{{ route('dashboard.create.product') }}" class="btn btn-label-secondary w-100 btn-sm">
+                                            <i class="ti ti-plus me-1"></i>إضافة كتاب جديد
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- طلبات الكوبونات والفاوتشرات --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->hasAnyPermission(['view_voucher_orders', 'view_vouchers', 'view_coupons'])))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #8b5cf6 !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-info" style="color: #8b5cf6 !important; background-color: rgba(139, 92, 246, 0.1) !important;">
+                                                <i class="ti ti-ticket fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-info">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">الفاوتشرات والكوبونات</h5>
+                                    <p class="text-muted small mb-3">
+                                        متابعة طلبات كروت الكوبونات والفاوتشرات المسجلة وتحديث حالاتها.
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-column gap-2">
+                                    @if ($currentAdmin->can('view_voucher_orders'))
+                                        <a href="{{ route('dashboard.voucher_order') }}" class="btn btn-primary w-100" style="background-color: #8b5cf6; border-color: #8b5cf6;">
+                                            <i class="ti ti-file-text me-1"></i>طلبات الكوبونات
+                                        </a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_vouchers'))
+                                        <a href="{{ route('dashboard.voucher') }}" class="btn btn-label-secondary w-100 btn-sm">
+                                            <i class="ti ti-ticket me-1"></i>قائمة الفاوتشرات
+                                        </a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_coupons'))
+                                        <a href="{{ route('dashboard.coupons') }}" class="btn btn-label-secondary w-100 btn-sm">
+                                            <i class="ti ti-discount me-1"></i>أكواد المدرسين
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- المدرسين --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->can('view_teachers')))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #06b6d4 !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-info">
+                                                <i class="ti ti-users fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-info">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">المدرسين والمحاضرين</h5>
+                                    <p class="text-muted small mb-3">
+                                        إدارة حسابات المدرسين، المواد الخاصة بهم، وربطهم بالمراحل الدراسية.
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-column gap-2">
+                                    <a href="{{ route('dashboard.teachers') }}" class="btn btn-info w-100 text-white">
+                                        <i class="ti ti-user-check me-1"></i>عرض قائمة المدرسين
+                                    </a>
+                                    @if ($currentAdmin->can('create_teachers'))
+                                        <a href="{{ route('dashboard.create.teachers') }}" class="btn btn-label-secondary w-100 btn-sm">
+                                            <i class="ti ti-plus me-1"></i>إضافة مدرس جديد
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- المراحل والمواد الدراسية --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->hasAnyPermission(['view_stages', 'view_sliders', 'view_categories', 'view_main_categories'])))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #6366f1 !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-primary">
+                                                <i class="ti ti-school fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-primary">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">الهيكل التعليمي</h5>
+                                    <p class="text-muted small mb-3">
+                                        إدارة المراحل التعليمية، الصفوف الدراسية، المواد، والأقسام الرئيسية.
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @if ($currentAdmin->can('view_stages'))
+                                        <a href="{{ route('dashboard.education_stages') }}" class="btn btn-sm btn-outline-primary flex-fill">
+                                            المراحل التعليمية
+                                        </a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_sliders'))
+                                        <a href="{{ route('dashboard.slider') }}" class="btn btn-sm btn-outline-primary flex-fill">
+                                            الصفوف الدراسية
+                                        </a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_categories'))
+                                        <a href="{{ route('dashboard.category') }}" class="btn btn-sm btn-outline-primary flex-fill">
+                                            المواد الدراسية
+                                        </a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_main_categories'))
+                                        <a href="{{ route('dashboard.main_categories') }}" class="btn btn-sm btn-outline-primary flex-fill">
+                                            الأقسام الرئيسية
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- العروض والخصومات --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->hasAnyPermission(['view_offers', 'view_discounts'])))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #ef4444 !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-danger">
+                                                <i class="ti ti-tag fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-danger">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">العروض والخصومات</h5>
+                                    <p class="text-muted small mb-3">
+                                        إدارة العروض الترويجية والخصومات المطبقة على أسعار الكتب.
+                                    </p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    @if ($currentAdmin->can('view_offers'))
+                                        <a href="{{ route('dashboard.offers') }}" class="btn btn-danger flex-fill">العروض</a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_discounts'))
+                                        <a href="{{ route('dashboard.discounts') }}" class="btn btn-label-secondary flex-fill">الخصومات</a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- الشحن والمحافظات --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->hasAnyPermission(['view_shipping_methods', 'view_governorates'])))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #14b8a6 !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-info">
+                                                <i class="ti ti-truck fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-info">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">الشحن والمحافظات</h5>
+                                    <p class="text-muted small mb-3">
+                                        إدارة طرق وشركات الشحن، أسعار التوصيل للمحافظات والمناطق.
+                                    </p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    @if ($currentAdmin->can('view_shipping_methods'))
+                                        <a href="{{ route('dashboard.shipping_methods.index') }}" class="btn btn-info text-white flex-fill">طرق الشحن</a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_governorates'))
+                                        <a href="{{ route('dashboard.governorates.index') }}" class="btn btn-label-secondary flex-fill">المحافظات والمدن</a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- الأسئلة الشائعة والبحث --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->hasAnyPermission(['view_faqs', 'view_search_keywords', 'view_notifications'])))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #64748b !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-secondary">
+                                                <i class="ti ti-help fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-secondary">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">المحتوى والتنبيهات</h5>
+                                    <p class="text-muted small mb-3">
+                                        إدارة الأسئلة الشائعة، الكلمات الأكثر بحثاً، وتنبيهات الموقع للزوار.
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @if ($currentAdmin->can('view_faqs'))
+                                        <a href="{{ route('dashboard.faqs.index') }}" class="btn btn-sm btn-outline-secondary flex-fill">الأسئلة الشائعة</a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_search_keywords'))
+                                        <a href="{{ route('dashboard.search-keywords.index') }}" class="btn btn-sm btn-outline-secondary flex-fill">كلمات البحث</a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_notifications'))
+                                        <a href="{{ route('dashboard.site_notifications.index') }}" class="btn btn-sm btn-outline-secondary flex-fill">تنبيهات الموقع</a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- إدارة المديرين والأدوار --}}
+                @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->hasAnyPermission(['view_admins', 'view_roles', 'view_settings'])))
+                    @php $hasAnyPermission = true; @endphp
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #e11d48 !important;">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="avatar avatar-md">
+                                            <span class="avatar-initial rounded bg-label-danger">
+                                                <i class="ti ti-shield-lock fs-4"></i>
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-label-danger">متاح لك</span>
+                                    </div>
+                                    <h5 class="card-title mb-2 fw-bold">النظام والإدارة</h5>
+                                    <p class="text-muted small mb-3">
+                                        إدارة حسابات المديرين، توزيع الأدوار والصلاحيات، وإعدادات الموقع.
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @if ($currentAdmin->can('view_admins'))
+                                        <a href="{{ route('dashboard.admins.index') }}" class="btn btn-sm btn-danger flex-fill">قائمة المديرين</a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_roles'))
+                                        <a href="{{ route('dashboard.roles.index') }}" class="btn btn-sm btn-label-secondary flex-fill">الأدوار والصلاحيات</a>
+                                    @endif
+                                    @if ($currentAdmin->can('view_settings'))
+                                        <a href="{{ route('dashboard.settings.index') }}" class="btn btn-sm btn-label-secondary flex-fill">إعدادات الموقع</a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+            </div>
+
+            {{-- Fallback if no specific permissions --}}
+            @if (!$hasAnyPermission)
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body text-center py-5">
+                        <div class="avatar avatar-xl mx-auto mb-3">
+                            <span class="avatar-initial rounded-circle bg-label-warning fs-1">
+                                <i class="ti ti-alert-triangle"></i>
+                            </span>
+                        </div>
+                        <h4 class="fw-bold mb-2">لا توجد صلاحيات مخصصة لحسابك حالياً</h4>
+                        <p class="text-muted mb-4 mx-auto" style="max-width: 500px;">
+                            تم تسجيل دخولك بنجاح ولكن لم يتم تعيين صلاحيات وصول بعد. يرجى التواصل مع المسؤول العام (Super Admin) لمنحك الصلاحيات المناسبة لمهامك.
+                        </p>
+                        <a href="{{ route('dashboard.profile') }}" class="btn btn-primary">
+                            <i class="ti ti-user me-1"></i>عرض الملف الشخصي
+                        </a>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Recent Orders Table if admin has view_orders permission --}}
+            @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->can('view_orders')) && isset($recentOrders) && $recentOrders->count() > 0)
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-3">
+                        <h5 class="card-title mb-0 fw-bold">
+                            <i class="ti ti-clock me-2 text-primary"></i>آخر الطلبات المسجلة
+                        </h5>
+                        <a href="{{ route('dashboard.orders') }}" class="btn btn-sm btn-label-primary">
+                            <i class="ti ti-eye me-1"></i>عرض كل الطلبات
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>العميل</th>
+                                        <th>الإجمالي</th>
+                                        <th>الحالة</th>
+                                        <th>التاريخ</th>
+                                        <th>إجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentOrders as $order)
+                                        <tr>
+                                            <td>
+                                                <a href="{{ route('dashboard.orders.details', $order->id) }}" class="fw-bold text-primary">
+                                                    #{{ $order->id }}
+                                                </a>
+                                            </td>
+                                            <td>{{ $order->user->name ?? ($order->name ?? 'N/A') }}</td>
+                                            <td><span class="fw-bold">{{ number_format($order->total, 2) }}</span> جنيه</td>
+                                            <td>
+                                                @if ($order->status == 'delivered')
+                                                    <span class="badge bg-label-success">تم التوصيل</span>
+                                                @elseif($order->status == 'pending')
+                                                    <span class="badge bg-label-warning">قيد الانتظار</span>
+                                                @elseif($order->status == 'cancelled')
+                                                    <span class="badge bg-label-danger">ملغي</span>
+                                                @else
+                                                    <span class="badge bg-label-secondary">{{ $order->status }}</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $order->created_at->format('Y/m/d H:i') }}</td>
+                                            <td>
+                                                <a href="{{ route('dashboard.orders.details', $order->id) }}" class="btn btn-xs btn-label-primary">
+                                                    التفاصيل
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Recent Voucher Orders Table if admin has view_voucher_orders permission --}}
+            @if ($currentAdmin && ($currentAdmin->hasRole('Super Admin') || $currentAdmin->can('view_voucher_orders')) && isset($recentVoucherOrders) && $recentVoucherOrders->count() > 0)
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-3">
+                        <h5 class="card-title mb-0 fw-bold">
+                            <i class="ti ti-ticket me-2 text-info"></i>آخر طلبات الكوبونات
+                        </h5>
+                        <a href="{{ route('dashboard.voucher_order') }}" class="btn btn-sm btn-label-info">
+                            <i class="ti ti-eye me-1"></i>عرض الكل
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>العميل</th>
+                                        <th>الكمية</th>
+                                        <th>الحالة</th>
+                                        <th>التاريخ</th>
+                                        <th>إجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentVoucherOrders as $voucher)
+                                        <tr>
+                                            <td>
+                                                <a href="{{ route('dashboard.voucher_order.details', $voucher->id) }}" class="fw-bold text-info">
+                                                    #{{ $voucher->id }}
+                                                </a>
+                                            </td>
+                                            <td>{{ $voucher->user_name }}</td>
+                                            <td>{{ $voucher->quantity }}</td>
+                                            <td>
+                                                @if ($voucher->state == 'completed')
+                                                    <span class="badge bg-label-success">مكتملة</span>
+                                                @elseif($voucher->state == 'success')
+                                                    <span class="badge bg-label-info">ناجحة</span>
+                                                @elseif($voucher->state == 'pending')
+                                                    <span class="badge bg-label-warning">قيد الانتظار</span>
+                                                @else
+                                                    <span class="badge bg-label-secondary">{{ $voucher->state }}</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $voucher->created_at->format('Y/m/d H:i') }}</td>
+                                            <td>
+                                                <a href="{{ route('dashboard.voucher_order.details', $voucher->id) }}" class="btn btn-xs btn-label-info">
+                                                    التفاصيل
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+        @endif
     </div>
 @endsection
 
 @section('page-script')
+    @if ($canViewStats)
     <script>
         // Revenue Chart
         const revenueChartOptions = {
@@ -865,4 +1433,5 @@
             vouchersChart.render();
         }
     </script>
+    @endif
 @endsection

@@ -22,7 +22,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $permissionsByGroup = [
             'لوحة التحكم' => [
-                'view_dashboard' => 'عرض لوحة التحكم والإحصائيات',
+                'view_dashboard_stats' => 'عرض إحصائيات الشاشة الرئيسية',
             ],
             'إدارة المديرين' => [
                 'view_admins' => 'عرض قائمة المديرين',

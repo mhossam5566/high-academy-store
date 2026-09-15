@@ -19,11 +19,51 @@ class AdminController extends Controller
 
     public function index(Request $request)
     {
-        $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
-        $dateTo = $request->input('date_to', now()->endOfDay()->format('Y-m-d'));
+        $admin = auth('admin')->user();
 
-        $statistics = $this->getStatistics($dateFrom, $dateTo);
-        return view('dashboard.pages.home.dashboard', compact('statistics', 'dateFrom', 'dateTo'));
+        // Check if admin has permission to view dashboard statistics
+        $canViewStats = false;
+        if ($admin) {
+            if ($admin->hasRole('Super Admin')) {
+                $canViewStats = true;
+            } else {
+                try {
+                    $canViewStats = $admin->can('view_dashboard_stats') || $admin->can('view_dashboard');
+                } catch (\Throwable $e) {
+                    $canViewStats = false;
+                }
+            }
+        }
+
+        if ($canViewStats) {
+            $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
+            $dateTo = $request->input('date_to', now()->endOfDay()->format('Y-m-d'));
+
+            $statistics = $this->getStatistics($dateFrom, $dateTo);
+            return view('dashboard.pages.home.dashboard', compact('statistics', 'dateFrom', 'dateTo', 'canViewStats'));
+        }
+
+        // If admin doesn't have permission to view store-wide statistics,
+        // load operational data tailored to the specific permissions they DO have
+        $recentOrders = collect();
+        if ($admin && ($admin->hasRole('Super Admin') || $admin->can('view_orders'))) {
+            try {
+                $recentOrders = \App\Models\Order::with('user')->latest()->take(5)->get();
+            } catch (\Throwable $e) {
+                $recentOrders = collect();
+            }
+        }
+
+        $recentVoucherOrders = collect();
+        if ($admin && ($admin->hasRole('Super Admin') || $admin->can('view_voucher_orders'))) {
+            try {
+                $recentVoucherOrders = \App\Models\VouchersOrder::latest()->take(5)->get();
+            } catch (\Throwable $e) {
+                $recentVoucherOrders = collect();
+            }
+        }
+
+        return view('dashboard.pages.home.dashboard', compact('canViewStats', 'recentOrders', 'recentVoucherOrders'));
     }
 
     private function getStatistics($dateFrom, $dateTo)

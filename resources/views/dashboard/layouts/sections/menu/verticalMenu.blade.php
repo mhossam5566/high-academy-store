@@ -53,7 +53,7 @@
                     {{-- active menu method --}}
                     @php
                         $activeClass = null;
-                        $currentRouteName = Route::currentRouteName();
+                        $currentRouteName = Route::currentRouteName() ?? '';
 
                         if ($currentRouteName === $menu->slug) {
                             $activeClass = 'active';

@@ -17,7 +17,7 @@ class RoleController extends Controller
     {
         return [
             'لوحة التحكم' => [
-                'view_dashboard' => 'عرض لوحة التحكم والإحصائيات',
+                'view_dashboard_stats' => 'عرض إحصائيات الشاشة الرئيسية',
             ],
             'إدارة المديرين' => [
                 'view_admins' => 'عرض قائمة المديرين',
@@ -188,11 +188,21 @@ class RoleController extends Controller
     {
         try {
             $grouped = self::getPermissionsGrouped();
+            $permissionNames = [];
             foreach ($grouped as $group => $perms) {
                 foreach ($perms as $permName => $label) {
                     Permission::findOrCreate($permName, 'admin');
+                    $permissionNames[] = $permName;
                 }
             }
+
+            // Also ensure legacy view_dashboard exists for compatibility
+            Permission::findOrCreate('view_dashboard', 'admin');
+            $permissionNames[] = 'view_dashboard';
+
+            // Sync with Super Admin role
+            $superAdmin = Role::findOrCreate('Super Admin', 'admin');
+            $superAdmin->syncPermissions($permissionNames);
         } catch (\Throwable $e) {
             // Silently continue if DB connection isn't ready
         }

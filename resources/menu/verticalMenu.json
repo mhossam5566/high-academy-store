@@ -4,8 +4,7 @@
             "url": "/dashboard",
             "name": "لوحة التحكم",
             "icon": "menu-icon tf-icons ti ti-home",
-            "slug": "dashboard.index",
-            "permission": "view_dashboard"
+            "slug": "dashboard.index"
         },
         {
             "name": "إدارة المديرين",
