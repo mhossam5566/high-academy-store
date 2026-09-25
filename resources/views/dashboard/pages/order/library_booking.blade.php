@@ -48,6 +48,41 @@
             border-color: #7367f0;
             background-color: rgba(115, 103, 240, 0.06);
         }
+        .nav-pills .nav-link {
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        .nav-pills .nav-link.active {
+            box-shadow: 0 2px 6px rgba(115, 103, 240, 0.35);
+        }
+        @media print {
+            #layout-menu,
+            .layout-navbar,
+            .content-footer,
+            #libraryBookingTabs,
+            #quickPeriodGroup,
+            #statsFilterForm,
+            .btn-print-report,
+            #btnExportExcel,
+            .btn,
+            .card-header .btn-group,
+            .badge-primary {
+                display: none !important;
+            }
+            .card {
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            body {
+                background-color: #fff !important;
+            }
+            .content-wrapper {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        }
     </style>
 @endsection
 
@@ -68,6 +103,30 @@
             <i class="ti ti-arrow-right me-1"></i>العودة لقائمة الطلبات
         </a>
     </div>
+
+    {{-- Navigation Tabs --}}
+    <ul class="nav nav-pills mb-4 gap-2" id="libraryBookingTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ ($activeTab ?? 'booking') === 'booking' ? 'active' : '' }} fw-bold px-4 py-2" 
+                    id="tab-booking-btn" data-bs-toggle="pill" data-bs-target="#tab-booking-pane" type="button" role="tab" 
+                    aria-controls="tab-booking-pane" aria-selected="{{ ($activeTab ?? 'booking') === 'booking' ? 'true' : 'false' }}">
+                <i class="ti ti-edit me-2 fs-5"></i>حجز طلب جديد بالمكتبة
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ ($activeTab ?? 'booking') === 'statistics' ? 'active' : '' }} fw-bold px-4 py-2" 
+                    id="tab-stats-btn" data-bs-toggle="pill" data-bs-target="#tab-stats-pane" type="button" role="tab" 
+                    aria-controls="tab-stats-pane" aria-selected="{{ ($activeTab ?? 'booking') === 'statistics' ? 'true' : 'false' }}">
+                <i class="ti ti-chart-bar me-2 fs-5"></i>إحصائيات المبيعات والفروع
+                <span class="badge bg-primary ms-2" id="tabStatsBadge">{{ number_format($stats['grand_total_books'] ?? 0) }} كتاب</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content p-0 border-0 shadow-none bg-transparent" id="libraryBookingTabsContent">
+        {{-- TAB 1: Booking Form --}}
+        <div class="tab-pane fade {{ ($activeTab ?? 'booking') === 'booking' ? 'show active' : '' }}" 
+             id="tab-booking-pane" role="tabpanel" aria-labelledby="tab-booking-btn">
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible mb-4" role="alert">
@@ -172,31 +231,68 @@
                                 <label class="form-label fw-semibold">ابحث عن كتاب متاح للحجز المسبق (اسم الكتاب / المدرس / الصف)</label>
                                 <select id="productSelector" class="form-select select2-products">
                                     <option value="">-- اختر من الكتب المتاحة للحجز المسبق --</option>
-                                    @foreach ($products as $product)
-                                        @php
-                                            $prodPrice = $product->final_price ?? $product->price ?? 0;
-                                            $stock = $product->quantity ?? 0;
-                                            $stage = $product->sliders->name ?? '';
-                                            $brand = $product->brands->name ?? '';
-                                        @endphp
-                                        <option value="{{ $product->id }}" 
-                                                data-name="{{ $product->name }}"
-                                                data-short-name="{{ $product->short_name ?: $product->name }}"
-                                                data-price="{{ $prodPrice }}"
-                                                data-stock="{{ $stock }}"
-                                                data-brand="{{ $brand }}"
-                                                data-stage="{{ $stage }}">
-                                            {{ $product->short_name ?: $product->name }} 
-                                            @if($brand) - [مدرس: {{ $brand }}] @endif
-                                            @if($stage) - [{{ $stage }}] @endif
-                                            ({{ $prodPrice }} ج.م) - المتاح: {{ $stock }}
-                                        </option>
-                                    @endforeach
+                                    @php
+                                        $availableProducts = $products->filter(fn($p) => ($p->quantity ?? 0) > 0);
+                                        $outOfStockProducts = $products->filter(fn($p) => ($p->quantity ?? 0) <= 0);
+                                    @endphp
+
+                                    @if($availableProducts->isNotEmpty())
+                                        <optgroup label="✅ الكتب المتوفرة بالمخزن">
+                                            @foreach ($availableProducts as $product)
+                                                @php
+                                                    $prodPrice = $product->final_price ?? $product->price ?? 0;
+                                                    $stock = (int) ($product->quantity ?? 0);
+                                                    $stage = $product->sliders->name ?? '';
+                                                    $brand = $product->brands->name ?? '';
+                                                @endphp
+                                                <option value="{{ $product->id }}" 
+                                                        data-name="{{ $product->name }}"
+                                                        data-short-name="{{ $product->short_name ?: $product->name }}"
+                                                        data-price="{{ $prodPrice }}"
+                                                        data-stock="{{ $stock }}"
+                                                        data-brand="{{ $brand }}"
+                                                        data-stage="{{ $stage }}">
+                                                    {{ $product->short_name ?: $product->name }} 
+                                                    @if($brand) - [مدرس: {{ $brand }}] @endif
+                                                    @if($stage) - [{{ $stage }}] @endif
+                                                    ({{ $prodPrice }} ج.م) - [المتاح: {{ $stock }}]
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endif
+
+                                    @if($outOfStockProducts->isNotEmpty())
+                                        <optgroup label="❌ كتب نفدت من المخزن (رصيد 0 - غير متاحة للإضافة)">
+                                            @foreach ($outOfStockProducts as $product)
+                                                @php
+                                                    $prodPrice = $product->final_price ?? $product->price ?? 0;
+                                                    $stage = $product->sliders->name ?? '';
+                                                    $brand = $product->brands->name ?? '';
+                                                @endphp
+                                                <option value="{{ $product->id }}" 
+                                                        data-name="{{ $product->name }}"
+                                                        data-short-name="{{ $product->short_name ?: $product->name }}"
+                                                        data-price="{{ $prodPrice }}"
+                                                        data-stock="0"
+                                                        data-brand="{{ $brand }}"
+                                                        data-stage="{{ $stage }}"
+                                                        disabled>
+                                                    {{ $product->short_name ?: $product->name }} 
+                                                    @if($brand) - [مدرس: {{ $brand }}] @endif
+                                                    @if($stage) - [{{ $stage }}] @endif
+                                                    ({{ $prodPrice }} ج.م) - [نفد من المخزن: 0]
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endif
                                 </select>
+                                <div id="stockAvailabilityBadge" class="mt-2" style="display: none;"></div>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label fw-semibold">الكمية</label>
-                                <input type="number" id="quickQuantity" class="form-control text-center" value="1" min="1" max="99">
+                                <label class="form-label fw-semibold" for="quickQuantity">
+                                    الكمية <span id="quickMaxStockHint" class="text-primary small fw-bold"></span>
+                                </label>
+                                <input type="number" id="quickQuantity" class="form-control text-center fw-bold" value="1" min="1" max="99">
                             </div>
                             <div class="col-md-2">
                                 <button type="button" id="btnAddProduct" class="btn btn-success w-100" {{ $products->isEmpty() ? 'disabled' : '' }}>
@@ -390,6 +486,118 @@
             </div>
         </div>
     </form>
+        </div> {{-- End Tab 1 Booking Pane --}}
+
+        {{-- TAB 2: Statistics & Reports --}}
+        <div class="tab-pane fade {{ ($activeTab ?? 'booking') === 'statistics' ? 'show active' : '' }}" 
+             id="tab-stats-pane" role="tabpanel" aria-labelledby="tab-stats-btn">
+            
+            {{-- Filter Toolbar Card --}}
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center">
+                        <i class="ti ti-filter me-2 text-primary"></i>تحديد دورة وفترة الإحصائيات
+                    </h5>
+                    {{-- Quick Period Presets --}}
+                    <div class="btn-group btn-group-sm mt-2 mt-sm-0" role="group" id="quickPeriodGroup">
+                        <button type="button" class="btn btn-outline-primary {{ ($stats['period'] ?? '') === 'today' ? 'active' : '' }}" data-period="today">
+                            <i class="ti ti-calendar-event me-1"></i>اليوم
+                        </button>
+                        <button type="button" class="btn btn-outline-primary {{ ($stats['period'] ?? '') === 'week' ? 'active' : '' }}" data-period="week">
+                            <i class="ti ti-calendar me-1"></i>هذا الأسبوع
+                        </button>
+                        <button type="button" class="btn btn-outline-primary {{ ($stats['period'] ?? 'month') === 'month' ? 'active' : '' }}" data-period="month">
+                            <i class="ti ti-calendar-month me-1"></i>هذا الشهر
+                        </button>
+                        <button type="button" class="btn btn-outline-primary {{ ($stats['period'] ?? '') === 'year' ? 'active' : '' }}" data-period="year">
+                            <i class="ti ti-calendar-time me-1"></i>هذه السنة
+                        </button>
+                        <button type="button" class="btn btn-outline-primary {{ ($stats['period'] ?? '') === 'custom' ? 'active' : '' }}" data-period="custom">
+                            <i class="ti ti-calendar-stats me-1"></i>فترة مخصصة
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <form id="statsFilterForm" class="row g-3 align-items-end">
+                        <input type="hidden" name="period" id="statsPeriodInput" value="{{ $stats['period'] ?? 'month' }}">
+
+                        {{-- Custom Date Inputs --}}
+                        <div class="col-md-3 col-sm-6" id="fromDateCol" style="{{ ($stats['period'] ?? '') === 'custom' ? '' : 'display: none;' }}">
+                            <label class="form-label fw-semibold" for="stats_from_date">من تاريخ</label>
+                            <input type="date" id="stats_from_date" name="from_date" class="form-control" value="{{ $stats['from_date'] ?? '' }}">
+                        </div>
+                        <div class="col-md-3 col-sm-6" id="toDateCol" style="{{ ($stats['period'] ?? '') === 'custom' ? '' : 'display: none;' }}">
+                            <label class="form-label fw-semibold" for="stats_to_date">إلى تاريخ</label>
+                            <input type="date" id="stats_to_date" name="to_date" class="form-control" value="{{ $stats['to_date'] ?? '' }}">
+                        </div>
+
+                        {{-- Branch Filter --}}
+                        <div class="col-md-3 col-sm-6">
+                            <label class="form-label fw-semibold" for="stats_branch_id">فرع المكتبة</label>
+                            <select name="branch_id" id="stats_branch_id" class="form-select">
+                                <option value="all">-- كل الفروع --</option>
+                                @foreach($shippingMethods as $b)
+                                    <option value="{{ $b->id }}" {{ ($stats['selected_branch_id'] ?? '') == $b->id ? 'selected' : '' }}>
+                                        {{ $b->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Product Filter --}}
+                        <div class="col-md-3 col-sm-6">
+                            <label class="form-label fw-semibold" for="stats_product_id">تصفية حسب الكتاب / الصنف</label>
+                            <select name="product_id" id="stats_product_id" class="form-select select2-stats-product">
+                                <option value="all">-- جميع الكتب والأصناف --</option>
+                                @foreach($allProducts ?? $products as $prod)
+                                    <option value="{{ $prod->id }}" {{ ($stats['selected_product_id'] ?? '') == $prod->id ? 'selected' : '' }}>
+                                        {{ $prod->short_name ?: $prod->name }}
+                                        @if($prod->brands) ({{ $prod->brands->title ?? $prod->brands->name }}) @endif
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Status Filter --}}
+                        <div class="col-md-2 col-sm-6">
+                            <label class="form-label fw-semibold" for="stats_status">حالة الطلبات</label>
+                            <select name="status" id="stats_status" class="form-select">
+                                <option value="all" {{ ($stats['selected_status'] ?? '') == 'all' ? 'selected' : '' }}>كل الحالات المعتمدة</option>
+                                <option value="reserved" {{ ($stats['selected_status'] ?? '') == 'reserved' ? 'selected' : '' }}>محجوز (Reserved)</option>
+                                <option value="success" {{ ($stats['selected_status'] ?? '') == 'success' ? 'selected' : '' }}>ناجح ومستلم (Success)</option>
+                                <option value="new" {{ ($stats['selected_status'] ?? '') == 'new' ? 'selected' : '' }}>جديد (New)</option>
+                                <option value="pending" {{ ($stats['selected_status'] ?? '') == 'pending' ? 'selected' : '' }}>معلق (Pending)</option>
+                            </select>
+                        </div>
+
+                        {{-- Filter Action Buttons --}}
+                        <div class="col-md-4 col-sm-12 d-flex gap-2">
+                            <button type="submit" id="btnApplyStatsFilter" class="btn btn-primary flex-grow-1">
+                                <i class="ti ti-search me-1"></i>تطبيق الفلتر
+                            </button>
+                            <button type="button" id="btnResetStatsFilter" class="btn btn-label-secondary" title="إعادة تعيين إلى هذا الشهر">
+                                <i class="ti ti-refresh me-1"></i>إعادة تعيين
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {{-- Dynamic Stats Data Wrapper with Loading Overlay --}}
+            <div id="statsDataWrapper" class="position-relative">
+                <div id="statsLoadingOverlay" class="position-absolute w-100 h-100 top-0 start-0 d-flex justify-content-center align-items-center bg-white bg-opacity-75 rounded" style="display: none; z-index: 10;">
+                    <div class="text-center p-4">
+                        <div class="spinner-border text-primary mb-2" role="status" style="width: 3rem; height: 3rem;"></div>
+                        <div class="fw-bold text-dark fs-6">جاري جلب إحصائيات المبيعات والأصناف...</div>
+                    </div>
+                </div>
+                
+                <div id="statsContentPlaceholder">
+                    @include('dashboard.pages.order.partials.library_stats_content', ['stats' => $stats])
+                </div>
+            </div>
+        </div> {{-- End Tab 2 Stats Pane --}}
+    </div> {{-- End Tab Content --}}
 @endsection
 
 @section('page-script')
@@ -424,6 +632,62 @@ $(document).ready(function() {
         calculateTotals();
     });
 
+    // Stock feedback when selecting a product
+    $('#productSelector').on('change', function() {
+        const select = $(this);
+        const option = select.find('option:selected');
+        const stock = parseInt(option.data('stock')) || 0;
+        const val = select.val();
+        const hint = $('#quickMaxStockHint');
+        const badge = $('#stockAvailabilityBadge');
+        const quickQty = $('#quickQuantity');
+        const btnAdd = $('#btnAddProduct');
+
+        if (!val) {
+            hint.text('');
+            badge.hide();
+            quickQty.attr('max', 99).val(1);
+            btnAdd.prop('disabled', false);
+            return;
+        }
+
+        if (stock <= 0) {
+            hint.text('(نفد)').removeClass('text-primary').addClass('text-danger');
+            quickQty.attr('max', 0).val(0);
+            btnAdd.prop('disabled', true);
+            badge.html('<span class="badge bg-label-danger py-2 px-3 fs-6 d-inline-flex align-items-center"><i class="ti ti-alert-triangle me-1"></i>عفواً، هذا الكتاب غير متوفر في المخزن حالياً (الكمية: 0). لا يمكن إضافته للطلب.</span>').slideDown(200);
+        } else {
+            hint.text(`(أقصى حد: ${stock})`).removeClass('text-danger').addClass('text-primary');
+            quickQty.attr('max', stock).val(1);
+            btnAdd.prop('disabled', false);
+            badge.html(`<span class="badge bg-label-success py-2 px-3 fs-6 d-inline-flex align-items-center"><i class="ti ti-check me-1"></i>الكمية المتاحة في المخزن: <strong class="ms-1">${stock}</strong> نسخة</span>`).slideDown(200);
+        }
+    });
+
+    // Clamp quickQuantity input to available stock
+    $('#quickQuantity').on('input change', function() {
+        const select = $('#productSelector');
+        const option = select.find('option:selected');
+        if (select.val()) {
+            const stock = parseInt(option.data('stock')) || 0;
+            let val = parseInt($(this).val()) || 0;
+            if (stock <= 0) {
+                $(this).val(0);
+            } else if (val > stock) {
+                $(this).val(stock);
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'تجاوز الكمية المتاحة',
+                    text: `الكمية المتاحة في المخزن لهذا الكتاب هي (${stock}) فقط. تم ضبط الكمية على الحد الأقصى.`,
+                    confirmButtonText: 'حسناً',
+                    customClass: { confirmButton: 'btn btn-primary' }
+                });
+            } else if (val < 1) {
+                $(this).val(1);
+            }
+        }
+    });
+
     // Add Product button click
     $('#btnAddProduct').on('click', function() {
         const select = $('#productSelector');
@@ -447,8 +711,43 @@ $(document).ready(function() {
         const stock = parseInt(option.data('stock')) || 0;
         const qtyToAdd = parseInt($('#quickQuantity').val()) || 1;
 
+        if (stock <= 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'غير متوفر بالمخزن',
+                text: `الكتاب "${name}" رصيده بالمخزن هو (0) حالياً ولا يمكن إضافته للطلب.`,
+                confirmButtonText: 'حسناً',
+                customClass: { confirmButton: 'btn btn-danger' }
+            });
+            return;
+        }
+
+        const currentQty = selectedItems[productId] ? selectedItems[productId].quantity : 0;
+        const totalQty = currentQty + qtyToAdd;
+
+        if (totalQty > stock) {
+            const remainingCanAdd = Math.max(0, stock - currentQty);
+            Swal.fire({
+                icon: 'warning',
+                title: 'تجاوز الكمية المتاحة',
+                html: `
+                    <div class="text-start">
+                        <p class="mb-2">الكمية المطلوبة تتجاوز رصيد المخزن للكتاب: <strong>${name}</strong></p>
+                        <ul class="mb-1 text-muted small">
+                            <li>الرصيد المتاح بالمخزن: <strong class="text-dark">${stock}</strong> نسخة</li>
+                            <li>المضاف حالياً للطلب: <strong class="text-dark">${currentQty}</strong> نسخة</li>
+                            <li>أقصى كمية متبقية يمكنك إضافتها: <strong class="text-primary">${remainingCanAdd}</strong> نسخة</li>
+                        </ul>
+                    </div>
+                `,
+                confirmButtonText: 'حسناً',
+                customClass: { confirmButton: 'btn btn-primary' }
+            });
+            return;
+        }
+
         if (selectedItems[productId]) {
-            selectedItems[productId].quantity += qtyToAdd;
+            selectedItems[productId].quantity = totalQty;
         } else {
             selectedItems[productId] = {
                 id: productId,
@@ -466,7 +765,9 @@ $(document).ready(function() {
 
         // Reset selector
         select.val('').trigger('change');
-        $('#quickQuantity').val(1);
+        $('#quickQuantity').val(1).attr('max', 99);
+        $('#quickMaxStockHint').text('');
+        $('#stockAvailabilityBadge').hide();
     });
 
     // Render items table
@@ -494,6 +795,7 @@ $(document).ready(function() {
         keys.forEach(id => {
             const item = selectedItems[id];
             const itemTotal = (item.price * item.quantity).toFixed(2);
+            const isMaxReached = (item.quantity >= item.stock);
 
             html += `
                 <tr class="item-row" data-id="${item.id}">
@@ -504,7 +806,7 @@ $(document).ready(function() {
                             ${item.brand ? '<span class="badge bg-label-info me-1">مدرس: ' + item.brand + '</span>' : ''}
                             ${item.stage ? '<span class="badge bg-label-secondary me-1">' + item.stage + '</span>' : ''}
                             <span class="badge ${item.stock > 0 ? 'bg-label-success' : 'bg-label-danger'} badge-stock">
-                                المتاح: ${item.stock}
+                                المتاح في المخزن: ${item.stock}
                             </span>
                         </div>
                     </td>
@@ -523,16 +825,17 @@ $(document).ready(function() {
                             <button type="button" class="btn btn-sm btn-outline-secondary qty-btn btn-decrease" data-id="${item.id}">
                                 <i class="ti ti-minus"></i>
                             </button>
-                            <input type="number" min="1" max="99" 
+                            <input type="number" min="1" max="${item.stock}" 
                                    name="items[${index}][quantity]" 
-                                   class="form-control form-control-sm text-center item-qty-input" 
+                                   class="form-control form-control-sm text-center item-qty-input fw-bold" 
                                    data-id="${item.id}" 
                                    value="${item.quantity}" 
-                                   style="width: 55px;">
-                            <button type="button" class="btn btn-sm btn-outline-secondary qty-btn btn-increase" data-id="${item.id}">
+                                   style="width: 60px;">
+                            <button type="button" class="btn btn-sm ${isMaxReached ? 'btn-label-secondary' : 'btn-outline-secondary'} qty-btn btn-increase" data-id="${item.id}" ${isMaxReached ? 'title="تم الوصول لأقصى كمية متاحة بالمخزن"' : ''}>
                                 <i class="ti ti-plus"></i>
                             </button>
                         </div>
+                        ${isMaxReached ? '<small class="text-danger d-block mt-1 font-monospace" style="font-size: 0.7rem;">(الحد الأقصى)</small>' : ''}
                     </td>
                     <td class="text-center fw-bold text-primary">
                         <span class="row-total">${itemTotal}</span> ج.م
@@ -554,6 +857,17 @@ $(document).ready(function() {
     $(document).on('click', '.btn-increase', function() {
         const id = $(this).data('id');
         if (selectedItems[id]) {
+            const stock = selectedItems[id].stock;
+            if (selectedItems[id].quantity >= stock) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'الحد الأقصى للمخزون',
+                    text: `لا يمكنك زيادة الكمية. الرصيد المتاح في المخزن لهذا الكتاب هو (${stock}) نسخة فقط.`,
+                    confirmButtonText: 'حسناً',
+                    customClass: { confirmButton: 'btn btn-primary' }
+                });
+                return;
+            }
             selectedItems[id].quantity += 1;
             renderItemsTable();
             calculateTotals();
@@ -571,9 +885,25 @@ $(document).ready(function() {
 
     $(document).on('change input', '.item-qty-input', function() {
         const id = $(this).data('id');
-        const val = parseInt($(this).val()) || 1;
+        let val = parseInt($(this).val()) || 1;
         if (selectedItems[id]) {
-            selectedItems[id].quantity = Math.max(1, val);
+            const stock = selectedItems[id].stock;
+            if (val > stock) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'تجاوز الكمية المتاحة',
+                    text: `الكمية المدخلة (${val}) تتجاوز المتاح في المخزن (${stock}). تم تعديل الكمية تلقائياً إلى الحد الأقصى (${stock}).`,
+                    confirmButtonText: 'حسناً',
+                    customClass: { confirmButton: 'btn btn-primary' }
+                });
+                val = stock;
+                $(this).val(val);
+            }
+            if (val < 1) {
+                val = 1;
+                $(this).val(1);
+            }
+            selectedItems[id].quantity = val;
             renderItemsTable();
             calculateTotals();
         }
@@ -670,8 +1000,144 @@ $(document).ready(function() {
             return false;
         }
 
+        // Validate stock for all selected items before sending
+        let stockError = null;
+        Object.values(selectedItems).forEach(item => {
+            if (item.stock <= 0) {
+                stockError = `الكتاب "${item.name}" رصيده بالمخزن (0) ولا يمكن إتمام الحجز به. يرجى حذفه أولاً.`;
+            } else if (item.quantity > item.stock) {
+                stockError = `الكمية المطلوبة من كتاب "${item.name}" (${item.quantity} نسخة) تتجاوز الرصيد المتاح بالمخزن (${item.stock} نسخة).`;
+            }
+        });
+
+        if (stockError) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'خطأ في الكميات والمخزون',
+                text: stockError,
+                confirmButtonText: 'حسناً',
+                customClass: { confirmButton: 'btn btn-danger' }
+            });
+            return false;
+        }
+
         // Disable submit button to prevent double-submit
         $('#btnSubmitOrder').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>جاري حفظ الطلب...');
+    });
+
+    // ==========================================
+    // LIBRARY STATISTICS TAB LOGIC
+    // ==========================================
+
+    // Initialize Select2 for stats product filter
+    $('.select2-stats-product').select2({
+        placeholder: '-- جميع الكتب والأصناف --',
+        allowClear: true,
+        width: '100%',
+        dir: 'rtl'
+    });
+
+    // Handle Quick Period Preset Buttons (اليوم، هذا الأسبوع، هذا الشهر، هذه السنة، فترة مخصصة)
+    $('#quickPeriodGroup button').on('click', function() {
+        const period = $(this).data('period');
+        $('#quickPeriodGroup button').removeClass('active');
+        $(this).addClass('active');
+        $('#statsPeriodInput').val(period);
+
+        if (period === 'custom') {
+            $('#fromDateCol, #toDateCol').slideDown(200);
+            $('#stats_from_date').focus();
+        } else {
+            $('#fromDateCol, #toDateCol').slideUp(200);
+            // Automatically submit filter when selecting a quick preset
+            fetchStatistics();
+        }
+    });
+
+    // Filter Form Submit
+    $('#statsFilterForm').on('submit', function(e) {
+        e.preventDefault();
+        fetchStatistics();
+    });
+
+    // Reset Filter Button
+    $('#btnResetStatsFilter').on('click', function() {
+        $('#statsPeriodInput').val('month');
+        $('#quickPeriodGroup button').removeClass('active');
+        $('#quickPeriodGroup button[data-period="month"]').addClass('active');
+        $('#fromDateCol, #toDateCol').hide();
+        $('#stats_from_date').val('');
+        $('#stats_to_date').val('');
+        $('#stats_branch_id').val('all');
+        $('#stats_product_id').val('all').trigger('change');
+        $('#stats_status').val('all');
+        fetchStatistics();
+    });
+
+    // Function to fetch statistics via AJAX
+    function fetchStatistics() {
+        const formData = $('#statsFilterForm').serialize();
+        $('#statsLoadingOverlay').show();
+
+        // Update Excel export link with current filters
+        const exportBaseUrl = "{{ route('dashboard.orders.library_booking.stats.export') }}";
+        $('#btnExportExcel').attr('href', exportBaseUrl + '?' + formData);
+
+        $.ajax({
+            url: "{{ route('dashboard.orders.library_booking.stats') }}",
+            type: "GET",
+            data: formData,
+            dataType: "json",
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                $('#statsLoadingOverlay').hide();
+                if (response.status === 'success' && response.html) {
+                    $('#statsContentPlaceholder').html(response.html);
+                    if (response.stats) {
+                        $('#tabStatsBadge').text(response.stats.grand_total_books + ' كتاب');
+                        $('#currentPeriodTitle').text(response.stats.period_label);
+                        // Re-bind export link inside dynamic content
+                        $('#btnExportExcel').attr('href', exportBaseUrl + '?' + formData);
+                    }
+                }
+            },
+            error: function(xhr) {
+                $('#statsLoadingOverlay').hide();
+                console.error('Error fetching statistics:', xhr);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: 'حدث خطأ أثناء تحميل بيانات الإحصائيات، يرجى المحاولة مرة أخرى.',
+                    confirmButtonText: 'حسناً',
+                    customClass: { confirmButton: 'btn btn-primary' }
+                });
+            }
+        });
+    }
+
+    // Persist active tab across page refresh & URL hash
+    function checkUrlTab() {
+        const hash = window.location.hash;
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+
+        if (hash === '#statistics' || tabParam === 'statistics') {
+            const statsTab = new bootstrap.Tab(document.getElementById('tab-stats-btn'));
+            statsTab.show();
+        }
+    }
+
+    checkUrlTab();
+
+    $('#tab-booking-btn').on('shown.bs.tab', function() {
+        window.history.replaceState(null, null, window.location.pathname + '?tab=booking');
+    });
+
+    $('#tab-stats-btn').on('shown.bs.tab', function() {
+        window.history.replaceState(null, null, window.location.pathname + '?tab=statistics');
     });
 });
 </script>

@@ -242,6 +242,12 @@
                     "permission": "create_library_orders"
                 },
                 {
+                    "url": "/dashboard/orders/library-booking?tab=statistics",
+                    "name": "إحصائيات فروع المكتبة",
+                    "slug": "dashboard.orders.library_booking.stats",
+                    "permission": "create_library_orders"
+                },
+                {
                     "url": "/dashboard/orders",
                     "name": "كل الطلبات",
                     "slug": "dashboard.orders",

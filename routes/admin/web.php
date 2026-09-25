@@ -123,6 +123,8 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/orders/library-booking', [OrderController::class, 'createLibraryOrder'])->name('orders.library_booking');
     Route::post('/orders/library-booking', [OrderController::class, 'storeLibraryOrder'])->name('orders.library_booking.store');
+    Route::get('/orders/library-booking/statistics-data', [OrderController::class, 'libraryBookingStatistics'])->name('orders.library_booking.stats');
+    Route::get('/orders/library-booking/statistics-export', [OrderController::class, 'libraryBookingStatisticsExport'])->name('orders.library_booking.stats.export');
     Route::get('orders/datatable', [OrderController::class, 'datatable'])->name('orders.datatable');
     Route::get('orders/details/{id}', [OrderController::class, 'details'])->name('orders.details');
     Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');

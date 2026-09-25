@@ -25,6 +25,7 @@ use App\Models\OrderDetail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -902,12 +903,12 @@ class OrderController extends Controller
     }
 
     /**
-     * Show the library booking form for creating an in-person order.
+     * Show the library booking form for creating an in-person order and viewing statistics.
      */
-    public function createLibraryOrder()
+    public function createLibraryOrder(Request $request)
     {
         $admin = auth('admin')->user();
-        if ($admin && !$admin->hasRole('Super Admin') && !$admin->can('create_library_orders')) {
+        if ($admin && !$admin->hasRole('Super Admin') && !$admin->can('create_library_orders') && !$admin->can('view_orders')) {
             abort(403, 'غير مصرح لك بالوصول لصفحة الحجز من المكتبة');
         }
 
@@ -918,13 +919,23 @@ class OrderController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
+        // Fetch all products for the statistics filter dropdown
+        $allProducts = Product::where('is_deleted', 0)
+            ->with(['translations', 'brands'])
+            ->orderBy('id', 'desc')
+            ->get();
+
         // Fetch ONLY library branches (type = branch)
         $shippingMethods = ShippingMethod::where('type', 'branch')->get();
         if ($shippingMethods->isEmpty()) {
             $shippingMethods = ShippingMethod::all();
         }
 
-        return view('dashboard.pages.order.library_booking', compact('products', 'shippingMethods'));
+        // Calculate initial statistics
+        $stats = $this->calculateLibraryBookingStats($request);
+        $activeTab = $request->query('tab', 'booking');
+
+        return view('dashboard.pages.order.library_booking', compact('products', 'allProducts', 'shippingMethods', 'stats', 'activeTab'));
     }
 
     /**
@@ -994,6 +1005,20 @@ class OrderController extends Controller
             foreach ($request->items as $item) {
                 $product = Product::findOrFail($item['product_id']);
                 $qty = (int) $item['quantity'];
+                $availableStock = (int) ($product->quantity ?? 0);
+                $prodTitle = $product->short_name ?: $product->name;
+
+                if ($availableStock <= 0) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'items' => ["عفواً، الكتاب '{$prodTitle}' نفد من المخزن (الكمية المتاحة: 0) ولا يمكن إتمام الحجز به."],
+                    ]);
+                }
+
+                if ($qty > $availableStock) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'items' => ["الكمية المطلوبة من كتاب '{$prodTitle}' ({$qty} نسخة) تتجاوز الرصيد المتاح بالمخزن ({$availableStock} نسخة فقط)."],
+                    ]);
+                }
                 
                 $unitPrice = isset($item['price']) && $item['price'] !== '' && is_numeric($item['price'])
                     ? (float) $item['price']
@@ -1109,5 +1134,378 @@ class OrderController extends Controller
             return redirect()->route('dashboard.orders.details', $order->id)
                 ->with('success', "تم إنشاء حجز المكتبة بنجاح برقم الطلب #{$order->id} ({$order->code})");
         });
+    }
+
+    /**
+     * AJAX endpoint to fetch statistics data and rendered HTML for library orders.
+     */
+    public function libraryBookingStatistics(Request $request)
+    {
+        $admin = auth('admin')->user();
+        if ($admin && !$admin->hasRole('Super Admin') && !$admin->can('create_library_orders') && !$admin->can('view_orders')) {
+            return response()->json(['error' => 'غير مصرح لك بالوصول للإحصائيات'], 403);
+        }
+
+        $stats = $this->calculateLibraryBookingStats($request);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $html = view('dashboard.pages.order.partials.library_stats_content', compact('stats'))->render();
+            return response()->json([
+                'status' => 'success',
+                'stats' => $stats,
+                'html' => $html,
+            ]);
+        }
+
+        return redirect()->route('dashboard.orders.library_booking', ['tab' => 'statistics'] + $request->all());
+    }
+
+    /**
+     * Export library booking statistics to CSV (with Arabic UTF-8 BOM for Excel).
+     */
+    public function libraryBookingStatisticsExport(Request $request)
+    {
+        $admin = auth('admin')->user();
+        if ($admin && !$admin->hasRole('Super Admin') && !$admin->can('create_library_orders') && !$admin->can('view_orders')) {
+            abort(403, 'غير مصرح لك بتصدير الإحصائيات');
+        }
+
+        $stats = $this->calculateLibraryBookingStats($request);
+        $filename = 'library-sales-stats-' . $stats['period'] . '-' . date('Y-m-d') . '.csv';
+
+        $callback = function () use ($stats) {
+            $handle = fopen('php://output', 'w');
+            fputs($handle, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel
+
+            fputcsv($handle, ['تقرير إحصائيات مبيعات فروع المكتبة']);
+            fputcsv($handle, ['الدورة / الفترة:', $stats['period_label']]);
+            fputcsv($handle, ['من تاريخ:', $stats['from_date'], 'إلى تاريخ:', $stats['to_date']]);
+            fputcsv($handle, []);
+
+            fputcsv($handle, ['إجمالي الكتب المباعة:', $stats['grand_total_books']]);
+            fputcsv($handle, ['إجمالي المبيعات (جنيه):', number_format($stats['grand_total_revenue'], 2)]);
+            fputcsv($handle, ['إجمالي عدد الطلبات:', $stats['grand_total_orders']]);
+            fputcsv($handle, ['أكثر الفروع مبيعاً:', $stats['top_branch']]);
+            fputcsv($handle, ['أكثر الكتب مبيعاً:', $stats['top_product']]);
+            fputcsv($handle, []);
+
+            fputcsv($handle, ['=== تفاصيل مبيعات كل فرع والأصناف ===']);
+            fputcsv($handle, ['الفرع', 'اسم الكتاب / الصنف', 'المدرس / المؤلف', 'سعر الوحدة', 'الكمية المباعة', 'إجمالي المبلغ']);
+
+            foreach ($stats['branches_stats'] as $branch) {
+                if (empty($branch['items'])) {
+                    fputcsv($handle, [$branch['branch_name'], 'لا توجد مبيعات', '—', 0, 0, 0]);
+                } else {
+                    foreach ($branch['items'] as $item) {
+                        fputcsv($handle, [
+                            $branch['branch_name'],
+                            $item['product_name'],
+                            $item['author'],
+                            $item['unit_price'],
+                            $item['quantity'],
+                            $item['total_amount']
+                        ]);
+                    }
+                }
+                fputcsv($handle, [
+                    'إجمالي ' . $branch['branch_name'],
+                    '',
+                    '',
+                    '',
+                    $branch['total_books'],
+                    $branch['total_revenue']
+                ]);
+                fputcsv($handle, []);
+            }
+
+            fputcsv($handle, ['=== ملخص مبيعات الأصناف عبر جميع الفروع ===']);
+            fputcsv($handle, ['اسم الكتاب / الصنف', 'المدرس / المؤلف', 'سعر الوحدة', 'إجمالي الكمية المباعة', 'إجمالي المبيعات']);
+            foreach ($stats['products_summary'] as $prod) {
+                fputcsv($handle, [
+                    $prod['product_name'],
+                    $prod['brand_name'],
+                    $prod['unit_price'],
+                    $prod['total_quantity'],
+                    $prod['total_revenue']
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    /**
+     * Calculate comprehensive statistics for library branch sales and book items.
+     */
+    protected function calculateLibraryBookingStats(Request $request)
+    {
+        $period = $request->input('period', 'month');
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
+        $selectedBranchId = $request->input('branch_id');
+        $selectedProductId = $request->input('product_id');
+        $selectedStatus = $request->input('status', 'all');
+
+        $now = Carbon::now();
+        $startDate = null;
+        $endDate = null;
+        $periodLabel = '';
+
+        switch ($period) {
+            case 'today':
+                $startDate = $now->copy()->startOfDay();
+                $endDate = $now->copy()->endOfDay();
+                $periodLabel = 'اليوم (' . $now->format('Y-m-d') . ')';
+                break;
+            case 'week':
+                $startDate = $now->copy()->startOfWeek();
+                $endDate = $now->copy()->endOfWeek();
+                $periodLabel = 'هذا الأسبوع (' . $startDate->format('Y-m-d') . ' إلى ' . $endDate->format('Y-m-d') . ')';
+                break;
+            case 'year':
+                $startDate = $now->copy()->startOfYear();
+                $endDate = $now->copy()->endOfYear();
+                $periodLabel = 'هذه السنة (' . $now->year . ')';
+                break;
+            case 'custom':
+                if ($fromDate && $toDate) {
+                    $startDate = Carbon::parse($fromDate)->startOfDay();
+                    $endDate = Carbon::parse($toDate)->endOfDay();
+                    $periodLabel = 'من ' . $startDate->format('Y-m-d') . ' إلى ' . $endDate->format('Y-m-d');
+                } elseif ($fromDate) {
+                    $startDate = Carbon::parse($fromDate)->startOfDay();
+                    $endDate = $now->copy()->endOfDay();
+                    $periodLabel = 'من ' . $startDate->format('Y-m-d') . ' حتى اليوم';
+                } else {
+                    $period = 'month';
+                    $startDate = $now->copy()->startOfMonth();
+                    $endDate = $now->copy()->endOfMonth();
+                    $periodLabel = 'هذا الشهر (' . $now->format('Y-m') . ')';
+                }
+                break;
+            case 'month':
+            default:
+                $period = 'month';
+                $startDate = $now->copy()->startOfMonth();
+                $endDate = $now->copy()->endOfMonth();
+                $periodLabel = 'هذا الشهر (' . $now->format('Y-m') . ')';
+                break;
+        }
+
+        // Get all branch shipping methods
+        $branches = ShippingMethod::where('type', 'branch')->get();
+        if ($branches->isEmpty()) {
+            $branches = ShippingMethod::all();
+        }
+        $branchIds = $branches->pluck('id')->toArray();
+
+        // Determine target branch IDs for filtering
+        $filterBranchIds = $branchIds;
+        if ($selectedBranchId && $selectedBranchId !== 'all') {
+            $filterBranchIds = [(int)$selectedBranchId];
+        }
+
+        // Base Orders Query
+        $ordersQuery = Order::query()
+            ->where(function ($q) use ($filterBranchIds) {
+                $q->whereIn('shipping_method_id', $filterBranchIds)
+                  ->orWhereIn('shipping_method', array_map('strval', $filterBranchIds))
+                  ->orWhereHas('shipping', function ($sub) use ($filterBranchIds) {
+                      $sub->whereIn('id', $filterBranchIds);
+                  });
+            })
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('created_at', [$startDate, $endDate])
+                  ->orWhereBetween('date', [$startDate->format('Y-m-d 00:00:00'), $endDate->format('Y-m-d 23:59:59')]);
+            });
+
+        // Status filter
+        if ($selectedStatus && $selectedStatus !== 'all') {
+            $ordersQuery->where('status', $selectedStatus);
+        } else {
+            $ordersQuery->whereNotIn('status', ['canceled', 'cancelled', 'rejected']);
+        }
+
+        // Product filter (if selected)
+        if ($selectedProductId && $selectedProductId !== 'all') {
+            $ordersQuery->whereHas('orderDetails', function ($q) use ($selectedProductId) {
+                $q->where('product_id', $selectedProductId);
+            });
+        }
+
+        // Retrieve orders with relations
+        $orders = $ordersQuery->with([
+            'orderDetails' => function ($q) use ($selectedProductId) {
+                if ($selectedProductId && $selectedProductId !== 'all') {
+                    $q->where('product_id', $selectedProductId);
+                }
+                $q->with(['products.translations', 'products.brands.translations']);
+            },
+            'shipping'
+        ])->get();
+
+        // Initialize branch aggregation dictionary
+        $branchStats = [];
+        foreach ($branches as $branch) {
+            if ($selectedBranchId && $selectedBranchId !== 'all' && $branch->id != $selectedBranchId) {
+                continue;
+            }
+            $branchStats[$branch->id] = [
+                'branch_id' => $branch->id,
+                'branch_name' => $branch->name,
+                'branch_address' => $branch->address ?: 'المكتبة',
+                'orders_count' => 0,
+                'total_books' => 0,
+                'total_revenue' => 0,
+                'items' => [], // product_id => item stats
+            ];
+        }
+
+        $grandTotalBooks = 0;
+        $grandTotalRevenue = 0;
+        $grandTotalOrders = $orders->count();
+        $allProductsSummary = [];
+
+        foreach ($orders as $order) {
+            // Identify branch
+            $bId = $order->shipping_method_id ?: (is_numeric($order->shipping_method) ? (int)$order->shipping_method : null);
+            if (!$bId || !isset($branchStats[$bId])) {
+                if ($order->shipping && isset($branchStats[$order->shipping->id])) {
+                    $bId = $order->shipping->id;
+                } else {
+                    $matchedBranch = $branches->first(function ($b) use ($order) {
+                        return $b->name == $order->shipping_name || $b->name == $order->address;
+                    });
+                    if ($matchedBranch && isset($branchStats[$matchedBranch->id])) {
+                        $bId = $matchedBranch->id;
+                    } else {
+                        $bId = 'other';
+                        if (!isset($branchStats[$bId])) {
+                            $branchStats[$bId] = [
+                                'branch_id' => null,
+                                'branch_name' => $order->shipping_name ?: ($order->address ?: 'فرع آخر'),
+                                'branch_address' => $order->shipping_address ?: '—',
+                                'orders_count' => 0,
+                                'total_books' => 0,
+                                'total_revenue' => 0,
+                                'items' => [],
+                            ];
+                        }
+                    }
+                }
+            }
+
+            $branchStats[$bId]['orders_count']++;
+
+            foreach ($order->orderDetails as $detail) {
+                $qty = (int) ($detail->amout ?? 1);
+                $unitPrice = (float) ($detail->price ?? 0);
+                $itemTotal = (float) ($detail->total_price ?: ($qty * $unitPrice));
+
+                $branchStats[$bId]['total_books'] += $qty;
+                $branchStats[$bId]['total_revenue'] += $itemTotal;
+
+                $grandTotalBooks += $qty;
+                $grandTotalRevenue += $itemTotal;
+
+                $product = $detail->products;
+                $pId = $detail->product_id ?: 0;
+                $pName = $product ? ($product->short_name ?: $product->name) : ('كتاب #' . $pId);
+                $brandTitle = '—';
+                if ($product && $product->brands) {
+                    $brandTitle = $product->brands->title ?? $product->brands->name ?? '—';
+                }
+
+                // Add to branch items
+                if (!isset($branchStats[$bId]['items'][$pId])) {
+                    $branchStats[$bId]['items'][$pId] = [
+                        'product_id' => $pId,
+                        'product_name' => $pName,
+                        'author' => $brandTitle,
+                        'unit_price' => $unitPrice,
+                        'quantity' => 0,
+                        'total_amount' => 0,
+                    ];
+                }
+                $branchStats[$bId]['items'][$pId]['quantity'] += $qty;
+                $branchStats[$bId]['items'][$pId]['total_amount'] += $itemTotal;
+
+                // Add to overall products summary
+                if (!isset($allProductsSummary[$pId])) {
+                    $allProductsSummary[$pId] = [
+                        'product_id' => $pId,
+                        'product_name' => $pName,
+                        'brand_name' => $brandTitle,
+                        'unit_price' => $unitPrice,
+                        'total_quantity' => 0,
+                        'total_revenue' => 0,
+                        'branch_sales' => [],
+                    ];
+                }
+                $allProductsSummary[$pId]['total_quantity'] += $qty;
+                $allProductsSummary[$pId]['total_revenue'] += $itemTotal;
+                $currentBranchName = $branchStats[$bId]['branch_name'];
+                $allProductsSummary[$pId]['branch_sales'][$currentBranchName] = ($allProductsSummary[$pId]['branch_sales'][$currentBranchName] ?? 0) + $qty;
+            }
+        }
+
+        // Sort items inside each branch by quantity descending
+        foreach ($branchStats as &$b) {
+            if (!empty($b['items'])) {
+                $itemsArray = array_values($b['items']);
+                usort($itemsArray, function ($a, $b) {
+                    return $b['quantity'] <=> $a['quantity'];
+                });
+                $b['items'] = $itemsArray;
+            } else {
+                $b['items'] = [];
+            }
+        }
+        unset($b);
+
+        // Sort overall products by quantity descending
+        $allProductsList = array_values($allProductsSummary);
+        usort($allProductsList, function ($a, $b) {
+            return $b['total_quantity'] <=> $a['total_quantity'];
+        });
+
+        // Top branch
+        $topBranchName = '—';
+        $topBranchBooks = 0;
+        foreach ($branchStats as $b) {
+            if ($b['total_books'] > $topBranchBooks) {
+                $topBranchBooks = $b['total_books'];
+                $topBranchName = $b['branch_name'] . ' (' . $b['total_books'] . ' كتاب)';
+            }
+        }
+
+        // Top product
+        $topProductName = '—';
+        if (!empty($allProductsList) && $allProductsList[0]['total_quantity'] > 0) {
+            $topProductName = $allProductsList[0]['product_name'] . ' (' . $allProductsList[0]['total_quantity'] . ' نسخة)';
+        }
+
+        return [
+            'period' => $period,
+            'period_label' => $periodLabel,
+            'from_date' => $startDate->format('Y-m-d'),
+            'to_date' => $endDate->format('Y-m-d'),
+            'selected_branch_id' => $selectedBranchId ?: 'all',
+            'selected_product_id' => $selectedProductId ?: 'all',
+            'selected_status' => $selectedStatus,
+            'grand_total_books' => $grandTotalBooks,
+            'grand_total_revenue' => $grandTotalRevenue,
+            'grand_total_orders' => $grandTotalOrders,
+            'top_branch' => $topBranchName,
+            'top_product' => $topProductName,
+            'branches_stats' => array_values($branchStats),
+            'products_summary' => $allProductsList,
+            'branches_list' => $branches,
+        ];
     }
 }
