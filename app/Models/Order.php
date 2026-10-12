@@ -65,4 +65,9 @@ class Order extends Model
     {
         return $this->belongsTo(ShippingMethod::class, 'shipping_method');
     }
+
+    public function logs()
+    {
+        return $this->hasMany(OrderLog::class, 'order_id')->orderBy('id');
+    }
 }

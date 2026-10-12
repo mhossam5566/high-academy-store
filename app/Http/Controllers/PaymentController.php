@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\OrderLog;
 use App\Mail\SuccessPaid;
 use Illuminate\Http\Request;
 use App\Services\WhatsappService;
@@ -49,13 +50,31 @@ class PaymentController extends Controller
     }
 
     /**
-     * كتابة لوج إلى الملف
+     * كتابة لوج إلى قاعدة البيانات
+     *
+     * @param mixed      &$dbLogState  حالة مشتركة [order_id, process_id, ip]
+     * @param string      $message
+     * @param string      $level       info|success|warning|error
+     * @param string|null $step
+     * @param array       $context
      */
-    private function logToFile($filePath, $message)
+    private function logToDB(array &$dbLogState, string $message, string $level = 'info', ?string $step = null, array $context = []): void
     {
-        $timestamp = date('Y-m-d H:i:s');
-        $logMessage = "[{$timestamp}] {$message}" . PHP_EOL;
-        file_put_contents($filePath, $logMessage, FILE_APPEND | LOCK_EX);
+        try {
+            OrderLog::create([
+                'order_id'   => $dbLogState['order_id'] ?? null,
+                'process_id' => $dbLogState['process_id'] ?? null,
+                'level'      => $level,
+                'step'       => $step,
+                'message'    => $message,
+                'context'    => $context ?: null,
+                'ip'         => $dbLogState['ip'] ?? null,
+            ]);
+        } catch (\Throwable $e) {
+            // fallback to laravel log so we never lose the message
+            Log::warning('OrderLog DB write failed: ' . $e->getMessage());
+            Log::info("[{$level}] {$message}", $context);
+        }
     }
 
     public function payment($order)
@@ -139,214 +158,233 @@ class PaymentController extends Controller
 
         // إنشاء معرف فريد للعملية
         $processId = 'fawry_' . time() . '_' . uniqid();
-        $logFile = storage_path("logs/fawry_webhooks/{$processId}.log");
 
-        // إنشاء المجلد إذا لم يكن موجود
-        if (!file_exists(dirname($logFile))) {
-            mkdir(dirname($logFile), 0755, true);
-        }
-
-        // بداية التسجيل
-        $this->logToFile($logFile, "=== FAWRY WEBHOOK PROCESS START ===");
-        $this->logToFile($logFile, "Process ID: {$processId}");
-        $this->logToFile($logFile, "Timestamp: " . date('Y-m-d H:i:s'));
-        $this->logToFile($logFile, "Request IP: " . $request->ip());
-        $this->logToFile($logFile, "Request Method: " . $request->method());
+        // حالة اللوج المشتركة (قبل معرفة الطلب)
+        $dbLog = [
+            'order_id'   => null,
+            'process_id' => $processId,
+            'ip'         => $request->ip(),
+        ];
 
         // تحويل المصفوفة إلى JSON
         $jsonText = json_encode($data, JSON_PRETTY_PRINT);
-        $this->logToFile($logFile, "Received data: " . $jsonText);
+
+        // بداية التسجيل
+        $this->logToDB($dbLog, '=== FAWRY WEBHOOK PROCESS START ===', 'info', 'START', [
+            'process_id'     => $processId,
+            'timestamp'      => date('Y-m-d H:i:s'),
+            'ip'             => $request->ip(),
+            'method'         => $request->method(),
+            'received_data'  => $data,
+        ]);
 
         // التحقق من وجود orderStatus
-        $this->logToFile($logFile, "STEP 1: Checking if orderStatus exists");
+        $this->logToDB($dbLog, 'STEP 1: Checking if orderStatus exists', 'info', 'STEP 1');
 
         if (!isset($request->orderStatus)) {
-            $this->logToFile($logFile, "ERROR: orderStatus not found in request");
-            $this->logToFile($logFile, "=== PROCESS TERMINATED - NO ORDER STATUS ===");
+            $this->logToDB($dbLog, 'ERROR: orderStatus not found in request', 'error', 'STEP 1');
+            $this->logToDB($dbLog, '=== PROCESS TERMINATED - NO ORDER STATUS ===', 'error', 'END');
             return;
         }
 
-        $this->logToFile($logFile, "SUCCESS: orderStatus found - " . $request->orderStatus);
+        $this->logToDB($dbLog, 'SUCCESS: orderStatus found - ' . $request->orderStatus, 'success', 'STEP 1');
 
         // استخراج البيانات المطلوبة
-        $this->logToFile($logFile, "STEP 2: Extracting required data");
+        $this->logToDB($dbLog, 'STEP 2: Extracting required data', 'info', 'STEP 2');
 
-        $fawryRefNumber = $data['fawryRefNumber'];
-        $merchantRefNumber = $data['merchantRefNumber'];
-        $paymentAmount = number_format($data['paymentAmount'], 2, '.', '');
-        $orderAmount = number_format($data['orderAmount'], 2, '.', '');
-        $orderStatus = $data['orderStatus'];
-        $paymentMethod = $data['paymentMethod'];
+        $fawryRefNumber       = $data['fawryRefNumber'];
+        $merchantRefNumber    = $data['merchantRefNumber'];
+        $paymentAmount        = number_format($data['paymentAmount'], 2, '.', '');
+        $orderAmount          = number_format($data['orderAmount'], 2, '.', '');
+        $orderStatus          = $data['orderStatus'];
+        $paymentMethod        = $data['paymentMethod'];
         $paymentReferenceNumber = isset($data['paymentRefrenceNumber']) ? $data['paymentRefrenceNumber'] : '';
-        $secureKey = config("nafezly-payments.FAWRY_SECRET");
+        $secureKey            = config('nafezly-payments.FAWRY_SECRET');
 
-        $this->logToFile($logFile, "Extracted data:");
-        $this->logToFile($logFile, "- fawryRefNumber: {$fawryRefNumber}");
-        $this->logToFile($logFile, "- merchantRefNumber: {$merchantRefNumber}");
-        $this->logToFile($logFile, "- paymentAmount: {$paymentAmount}");
-        $this->logToFile($logFile, "- orderAmount: {$orderAmount}");
-        $this->logToFile($logFile, "- orderStatus: {$orderStatus}");
-        $this->logToFile($logFile, "- paymentMethod: {$paymentMethod}");
-        $this->logToFile($logFile, "- paymentReferenceNumber: {$paymentReferenceNumber}");
+        $this->logToDB($dbLog, 'Extracted payment data', 'info', 'STEP 2', [
+            'fawryRefNumber'         => $fawryRefNumber,
+            'merchantRefNumber'      => $merchantRefNumber,
+            'paymentAmount'          => $paymentAmount,
+            'orderAmount'            => $orderAmount,
+            'orderStatus'            => $orderStatus,
+            'paymentMethod'          => $paymentMethod,
+            'paymentReferenceNumber' => $paymentReferenceNumber,
+        ]);
 
         // التحقق من صحة التوقيع
-        $this->logToFile($logFile, "STEP 3: Verifying signature");
+        $this->logToDB($dbLog, 'STEP 3: Verifying signature', 'info', 'STEP 3');
 
         $concatenatedString = $fawryRefNumber . $merchantRefNumber . $paymentAmount . $orderAmount . $orderStatus . $paymentMethod . $paymentReferenceNumber . $secureKey;
-        $sha256Digest = hash('sha256', $concatenatedString);
+        $sha256Digest       = hash('sha256', $concatenatedString);
 
-        $this->logToFile($logFile, "Concatenated string for signature: {$concatenatedString}");
-        $this->logToFile($logFile, "Generated SHA256: {$sha256Digest}");
-        $this->logToFile($logFile, "Received signature: " . $request->messageSignature);
+        $this->logToDB($dbLog, 'Signature check', 'info', 'STEP 3', [
+            'generated_sha256'  => $sha256Digest,
+            'received_signature' => $request->messageSignature,
+        ]);
 
         if ($request->messageSignature !== $sha256Digest) {
-            $this->logToFile($logFile, "ERROR: Signature verification failed!");
-            $this->logToFile($logFile, "=== PROCESS TERMINATED - INVALID SIGNATURE ===");
+            $this->logToDB($dbLog, 'ERROR: Signature verification failed!', 'error', 'STEP 3');
+            $this->logToDB($dbLog, '=== PROCESS TERMINATED - INVALID SIGNATURE ===', 'error', 'END');
             return;
         }
 
-        $this->logToFile($logFile, "SUCCESS: Signature verified");
+        $this->logToDB($dbLog, 'SUCCESS: Signature verified', 'success', 'STEP 3');
 
         // البحث عن الطلب
-        $this->logToFile($logFile, "STEP 4: Finding order");
-        $this->logToFile($logFile, "Searching for order with ID: {$merchantRefNumber} and user_id: " . $request->customerMerchantId);
+        $this->logToDB($dbLog, 'STEP 4: Finding order', 'info', 'STEP 4', [
+            'searching_order_id' => $merchantRefNumber,
+            'searching_user_id'  => $request->customerMerchantId,
+        ]);
 
-        $order = Order::where("id", $request->merchantRefNumber)->where("user_id", $request->customerMerchantId)->first();
+        $order = Order::where('id', $request->merchantRefNumber)->where('user_id', $request->customerMerchantId)->first();
 
         if (!$order) {
-            $this->logToFile($logFile, "ERROR: Order not found!");
-            $this->logToFile($logFile, "=== PROCESS TERMINATED - ORDER NOT FOUND ===");
+            $this->logToDB($dbLog, 'ERROR: Order not found!', 'error', 'STEP 4');
+            $this->logToDB($dbLog, '=== PROCESS TERMINATED - ORDER NOT FOUND ===', 'error', 'END');
             return;
         }
 
-        $this->logToFile($logFile, "SUCCESS: Order found - ID: {$order->id}");
-        $this->logToFile($logFile, "Order current status: {$order->status}");
-        $this->logToFile($logFile, "Order current is_paid: {$order->is_paid}");
-        $this->logToFile($logFile, "Order current tracker: {$order->tracker}");
+        // ربط اللوج بالطلب من الآن
+        $dbLog['order_id'] = $order->id;
+
+        $this->logToDB($dbLog, "SUCCESS: Order found - ID: {$order->id}", 'success', 'STEP 4', [
+            'order_id'      => $order->id,
+            'order_status'  => $order->status,
+            'order_is_paid' => $order->is_paid,
+            'order_tracker' => $order->tracker,
+        ]);
 
         // معالجة حالة الطلب
-        $this->logToFile($logFile, "STEP 5: Processing order status - {$orderStatus}");
+        $this->logToDB($dbLog, "STEP 5: Processing order status - {$orderStatus}", 'info', 'STEP 5');
 
-        if ($request->orderStatus == "PAID") {
-            $this->logToFile($logFile, "Processing PAID status");
+        if ($request->orderStatus == 'PAID') {
+            $this->logToDB($dbLog, 'Processing PAID status', 'info', 'STEP 5');
 
             $order->is_paid = 1;
-            $this->logToFile($logFile, "Set is_paid to 1");
+            $this->logToDB($dbLog, 'Set is_paid to 1', 'info', 'STEP 5');
 
             $hasReservedProduct = false;
-            $this->logToFile($logFile, "Checking order details for reserved products");
+            $this->logToDB($dbLog, 'Checking order details for reserved products', 'info', 'STEP 5');
 
             foreach ($order->orderDetails as $detail) {
-                $this->logToFile($logFile, "Processing order detail ID: {$detail->id}, product_id: {$detail->product_id}");
-
                 if (!empty($detail->products)) {
-                    $this->logToFile($logFile, "Product found - ID: {$detail->product_id}, State: {$detail->products->state}, Quantity: {$detail->products->quantity}");
+                    $productInfo = [
+                        'detail_id'  => $detail->id,
+                        'product_id' => $detail->product_id,
+                        'state'      => $detail->products->state,
+                        'quantity'   => $detail->products->quantity,
+                    ];
+                    $this->logToDB($dbLog, "Product found - ID: {$detail->product_id}, State: {$detail->products->state}, Qty: {$detail->products->quantity}", 'info', 'STEP 5', $productInfo);
                     Log::info("Webhook (Before Update) - Order ID: {$order->id}, Product ID: {$detail->product_id}, State: {$detail->products->state}, Quantity: {$detail->products->quantity}");
 
                     if ($detail->products->state == 2) {
                         $hasReservedProduct = true;
-                        $this->logToFile($logFile, "Reserved product detected");
+                        $this->logToDB($dbLog, "Reserved product detected - ID: {$detail->product_id}", 'warning', 'STEP 5');
                     }
                 } else {
-                    $this->logToFile($logFile, "No product found for detail ID: {$detail->id}");
+                    $this->logToDB($dbLog, "No product found for detail ID: {$detail->id}", 'warning', 'STEP 5');
                 }
             }
 
-            $orderStatus = $hasReservedProduct ? "reserved" : "success";
-            $order->status = $orderStatus;
-            $order->tracker = "shipped"; // second stage
+            $orderStatus    = $hasReservedProduct ? 'reserved' : 'success';
+            $order->status  = $orderStatus;
+            $order->tracker = 'shipped'; // second stage
 
-            $this->logToFile($logFile, "Set order status to: {$orderStatus}");
-            $this->logToFile($logFile, "Set tracker to: shipped");
+            $this->logToDB($dbLog, "Set order status to: {$orderStatus}", 'info', 'STEP 5');
+            $this->logToDB($dbLog, 'Set tracker to: shipped', 'info', 'STEP 5');
 
             // إرسال الإيميل
             try {
-                $this->logToFile($logFile, "Sending success email to: " . $order->user->email);
+                $this->logToDB($dbLog, 'Sending success email to: ' . $order->user->email, 'info', 'STEP 5');
                 Mail::to($order->user->email)->send(new SuccessPaid($order));
-                $this->logToFile($logFile, "Email sent successfully");
+                $this->logToDB($dbLog, 'Email sent successfully', 'success', 'STEP 5');
             } catch (\Exception $e) {
-                $this->logToFile($logFile, "ERROR sending email: " . $e->getMessage());
+                $this->logToDB($dbLog, 'ERROR sending email: ' . $e->getMessage(), 'error', 'STEP 5');
             }
 
             $order->save();
-            $this->logToFile($logFile, "Order saved successfully");
+            $this->logToDB($dbLog, 'Order saved successfully', 'success', 'STEP 5');
 
             // Send WhatsApp notification for successful payment
-            $this->sendOrderWhatsapp($order, $orderStatus, $logFile);
+            $this->sendOrderWhatsapp($order, $orderStatus, $dbLog);
 
-        } elseif ($request->orderStatus == "UNPAID") {
-            $this->logToFile($logFile, "Processing UNPAID status");
+        } elseif ($request->orderStatus == 'UNPAID') {
+            $this->logToDB($dbLog, 'Processing UNPAID status', 'info', 'STEP 5');
 
             $order->is_paid = 2;
-            $order->status = "cancelled";
+            $order->status  = 'cancelled';
             $order->response = $jsonText;
 
-            $this->logToFile($logFile, "Set is_paid to 2");
-            $this->logToFile($logFile, "Set status to cancelled");
-            $this->logToFile($logFile, "Set response data");
+            $this->logToDB($dbLog, 'Set is_paid to 2, status to cancelled', 'info', 'STEP 5');
 
             // Restore product quantities and handle state properly
-            $this->logToFile($logFile, "Starting product quantity restoration");
+            $this->logToDB($dbLog, 'Starting product quantity restoration', 'info', 'STEP 5');
 
             foreach ($order->orderDetails as $detail) {
-                $this->logToFile($logFile, "Processing detail ID: {$detail->id}, product_id: {$detail->product_id}, amount: {$detail->amout}");
+                $this->logToDB($dbLog, "Processing detail ID: {$detail->id}, product_id: {$detail->product_id}, amount: {$detail->amout}", 'info', 'STEP 5');
 
                 $product = Product::find($detail->product_id);
                 if (!$product) {
-                    $this->logToFile($logFile, "Product not found for ID: {$detail->product_id}");
+                    $this->logToDB($dbLog, "Product not found for ID: {$detail->product_id}", 'warning', 'STEP 5');
                     continue;
                 }
 
-                // Store original state before quantity restoration
-                $originalState = $product->state;
+                $originalState    = $product->state;
                 $originalQuantity = $product->quantity;
 
-                $this->logToFile($logFile, "Product before update - State: {$originalState}, Quantity: {$originalQuantity}");
+                $this->logToDB($dbLog, "Product before update - State: {$originalState}, Quantity: {$originalQuantity}", 'info', 'STEP 5', [
+                    'product_id'       => $product->id,
+                    'original_state'   => $originalState,
+                    'original_qty'     => $originalQuantity,
+                ]);
 
                 // Restore quantity
                 $product->increment('quantity', $detail->amout);
                 $product->refresh();
 
-                $this->logToFile($logFile, "Quantity restored by {$detail->amout}, new quantity: {$product->quantity}");
+                $this->logToDB($dbLog, "Quantity restored by {$detail->amout}, new quantity: {$product->quantity}", 'info', 'STEP 5');
 
                 // Smart state update logic for cancelled orders
                 if ($originalState == 2) {
-                    // If it was reserved, keep it reserved regardless of quantity
                     $product->state = 2;
-                    $this->logToFile($logFile, "Kept state as reserved (2)");
+                    $this->logToDB($dbLog, 'Kept state as reserved (2)', 'info', 'STEP 5');
                 } elseif ($originalState == 0 && $product->quantity > 0) {
-                    // If it was unavailable due to no stock, and now has stock, make it available
                     $product->state = 1;
-                    $this->logToFile($logFile, "Changed state from unavailable (0) to available (1)");
+                    $this->logToDB($dbLog, 'Changed state from unavailable (0) to available (1)', 'info', 'STEP 5');
                 } elseif ($originalState == 1) {
-                    // If it was available, keep it available if quantity > 0
                     $product->state = $product->quantity > 0 ? 1 : 0;
-                    $this->logToFile($logFile, "Updated state based on quantity - new state: {$product->state}");
+                    $this->logToDB($dbLog, "Updated state based on quantity - new state: {$product->state}", 'info', 'STEP 5');
                 }
 
-                $this->logStateChange($product, $originalState, $product->state, "Order cancelled", [
-                    'order_id' => $order->id,
-                    'order_status' => $order->status
+                $this->logStateChange($product, $originalState, $product->state, 'Order cancelled', [
+                    'order_id'    => $order->id,
+                    'order_status' => $order->status,
                 ]);
 
                 $product->save();
-                $this->logToFile($logFile, "Product saved - Final state: {$product->state}, Final quantity: {$product->quantity}");
+                $this->logToDB($dbLog, "Product saved - Final state: {$product->state}, Final quantity: {$product->quantity}", 'success', 'STEP 5', [
+                    'product_id'    => $product->id,
+                    'final_state'   => $product->state,
+                    'final_qty'     => $product->quantity,
+                ]);
             }
 
             $order->save();
-            $this->logToFile($logFile, "Order saved successfully");
+            $this->logToDB($dbLog, 'Order saved successfully', 'success', 'STEP 5');
 
             // Send WhatsApp notification for cancelled payment
-            $this->sendOrderWhatsapp($order, 'cancelled', $logFile);
+            $this->sendOrderWhatsapp($order, 'cancelled', $dbLog);
         } else {
-            $this->logToFile($logFile, "Unknown order status: {$request->orderStatus}");
+            $this->logToDB($dbLog, "Unknown order status: {$request->orderStatus}", 'warning', 'STEP 5');
         }
 
-        $this->logToFile($logFile, "=== FAWRY WEBHOOK PROCESS COMPLETED SUCCESSFULLY ===");
-        $this->logToFile($logFile, "Final order status: {$order->status}");
-        $this->logToFile($logFile, "Final is_paid: {$order->is_paid}");
-        $this->logToFile($logFile, "Process ended at: " . date('Y-m-d H:i:s'));
+        $this->logToDB($dbLog, '=== FAWRY WEBHOOK PROCESS COMPLETED SUCCESSFULLY ===', 'success', 'END', [
+            'final_status'  => $order->status,
+            'final_is_paid' => $order->is_paid,
+            'ended_at'      => date('Y-m-d H:i:s'),
+        ]);
     }
+
 
     public function cronjob()
     {
