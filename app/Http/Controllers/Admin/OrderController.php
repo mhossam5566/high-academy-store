@@ -251,9 +251,10 @@ class OrderController extends Controller
 
     public function details($id)
     {
-        $order = Order::with('shipping')->findOrFail($id);
+        $order = Order::with(['shipping', 'logs'])->findOrFail($id);
         return view('dashboard.pages.order.details', compact('order'));
     }
+
 
     public function changestate(Request $request)
     {

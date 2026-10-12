@@ -534,8 +534,10 @@ class PaymentController extends Controller
 
     /**
      * Send WhatsApp notification to customer on order status change
+     *
+     * @param array|null $dbLog  pass the shared dbLog state for DB logging, or null to skip
      */
-    private function sendOrderWhatsapp(Order $order, string $status, ?string $logFile = null): void
+    private function sendOrderWhatsapp(Order $order, string $status, ?array &$dbLog = null): void
     {
         try {
             $order->loadMissing(['user', 'orderDetails.products']);
@@ -543,8 +545,8 @@ class PaymentController extends Controller
             $phone = $order->user->phone ?? $order->mobile ?? null;
 
             if (empty($phone)) {
-                if ($logFile)
-                    $this->logToFile($logFile, "WhatsApp: No phone number found for order #{$order->id}");
+                if ($dbLog !== null)
+                    $this->logToDB($dbLog, "WhatsApp: No phone number found for order #{$order->id}", 'warning', 'WHATSAPP');
                 return;
             }
 
@@ -561,8 +563,8 @@ class PaymentController extends Controller
             }
 
             $statusMessages = [
-                'success' => 'تم الدفع بنجاح 💳✅' . "\n" . 'طلبك رقم #' . $order->id . ' تم تأكيده وجاري تجهيزه للشحن.',
-                'reserved' => 'تم الدفع بنجاح 💳✅' . "\n" . 'طلبك رقم #' . $order->id . ' تم حجزه وسيتم التواصل معك قريباً.',
+                'success'   => 'تم الدفع بنجاح 💳✅' . "\n" . 'طلبك رقم #' . $order->id . ' تم تأكيده وجاري تجهيزه للشحن.',
+                'reserved'  => 'تم الدفع بنجاح 💳✅' . "\n" . 'طلبك رقم #' . $order->id . ' تم حجزه وسيتم التواصل معك قريباً.',
                 'cancelled' => 'تم إلغاء طلبك رقم #' . $order->id . ' بسبب عدم اكتمال الدفع. إذا كان هناك خطأ تواصل معنا.',
             ];
 
@@ -572,17 +574,21 @@ class PaymentController extends Controller
             $whatsapp = new WhatsappService();
             $result = $whatsapp->send($phone, $message);
 
-            if ($logFile) {
-                $this->logToFile($logFile, "WhatsApp sent to {$phone} - Status: " . ($result['status'] ? 'Success' : 'Failed'));
+            if ($dbLog !== null) {
+                $sent = ($result['status'] ?? false) ? 'Success' : 'Failed';
+                $this->logToDB($dbLog, "WhatsApp sent to {$phone} - Status: {$sent}", 'info', 'WHATSAPP', [
+                    'phone'  => $phone,
+                    'status' => $sent,
+                ]);
             }
         } catch (\Exception $e) {
-            if ($logFile) {
-                $this->logToFile($logFile, "WhatsApp ERROR: " . $e->getMessage());
+            if ($dbLog !== null) {
+                $this->logToDB($dbLog, 'WhatsApp ERROR: ' . $e->getMessage(), 'error', 'WHATSAPP');
             }
             Log::error('WhatsApp order notification failed', [
                 'order_id' => $order->id,
-                'status' => $status,
-                'error' => $e->getMessage(),
+                'status'   => $status,
+                'error'    => $e->getMessage(),
             ]);
         }
     }

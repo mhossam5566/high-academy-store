@@ -226,7 +226,141 @@
             </div>
         </div>
     @endif
+
+    {{-- ===== قسم سجل العمليات ===== --}}
+    @if ($order->logs->count() > 0)
+        <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="ti ti-list-details me-2 text-primary"></i>سجل عمليات الطلب
+                    <span class="badge bg-label-primary ms-2">{{ $order->logs->count() }} سطر</span>
+                </h5>
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#orderLogsCollapse" aria-expanded="true">
+                    <i class="ti ti-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse show" id="orderLogsCollapse">
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                        <table class="table table-sm table-hover mb-0 align-middle" style="font-size: 0.82rem; direction: ltr; text-align: left;">
+                            <thead class="table-dark sticky-top">
+                                <tr>
+                                    <th style="width:40px">#</th>
+                                    <th style="width:80px">Level</th>
+                                    <th style="width:80px">Step</th>
+                                    <th>Message</th>
+                                    <th style="width:160px">Timestamp</th>
+                                    <th style="width:120px">IP</th>
+                                    <th style="width:60px">Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $levelColors = [
+                                        'info'    => 'bg-label-info',
+                                        'success' => 'bg-label-success',
+                                        'warning' => 'bg-label-warning',
+                                        'error'   => 'bg-label-danger',
+                                    ];
+                                    $stepColors = [
+                                        'START'    => 'bg-dark text-white',
+                                        'STEP 1'   => 'bg-primary text-white',
+                                        'STEP 2'   => 'bg-primary text-white',
+                                        'STEP 3'   => 'bg-primary text-white',
+                                        'STEP 4'   => 'bg-primary text-white',
+                                        'STEP 5'   => 'bg-primary text-white',
+                                        'WHATSAPP' => 'bg-success text-white',
+                                        'END'      => 'bg-dark text-white',
+                                    ];
+                                @endphp
+                                @foreach ($order->logs as $i => $log)
+                                    @php
+                                        $rowClass = match ($log->level) {
+                                            'error'   => 'table-danger',
+                                            'warning' => 'table-warning',
+                                            'success' => 'table-success',
+                                            default   => '',
+                                        };
+                                    @endphp
+                                    <tr class="{{ $rowClass }}">
+                                        <td class="text-muted">{{ $i + 1 }}</td>
+                                        <td>
+                                            <span class="badge {{ $levelColors[$log->level] ?? 'bg-label-secondary' }}">
+                                                {{ strtoupper($log->level) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if ($log->step)
+                                                <span class="badge {{ $stepColors[$log->step] ?? 'bg-secondary' }}" style="font-size:0.7rem">
+                                                    {{ $log->step }}
+                                                </span>
+                                            @else
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <span class="{{ in_array($log->level, ['error']) ? 'fw-bold text-danger' : '' }}">
+                                                {{ $log->message }}
+                                            </span>
+                                        </td>
+                                        <td class="text-muted" style="font-size:0.75rem; white-space:nowrap">
+                                            {{ $log->created_at->format('Y-m-d H:i:s') }}
+                                        </td>
+                                        <td class="text-muted" style="font-size:0.75rem">
+                                            {{ $log->ip ?? '—' }}
+                                        </td>
+                                        <td class="text-center">
+                                            @if ($log->context)
+                                                <button type="button" class="btn btn-xs btn-icon btn-outline-secondary p-1"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#logContextModal{{ $log->id }}"
+                                                    title="عرض البيانات">
+                                                    <i class="ti ti-code" style="font-size:0.8rem"></i>
+                                                </button>
+
+                                                {{-- Modal for context --}}
+                                                <div class="modal fade" id="logContextModal{{ $log->id }}" tabindex="-1">
+                                                    <div class="modal-dialog modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">
+                                                                    <i class="ti ti-code me-2"></i>
+                                                                    {{ $log->step ?? 'Log' }} #{{ $log->id }} — Context Data
+                                                                </h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body p-0">
+                                                                <pre class="mb-0 p-3 bg-dark text-light rounded-bottom" style="max-height:400px; overflow-y:auto; font-size:0.8rem; direction:ltr; text-align:left">{{ json_encode($log->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}</pre>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Process ID footer --}}
+                    @php $firstLog = $order->logs->first(); @endphp
+                    @if ($firstLog && $firstLog->process_id)
+                        <div class="px-3 py-2 border-top bg-light" style="font-size:0.75rem; direction:ltr; text-align:left;">
+                            <i class="ti ti-fingerprint me-1 text-muted"></i>
+                            <strong>Process ID:</strong>
+                            <code>{{ $firstLog->process_id }}</code>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
+
 
 @section('page-script')
     <script>
