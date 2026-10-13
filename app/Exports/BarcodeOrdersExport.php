@@ -99,9 +99,20 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
             $notes .= ' / رقم احتياطي: ' . $order->temp_mobile;
         }
 
+        // Description: "{Book Title} - Quantity: {Requested Quantity}" for each book,
+        // joined with " - " when the order contains multiple books.
+        $description = $order->orderDetails
+            ->map(function ($detail) {
+                $title = optional($detail->products)->short_name
+                    ?? optional($detail->products)->name
+                    ?? 'منتج محذوف';
+                return "{$title} - Quantity: {$detail->amout}";
+            })
+            ->implode(' - ');
+
         return [
             '',           // Package_Serial
-            'books',      // Description
+            $description, // Description
             $totalWeight, // Total_Weight
             'small',      // Package_volume
             '',           // COD_Value
