@@ -106,7 +106,7 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
                 $title = optional($detail->products)->short_name
                     ?? optional($detail->products)->name
                     ?? 'منتج محذوف';
-                return "{$title} - Quantity: {$detail->amout}";
+                return "{$title} - عدد : {$detail->amout}";
             })
             ->implode(' - ');
 
