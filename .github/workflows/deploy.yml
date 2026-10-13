@@ -1,4 +1,3 @@
-```yaml
 name: Deploy Laravel to Hostinger
 
 on:
@@ -25,7 +24,7 @@ jobs:
       - name: Deploy application files
         uses: burnett01/rsync-deployments@7.0.2
         with:
-          switches: -avzr --exclude='.git/' --exclude='.github/' --exclude='.env' --exclude='storage/' --exclude='old/' --exclude='crm/' --exclude='myteacher/' --exclude='vendor/' --exclude='public/images/admin/' --exclude='public/storage/'
+          switches: "-avzr --exclude='.git/' --exclude='.github/' --exclude='.env' --exclude='storage/' --exclude='old/' --exclude='crm/' --exclude='myteacher/' --exclude='vendor/' --exclude='public/images/admin/' --exclude='public/storage/'"
           path: ./
           remote_path: /home/u114442604/domains/highacademystore.com/public_html/
           remote_host: ${{ secrets.HOSTINGER_HOST }}
