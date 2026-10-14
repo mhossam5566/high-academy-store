@@ -15,38 +15,46 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
     protected $limit;
     protected $shipping;
     protected $bookId;
+    protected $orderIds;
 
-    public function __construct($status = null, $limit = null, $shipping = null, $bookId = null)
+    public function __construct($status = null, $limit = null, $shipping = null, $bookId = null, $orderIds = null)
     {
         $this->status = $status;
         $this->limit = $limit;
         $this->shipping = $shipping;
         $this->bookId = $bookId;
+        $this->orderIds = $orderIds;
     }
 
     public function collection()
     {
-        $query = Order::where('shipping_method', "2")->with(['orderDetails.products', 'governorate'])
+        $query = Order::with(['orderDetails.products', 'governorate'])
             ->latest();
 
-        if ($this->status) {
-            $query->where('status', $this->status);
-        }
+        if (!empty($this->orderIds)) {
+            $query->whereIn('id', (array) $this->orderIds);
+        } else {
+            $query->where('shipping_method', "2");
 
-        if ($this->shipping && $this->shipping !== 'all') {
-            $query->whereHas('shipping', function ($q) {
-                $q->where('type', $this->shipping);
-            });
-        }
+            if ($this->status) {
+                $query->where('status', $this->status);
+            }
 
-        if ($this->bookId) {
-            $query->whereHas('orderDetails', function ($q) {
-                $q->where('product_id', $this->bookId);
-            });
-        }
+            if ($this->shipping && $this->shipping !== 'all') {
+                $query->whereHas('shipping', function ($q) {
+                    $q->where('type', $this->shipping);
+                });
+            }
 
-        if ($this->limit) {
-            $query->limit($this->limit);
+            if ($this->bookId) {
+                $query->whereHas('orderDetails', function ($q) {
+                    $q->where('product_id', $this->bookId);
+                });
+            }
+
+            if ($this->limit) {
+                $query->limit($this->limit);
+            }
         }
 
         return $query->get();

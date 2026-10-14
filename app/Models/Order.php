@@ -32,7 +32,10 @@ class Order extends Model
         'shipping_address',
         'method',
         'amount',
-        'delivery_fee'
+        'delivery_fee',
+        'printed_pdf',
+        'printed_excel',
+        'printed_completed'
     ];
 
     public function users()

@@ -1545,4 +1545,213 @@ class OrderController extends Controller
             'branches_list' => $branches,
         ];
     }
+
+    /**
+     * Display the print orders page.
+     */
+    public function printOrders()
+    {
+        $shippingMethods = ShippingMethod::all();
+        return view('dashboard.pages.order.print', compact('shippingMethods'));
+    }
+
+    /**
+     * Datatable for print orders (successful orders only).
+     */
+    public function printDatatable(Request $request)
+    {
+        $query = Order::with(['user', 'shipping', 'governorate'])
+            ->where('status', 'success')
+            ->select('orders.*');
+
+        // Completed / Cleared Filter
+        $completedStatus = $request->get('completed_status', 'active');
+        if ($completedStatus === 'active') {
+            $query->where('printed_completed', 0);
+        } elseif ($completedStatus === 'completed') {
+            $query->where('printed_completed', 1);
+        }
+
+        // Shipping filter
+        if ($request->filled('shipping') && $request->shipping !== 'all') {
+            $query->where('shipping_method', $request->shipping);
+        }
+
+        // PDF print status filter
+        if ($request->filled('printed_pdf') && $request->printed_pdf !== 'all') {
+            $query->where('printed_pdf', $request->printed_pdf == '1' ? 1 : 0);
+        }
+
+        // Excel print status filter
+        if ($request->filled('printed_excel') && $request->printed_excel !== 'all') {
+            $query->where('printed_excel', $request->printed_excel == '1' ? 1 : 0);
+        }
+
+        $query->orderBy('id', 'DESC');
+
+        return DataTables::of($query)
+            ->addColumn('checkbox', function ($row) {
+                return '<div class="form-check d-flex justify-content-center m-0"><input type="checkbox" class="form-check-input order-select-chk" value="' . $row->id . '"></div>';
+            })
+            ->editColumn('name', function ($row) {
+                return $row->name ?? ($row->user->name ?? '—');
+            })
+            ->editColumn('mobile', function ($row) {
+                $html = '<span dir="ltr">' . e($row->mobile ?? '—') . '</span>';
+                if (!empty($row->temp_mobile)) {
+                    $html .= '<br><small class="text-muted" dir="ltr"><i class="ti ti-phone me-1"></i>' . e($row->temp_mobile) . '</small>';
+                }
+                return $html;
+            })
+            ->editColumn('address', function ($row) {
+                $gov = $row->governorate ? $row->governorate->governorate_name_ar : null;
+                $addr = $row->address ?? '';
+                if ($gov && $addr) {
+                    return '<span title="' . e($addr) . '">' . e($gov) . ' - ' . Str::limit(e($addr), 35) . '</span>';
+                }
+                return e($gov ?: ($addr ?: '—'));
+            })
+            ->editColumn('shipping_method', function ($row) {
+                return optional($row->shipping)->name ?? '—';
+            })
+            ->editColumn('total', function ($row) {
+                return '<span class="fw-semibold text-primary">' . number_format($row->total, 2) . ' ج.م</span>';
+            })
+            ->editColumn('date', function ($row) {
+                return $row->date ?? ($row->created_at ? $row->created_at->format('Y-m-d') : '—');
+            })
+            ->editColumn('printed_excel', function ($row) {
+                if ($row->printed_excel) {
+                    return '<span class="badge bg-label-success d-inline-flex align-items-center gap-1"><i class="ti ti-check fs-6"></i> نعم</span>';
+                }
+                return '<span class="badge bg-label-danger d-inline-flex align-items-center gap-1"><i class="ti ti-x fs-6"></i> لا</span>';
+            })
+            ->editColumn('printed_pdf', function ($row) {
+                if ($row->printed_pdf) {
+                    return '<span class="badge bg-label-success d-inline-flex align-items-center gap-1"><i class="ti ti-check fs-6"></i> نعم</span>';
+                }
+                return '<span class="badge bg-label-danger d-inline-flex align-items-center gap-1"><i class="ti ti-x fs-6"></i> لا</span>';
+            })
+            ->addColumn('actions', function ($row) {
+                return '<a href="' . route('dashboard.orders.details', $row->id) . '" target="_blank" class="btn btn-sm btn-icon btn-label-primary" title="تفاصيل الطلب"><i class="ti ti-eye"></i></a>';
+            })
+            ->rawColumns(['checkbox', 'mobile', 'address', 'total', 'printed_excel', 'printed_pdf', 'actions'])
+            ->make(true);
+    }
+
+    /**
+     * Export selected orders as detailed PDF.
+     */
+    public function printExportPdf(Request $request)
+    {
+        ini_set('pcre.backtrack_limit', 10000000);
+
+        $orderIds = $request->input('order_ids');
+        if (is_string($orderIds)) {
+            $orderIds = explode(',', $orderIds);
+        }
+        $orderIds = array_filter(array_map('trim', (array) $orderIds));
+
+        if (empty($orderIds)) {
+            return back()->with('error', 'يرجى تحديد طلب واحد على الأقل للتصدير');
+        }
+
+        $orders = Order::with(['orderDetails.products', 'shipping', 'user', 'governorate'])
+            ->whereIn('id', $orderIds)
+            ->latest()
+            ->get();
+
+        // Mark as printed_pdf = 1
+        Order::whereIn('id', $orderIds)->update(['printed_pdf' => 1]);
+
+        $mpdf = new Mpdf([
+            'default_font' => 'DejaVu Sans',
+            'mode' => 'utf-8',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'format' => 'A4',
+        ]);
+
+        $html = view('dashboard.pages.order.successExport', compact('orders'))->render();
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('orders-details-' . now()->format('Y-m-d') . '.pdf', 'D');
+        exit;
+    }
+
+    /**
+     * Export selected orders as Excel.
+     */
+    public function printExportExcel(Request $request)
+    {
+        $orderIds = $request->input('order_ids');
+        if (is_string($orderIds)) {
+            $orderIds = explode(',', $orderIds);
+        }
+        $orderIds = array_filter(array_map('trim', (array) $orderIds));
+
+        if (empty($orderIds)) {
+            return back()->with('error', 'يرجى تحديد طلب واحد على الأقل للتصدير');
+        }
+
+        // Mark as printed_excel = 1
+        Order::whereIn('id', $orderIds)->update(['printed_excel' => 1]);
+
+        $filename = 'orders-print-' . now()->format('Y-m-d_H-i') . '.xlsx';
+        return Excel::download(
+            new BarcodeOrdersExport(null, null, null, null, $orderIds),
+            $filename
+        );
+    }
+
+    /**
+     * Clear / Dismiss selected orders from the print orders view.
+     */
+    public function printClearOrders(Request $request)
+    {
+        $orderIds = $request->input('order_ids');
+        if (is_string($orderIds)) {
+            $orderIds = explode(',', $orderIds);
+        }
+        $orderIds = array_filter(array_map('trim', (array) $orderIds));
+
+        if (empty($orderIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'يرجى تحديد طلب واحد على الأقل لتفريغ النتائج'
+            ], 422);
+        }
+
+        Order::whereIn('id', $orderIds)->update(['printed_completed' => 1]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تفريغ ' . count($orderIds) . ' طلب بنجاح واختفت من جدول الطباعة.'
+        ]);
+    }
+
+    /**
+     * Restore selected orders back to the print orders view.
+     */
+    public function printRestoreOrders(Request $request)
+    {
+        $orderIds = $request->input('order_ids');
+        if (is_string($orderIds)) {
+            $orderIds = explode(',', $orderIds);
+        }
+        $orderIds = array_filter(array_map('trim', (array) $orderIds));
+
+        if (empty($orderIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'يرجى تحديد طلب واحد على الأقل للاسترجاع'
+            ], 422);
+        }
+
+        Order::whereIn('id', $orderIds)->update(['printed_completed' => 0]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم استعادة ' . count($orderIds) . ' طلب بنجاح إلى جدول الطباعة.'
+        ]);
+    }
 }

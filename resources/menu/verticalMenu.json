@@ -227,6 +227,7 @@
             "icon": "menu-icon tf-icons ti ti-shopping-bag",
             "slug": [
                 "dashboard.orders",
+                "dashboard.orders.print",
                 "dashboard.orders.library_booking",
                 "dashboard.orders.barcode"
             ],
@@ -251,6 +252,12 @@
                     "url": "/dashboard/orders",
                     "name": "كل الطلبات",
                     "slug": "dashboard.orders",
+                    "permission": "view_orders"
+                },
+                {
+                    "url": "/dashboard/orders/print",
+                    "name": "طباعة الطلبات",
+                    "slug": "dashboard.orders.print",
                     "permission": "view_orders"
                 },
                 {

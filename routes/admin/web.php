@@ -132,6 +132,14 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::get('orders/export/branch', [OrderController::class, 'branchExport'])->name('orders.export.branch');
     Route::get('orders/export/grouped', [OrderController::class, 'groupedExport'])->name('orders.export.grouped');
     Route::get('orders/export/excel', [OrderController::class, 'excelExport'])->name('orders.export.excel');
+
+    // Print Orders
+    Route::get('/orders/print', [OrderController::class, 'printOrders'])->name('orders.print');
+    Route::get('/orders/print/datatable', [OrderController::class, 'printDatatable'])->name('orders.print.datatable');
+    Route::match(['get', 'post'], '/orders/print/export-pdf', [OrderController::class, 'printExportPdf'])->name('orders.print.export.pdf');
+    Route::match(['get', 'post'], '/orders/print/export-excel', [OrderController::class, 'printExportExcel'])->name('orders.print.export.excel');
+    Route::post('/orders/print/clear', [OrderController::class, 'printClearOrders'])->name('orders.print.clear');
+    Route::post('/orders/print/restore', [OrderController::class, 'printRestoreOrders'])->name('orders.print.restore');
     Route::get("orders/edit-barcode/{id}", [OrderController::class, "admineditbarcode"])->name("orders.editbarcode");
     Route::get("order/edit-barcode/{id}", [OrderController::class, "admineditbarcode"])->name("order.editbarcode");
     Route::get("orders/barcode", [OrderController::class, "orderbarcode"])->name("orders.barcode");
