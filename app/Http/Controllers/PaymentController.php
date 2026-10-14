@@ -52,23 +52,25 @@ class PaymentController extends Controller
     /**
      * كتابة لوج إلى قاعدة البيانات
      *
-     * @param mixed      &$dbLogState  حالة مشتركة [order_id, process_id, ip]
-     * @param string      $message
-     * @param string      $level       info|success|warning|error
-     * @param string|null $step
-     * @param array       $context
+     * @param mixed       &$dbLogState       حالة مشتركة [order_id, process_id, ip]
+     * @param string       $message
+     * @param string       $level             info|success|warning|error
+     * @param string|null  $step
+     * @param array        $context
+     * @param string|null  $confirmationType  manual|automatic - يوضح إذا كانت حالة الطلب تم تغييرها يدويًا أو تلقائيًا
      */
-    private function logToDB(array &$dbLogState, string $message, string $level = 'info', ?string $step = null, array $context = []): void
+    private function logToDB(array &$dbLogState, string $message, string $level = 'info', ?string $step = null, array $context = [], ?string $confirmationType = null): void
     {
         try {
             OrderLog::create([
-                'order_id'   => $dbLogState['order_id'] ?? null,
-                'process_id' => $dbLogState['process_id'] ?? null,
-                'level'      => $level,
-                'step'       => $step,
-                'message'    => $message,
-                'context'    => $context ?: null,
-                'ip'         => $dbLogState['ip'] ?? null,
+                'order_id'          => $dbLogState['order_id'] ?? null,
+                'process_id'        => $dbLogState['process_id'] ?? null,
+                'level'             => $level,
+                'step'              => $step,
+                'confirmation_type' => $confirmationType,
+                'message'           => $message,
+                'context'           => $context ?: null,
+                'ip'                => $dbLogState['ip'] ?? null,
             ]);
         } catch (\Throwable $e) {
             // fallback to laravel log so we never lose the message
@@ -290,7 +292,9 @@ class PaymentController extends Controller
             $order->status  = $orderStatus;
             $order->tracker = 'shipped'; // second stage
 
-            $this->logToDB($dbLog, "Set order status to: {$orderStatus}", 'info', 'STEP 5');
+            $this->logToDB($dbLog, "Order status changed to: {$orderStatus} (confirmed automatically by payment gateway)", 'success', 'STEP 5', [
+                'new_status' => $orderStatus,
+            ], OrderLog::CONFIRMATION_AUTOMATIC);
             $this->logToDB($dbLog, 'Set tracker to: shipped', 'info', 'STEP 5');
 
             // إرسال الإيميل
@@ -315,7 +319,9 @@ class PaymentController extends Controller
             $order->status  = 'cancelled';
             $order->response = $jsonText;
 
-            $this->logToDB($dbLog, 'Set is_paid to 2, status to cancelled', 'info', 'STEP 5');
+            $this->logToDB($dbLog, 'Order status changed to: cancelled (confirmed automatically by payment gateway)', 'success', 'STEP 5', [
+                'new_status' => 'cancelled',
+            ], OrderLog::CONFIRMATION_AUTOMATIC);
 
             // Restore product quantities and handle state properly
             $this->logToDB($dbLog, 'Starting product quantity restoration', 'info', 'STEP 5');

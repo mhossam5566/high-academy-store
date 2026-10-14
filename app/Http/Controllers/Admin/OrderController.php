@@ -6,6 +6,7 @@ use Mpdf\Mpdf;
 use App\Models\Order;
 use App\Mail\delivery;
 use App\Models\Product;
+use App\Models\OrderLog;
 use App\Mail\SuccessPaid;
 use App\Traits\ImageTrait;
 use App\Traits\DeleteTrait;
@@ -116,7 +117,8 @@ class OrderController extends Controller
                     'pending' => 'طلب معلق',
                     'success' => 'طلب ناجح',
                     'cancelled' => 'طلب ملغي',
-                    'reserved' => 'طلب محجوز'
+                    'reserved' => 'طلب محجوز',
+                    'returned' => 'طلب مرتجع'
                 ];
                 foreach ($statuses as $status => $statusText) {
                     $dropdown .= '<option value="' . route('dashboard.changeStatus', ['id' => $row->id, 'status' => $status]) . '">' . $statusText . '</option>';
@@ -286,6 +288,15 @@ class OrderController extends Controller
                 }
 
                 $whatsappStatus = 'success';
+                OrderLog::success(
+                    "Order status changed to: success (confirmed manually by admin)",
+                    $order->id,
+                    null,
+                    'STATUS_CHANGE',
+                    ['new_status' => 'success', 'admin_id' => auth('admin')->id()],
+                    $request->ip(),
+                    OrderLog::CONFIRMATION_MANUAL
+                );
             } elseif ($state == "2") {
                 $order->status = "cancelled";
                 foreach ($order->orderDetails as $detail) {
@@ -298,6 +309,15 @@ class OrderController extends Controller
                 }
 
                 $whatsappStatus = 'cancelled';
+                OrderLog::info(
+                    "Order status changed to: cancelled (confirmed manually by admin)",
+                    $order->id,
+                    null,
+                    'STATUS_CHANGE',
+                    ['new_status' => 'cancelled', 'admin_id' => auth('admin')->id()],
+                    $request->ip(),
+                    OrderLog::CONFIRMATION_MANUAL
+                );
             }
             $order->save();
             DB::commit();
@@ -583,9 +603,22 @@ class OrderController extends Controller
             case 'cancelled':
                 $order->update(['status' => 'cancelled']);
                 break;
+            case 'returned':
+                $order->update(['status' => 'returned']);
+                break;
             default:
                 $order->update(['status' => 'Not Found']);
         }
+
+        OrderLog::info(
+            "Order status changed to: {$status} (confirmed manually by admin)",
+            $order->id,
+            null,
+            'STATUS_CHANGE',
+            ['new_status' => $status, 'admin_id' => auth('admin')->id()],
+            request()->ip(),
+            OrderLog::CONFIRMATION_MANUAL
+        );
 
         $this->sendOrderStatusWhatsapp($order, $status);
 
@@ -886,6 +919,7 @@ class OrderController extends Controller
                 'reserved' => 'طلبك رقم #' . $order->id . ' تم حجزه وسيتم التواصل معك قريباً.',
                 'shipped' => 'طلبك رقم #' . $order->id . ' تم شحنه ✅ وفي الطريق إليك.' . (!empty($order->barcode) ? "\n\nكود التتبع: " . $order->barcode . "\n\nيمكنك تتبع شحنتك من هنا:\nhttps://egyptpost.gov.eg/ar-eg/home/eservices/track-and-trace/" : ''),
                 'delivered' => 'طلبك رقم #' . $order->id . ' تم تسليمه بنجاح 🎉',
+                'returned' => 'تم إرجاع طلبك رقم #' . $order->id . '. سيتم التواصل معك بخصوص تفاصيل الاسترجاع.',
             ];
 
             $message = $statusMessages[$status] ?? 'تم تحديث حالة طلبك رقم #' . $order->id . ' إلى: ' . $status;
