@@ -14,7 +14,9 @@ class DropFeeFromShippingMethodsTable extends Migration
     public function up()
     {
         Schema::table('shipping_methods', function (Blueprint $table) {
-            $table->dropColumn('fee');
+            if (Schema::hasColumn('shipping_methods', 'fee')) {
+                $table->dropColumn('fee');
+            }
         });
     }
 
@@ -27,7 +29,9 @@ class DropFeeFromShippingMethodsTable extends Migration
     public function down()
     {
         Schema::table('shipping_methods', function (Blueprint $table) {
-            $table->decimal('fee', 8, 2)->default(0);
+            if (!Schema::hasColumn('shipping_methods', 'fee')) {
+                $table->decimal('fee', 8, 2)->default(0);
+            }
         });
     }
 }
