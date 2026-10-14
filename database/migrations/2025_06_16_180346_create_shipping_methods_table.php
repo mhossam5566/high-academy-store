@@ -7,15 +7,17 @@ class CreateShippingMethodsTable extends Migration
 {
     public function up()
     {
-        Schema::create('shipping_methods', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');         // e.g. "استلام من المكتبه فرع شبين الكوم"
-            $table->string('address');      // free-text address
-            $table->unsignedInteger('government');  
-              // matches the `id` in your JSON file, not a DB FK
-            $table->json('phones')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('shipping_methods')) {
+            Schema::create('shipping_methods', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');         // e.g. "استلام من المكتبه فرع شبين الكوم"
+                $table->string('address');      // free-text address
+                $table->unsignedInteger('government');
+                  // matches the `id` in your JSON file, not a DB FK
+                $table->json('phones')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function down()
