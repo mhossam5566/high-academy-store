@@ -305,6 +305,19 @@
                                             @endif
                                         </td>
                                         <td>
+                                            @if ($log->confirmation_type === 'manual')
+                                                <span class="badge bg-label-warning" style="font-size:0.7rem">
+                                                    <i class="ti ti-user-check"></i> يدوي
+                                                </span>
+                                            @elseif ($log->confirmation_type === 'automatic')
+                                                <span class="badge bg-label-primary" style="font-size:0.7rem">
+                                                    <i class="ti ti-robot"></i> تلقائي
+                                                </span>
+                                            @else
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </td>
+                                        <td>
                                             <span class="{{ in_array($log->level, ['error']) ? 'fw-bold text-danger' : '' }}">
                                                 {{ $log->message }}
                                             </span>
