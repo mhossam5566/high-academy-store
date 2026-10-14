@@ -156,7 +156,7 @@
 
                             {{-- Order Total --}}
                             <div class="d-flex justify-content-between mb-2">
-                                <strong>المبلغ المدفوع</strong>
+                                <strong>المبلغ </strong>
                                 <span>{{ number_format($o->total, 2) }} جنيه</span>
                             </div>
 
