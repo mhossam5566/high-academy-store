@@ -231,13 +231,261 @@
         </div>
     @endif
 
-    {{-- ===== قسم سجل العمليات ===== --}}
+    {{-- ===== قسم سجل العمليات (عرض مُبسَّط للمسؤول) ===== --}}
     @if ($order->logs->count() > 0)
+        @php
+            // ===== ترجمة الرسائل التقنية إلى وصف مفهوم للمسؤول =====
+            $messageMap = [
+                // بداية ونهاية العملية
+                '=== FAWRY WEBHOOK PROCESS START ==='             => 'استُلم إشعار دفع جديد من فوري',
+                '=== FAWRY WEBHOOK PROCESS COMPLETED SUCCESSFULLY ===' => 'اكتملت عملية تأكيد الدفع بنجاح',
+                '=== PROCESS TERMINATED - NO ORDER STATUS ==='    => 'توقفت العملية: لم يرد حالة الطلب في الإشعار',
+                '=== PROCESS TERMINATED - INVALID SIGNATURE ===' => 'توقفت العملية: فشل التحقق من صحة التوقيع الأمني',
+                '=== PROCESS TERMINATED - ORDER NOT FOUND ==='   => 'توقفت العملية: لم يُعثر على الطلب في النظام',
+
+                // الخطوة 1
+                'STEP 1: Checking if orderStatus exists'          => 'التحقق من وجود حالة الطلب في الإشعار',
+                'ERROR: orderStatus not found in request'         => 'خطأ: حالة الطلب غائبة عن بيانات الإشعار',
+
+                // الخطوة 2
+                'STEP 2: Extracting required data'                => 'استخراج بيانات الدفع من الإشعار',
+                'Extracted payment data'                          => 'تم استخراج بيانات الدفع',
+
+                // الخطوة 3
+                'STEP 3: Verifying signature'                     => 'التحقق من التوقيع الأمني للإشعار',
+                'Signature check'                                 => 'مقارنة التوقيع الأمني',
+                'ERROR: Signature verification failed!'           => 'خطأ: التوقيع الأمني لا يطابق المتوقع',
+                'SUCCESS: Signature verified'                     => 'تم التحقق من صحة التوقيع الأمني ✓',
+
+                // الخطوة 4 – البحث عن الطلب
+                'ERROR: Order not found!'                         => 'خطأ: لم يُعثر على الطلب في قاعدة البيانات',
+
+                // الخطوة 5 – معالجة الدفع
+                'Processing PAID status'                          => 'جارٍ معالجة حالة الدفع: مدفوع',
+                'Processing UNPAID status'                        => 'جارٍ معالجة حالة الدفع: غير مدفوع',
+                'Set is_paid to 1'                                => 'تم تسجيل الطلب كمدفوع',
+                'Checking order details for reserved products'    => 'التحقق من بنود الطلب لرصد المنتجات المحجوزة',
+                'Starting product quantity restoration'           => 'جارٍ استعادة كميات المنتجات بعد الإلغاء',
+                'Order saved successfully'                        => 'تم حفظ الطلب بنجاح',
+                'Set tracker to: shipped'                         => 'تم تحديث مرحلة الشحن إلى: قيد الشحن',
+                'Kept state as reserved (2)'                      => 'المنتج لا يزال محجوزاً',
+                'Changed state from unavailable (0) to available (1)' => 'تم تغيير حالة المنتج من غير متاح إلى متاح',
+
+                // البريد الإلكتروني
+                'Email sent successfully'                         => 'تم إرسال بريد التأكيد للعميل ✓',
+
+                // واتساب
+            ];
+
+            // دالة مساعدة للترجمة مع احتساب القيم الديناميكية
+            $translateMessage = function(string $raw) use ($messageMap): string {
+                // بحث مباشر
+                if (isset($messageMap[$raw])) {
+                    return $messageMap[$raw];
+                }
+                // أنماط ديناميكية
+                if (str_starts_with($raw, 'SUCCESS: orderStatus found - ')) {
+                    $val = str_replace('SUCCESS: orderStatus found - ', '', $raw);
+                    $statusAr = match($val) {
+                        'PAID'   => 'مدفوع',
+                        'UNPAID' => 'غير مدفوع',
+                        default  => $val,
+                    };
+                    return "حالة الدفع المستلمة: {$statusAr} ✓";
+                }
+                if (str_starts_with($raw, 'STEP 5: Processing order status - ')) {
+                    $val = str_replace('STEP 5: Processing order status - ', '', $raw);
+                    $statusAr = match($val) {
+                        'PAID'   => 'مدفوع',
+                        'UNPAID' => 'غير مدفوع',
+                        default  => $val,
+                    };
+                    return "معالجة حالة الطلب: {$statusAr}";
+                }
+                if (str_starts_with($raw, 'STEP 4: Finding order')) {
+                    return 'البحث عن الطلب في قاعدة البيانات';
+                }
+                if (str_starts_with($raw, 'SUCCESS: Order found - ID: ')) {
+                    $id = str_replace('SUCCESS: Order found - ID: ', '', $raw);
+                    return "تم العثور على الطلب رقم #{$id} ✓";
+                }
+                if (str_starts_with($raw, 'Order status changed to: ')) {
+                    preg_match('/Order status changed to: (\S+)/', $raw, $m);
+                    $statusAr = match($m[1] ?? '') {
+                        'success'   => 'ناجح',
+                        'cancelled' => 'ملغي',
+                        'reserved'  => 'محجوز',
+                        'pending'   => 'معلق',
+                        default     => $m[1] ?? $raw,
+                    };
+                    $isAuto = str_contains($raw, 'automatically');
+                    return "تم تغيير حالة الطلب إلى: {$statusAr}" . ($isAuto ? ' (تلقائياً بعد تأكيد بوابة الدفع)' : '');
+                }
+                if (str_starts_with($raw, 'Product found - ID: ')) {
+                    preg_match('/ID: (\d+), State: (\d+), Qty: (\d+)/', $raw, $m);
+                    $stateAr = match((int)($m[2] ?? -1)) {
+                        0 => 'غير متاح', 1 => 'متاح', 2 => 'محجوز', default => $m[2] ?? '?'
+                    };
+                    return "منتج رقم #{$m[1]}: الحالة {$stateAr}، الكمية {$m[3]}";
+                }
+                if (str_starts_with($raw, 'Reserved product detected - ID: ')) {
+                    $id = str_replace('Reserved product detected - ID: ', '', $raw);
+                    return "⚠️ المنتج رقم #{$id} محجوز مسبقاً";
+                }
+                if (str_starts_with($raw, 'No product found for detail ID: ')) {
+                    $id = str_replace('No product found for detail ID: ', '', $raw);
+                    return "تحذير: لم يُعثر على منتج للعنصر رقم #{$id}";
+                }
+                if (str_starts_with($raw, 'Processing detail ID: ')) {
+                    preg_match('/product_id: (\d+), amount: (\d+)/', $raw, $m);
+                    return "معالجة المنتج رقم #{$m[1]}، الكمية: {$m[2]}";
+                }
+                if (str_starts_with($raw, 'Product not found for ID: ')) {
+                    $id = str_replace('Product not found for ID: ', '', $raw);
+                    return "تحذير: المنتج رقم #{$id} غير موجود";
+                }
+                if (str_starts_with($raw, 'Product before update - State: ')) {
+                    preg_match('/State: (\d+), Quantity: (\d+)/', $raw, $m);
+                    $stateAr = match((int)($m[1] ?? -1)) {
+                        0 => 'غير متاح', 1 => 'متاح', 2 => 'محجوز', default => $m[1] ?? '?'
+                    };
+                    return "حالة المنتج قبل التحديث: {$stateAr}، الكمية: {$m[2]}";
+                }
+                if (str_starts_with($raw, 'Quantity restored by ')) {
+                    preg_match('/by (\d+), new quantity: (\d+)/', $raw, $m);
+                    return "تمت استعادة {$m[1]} وحدة، الكمية الجديدة: {$m[2]}";
+                }
+                if (str_starts_with($raw, 'Updated state based on quantity - new state: ')) {
+                    preg_match('/new state: (\d+)/', $raw, $m);
+                    $stateAr = match((int)($m[1] ?? -1)) {
+                        0 => 'غير متاح', 1 => 'متاح', 2 => 'محجوز', default => $m[1] ?? '?'
+                    };
+                    return "تم تحديث حالة المنتج إلى: {$stateAr}";
+                }
+                if (str_starts_with($raw, 'Product saved - Final state: ')) {
+                    preg_match('/Final state: (\d+), Final quantity: (\d+)/', $raw, $m);
+                    $stateAr = match((int)($m[1] ?? -1)) {
+                        0 => 'غير متاح', 1 => 'متاح', 2 => 'محجوز', default => $m[1] ?? '?'
+                    };
+                    return "تم حفظ المنتج — الحالة: {$stateAr}، الكمية: {$m[2]}";
+                }
+                if (str_starts_with($raw, 'Sending success email to: ')) {
+                    $email = str_replace('Sending success email to: ', '', $raw);
+                    return "إرسال بريد التأكيد إلى: {$email}";
+                }
+                if (str_starts_with($raw, 'ERROR sending email: ')) {
+                    $err = str_replace('ERROR sending email: ', '', $raw);
+                    return "خطأ أثناء إرسال البريد الإلكتروني: {$err}";
+                }
+                if (str_starts_with($raw, 'WhatsApp: No phone number found')) {
+                    return 'واتساب: لا يوجد رقم هاتف مرتبط بالطلب';
+                }
+                if (str_starts_with($raw, 'WhatsApp sent to ')) {
+                    preg_match('/sent to (.+?) - Status: (.+)/', $raw, $m);
+                    $sentAr = ($m[2] ?? '') === 'Success' ? 'ناجح ✓' : 'فشل ✗';
+                    return "إرسال رسالة واتساب إلى {$m[1]}: {$sentAr}";
+                }
+                if (str_starts_with($raw, 'WhatsApp ERROR: ')) {
+                    $err = str_replace('WhatsApp ERROR: ', '', $raw);
+                    return "خطأ واتساب: {$err}";
+                }
+                if (str_starts_with($raw, 'Unknown order status: ')) {
+                    $val = str_replace('Unknown order status: ', '', $raw);
+                    return "حالة دفع غير معروفة: {$val}";
+                }
+                // fallback – أظهر الرسالة كما هي
+                return $raw;
+            };
+
+            // ===== ترجمة المراحل =====
+            $stepLabels = [
+                'START'    => ['label' => 'البداية',     'icon' => 'ti-player-play',   'color' => 'secondary'],
+                'STEP 1'   => ['label' => 'المرحلة 1',   'icon' => 'ti-circle-check',  'color' => 'info'],
+                'STEP 2'   => ['label' => 'المرحلة 2',   'icon' => 'ti-database-import','color' => 'info'],
+                'STEP 3'   => ['label' => 'المرحلة 3',   'icon' => 'ti-shield-lock',   'color' => 'warning'],
+                'STEP 4'   => ['label' => 'المرحلة 4',   'icon' => 'ti-search',        'color' => 'primary'],
+                'STEP 5'   => ['label' => 'المرحلة 5',   'icon' => 'ti-settings',      'color' => 'primary'],
+                'WHATSAPP' => ['label' => 'واتساب',      'icon' => 'ti-brand-whatsapp','color' => 'success'],
+                'END'      => ['label' => 'النهاية',     'icon' => 'ti-flag',          'color' => 'secondary'],
+            ];
+
+            // ===== ألوان وأيقونات مستوى الحدث =====
+            $levelConfig = [
+                'info'    => ['color' => '#3B82F6', 'bg' => '#EFF6FF', 'icon' => 'ti-info-circle',    'label' => 'معلومة'],
+                'success' => ['color' => '#22C55E', 'bg' => '#F0FDF4', 'icon' => 'ti-circle-check',   'label' => 'نجاح'],
+                'warning' => ['color' => '#F59E0B', 'bg' => '#FFFBEB', 'icon' => 'ti-alert-triangle', 'label' => 'تنبيه'],
+                'error'   => ['color' => '#EF4444', 'bg' => '#FEF2F2', 'icon' => 'ti-alert-circle',   'label' => 'خطأ'],
+            ];
+
+            $firstLog = $order->logs->first();
+        @endphp
+
+        <style>
+            .order-timeline { position: relative; padding: 0; list-style: none; }
+            .order-timeline::before {
+                content: '';
+                position: absolute;
+                right: 22px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: linear-gradient(to bottom, #e2e8f0 0%, #cbd5e1 100%);
+            }
+            [dir="ltr"] .order-timeline::before { left: 22px; right: auto; }
+            .order-timeline-item { position: relative; padding: 0 60px 18px 0; }
+            [dir="ltr"] .order-timeline-item { padding: 0 0 18px 60px; }
+            .order-timeline-icon {
+                position: absolute;
+                right: 5px;
+                top: 4px;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+                border: 3px solid #fff;
+                box-shadow: 0 1px 4px rgba(0,0,0,.15);
+                z-index: 1;
+            }
+            [dir="ltr"] .order-timeline-icon { right: auto; left: 5px; }
+            .order-timeline-card {
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+                padding: 10px 14px;
+                transition: box-shadow .15s;
+            }
+            .order-timeline-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+            .order-timeline-card.tl-error   { border-color: #fca5a5; }
+            .order-timeline-card.tl-warning { border-color: #fde68a; }
+            .order-timeline-card.tl-success { border-color: #86efac; }
+            .order-timeline-meta { font-size: 0.73rem; color: #94a3b8; }
+            .order-timeline-msg  { font-size: 0.88rem; line-height: 1.45; }
+            .tl-step-badge {
+                display: inline-block;
+                font-size: 0.68rem;
+                font-weight: 600;
+                padding: 1px 8px;
+                border-radius: 20px;
+                margin-inline-end: 5px;
+                vertical-align: middle;
+            }
+            .tl-confirmation-badge {
+                font-size: 0.7rem;
+                padding: 1px 7px;
+                border-radius: 20px;
+                display: inline-flex;
+                align-items: center;
+                gap: 3px;
+            }
+        </style>
+
         <div class="card mt-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">
-                    <i class="ti ti-list-details me-2 text-primary"></i>سجل عمليات الطلب
-                    <span class="badge bg-label-primary ms-2">{{ $order->logs->count() }} سطر</span>
+                    <i class="ti ti-timeline me-2 text-primary"></i>سجل مراحل معالجة الطلب
+                    <span class="badge bg-label-primary ms-2">{{ $order->logs->count() }} حدث</span>
                 </h5>
                 <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
                     data-bs-target="#orderLogsCollapse" aria-expanded="true">
@@ -245,134 +493,112 @@
                 </button>
             </div>
             <div class="collapse show" id="orderLogsCollapse">
-                <div class="card-body p-0">
-                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                        <table class="table table-sm table-hover mb-0 align-middle" style="font-size: 0.82rem; direction: ltr; text-align: left;">
-                            <thead class="table-dark sticky-top">
-                                <tr>
-                                    <th style="width:40px">#</th>
-                                    <th style="width:80px">Level</th>
-                                    <th style="width:80px">Step</th>
-                                    <th style="width:110px">Confirmation</th>
-                                    <th>Message</th>
-                                    <th style="width:160px">Timestamp</th>
-                                    <th style="width:120px">IP</th>
-                                    <th style="width:60px">Data</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php
-                                    $levelColors = [
-                                        'info'    => 'bg-label-info',
-                                        'success' => 'bg-label-success',
-                                        'warning' => 'bg-label-warning',
-                                        'error'   => 'bg-label-danger',
-                                    ];
-                                    $stepColors = [
-                                        'START'    => 'bg-dark text-white',
-                                        'STEP 1'   => 'bg-primary text-white',
-                                        'STEP 2'   => 'bg-primary text-white',
-                                        'STEP 3'   => 'bg-primary text-white',
-                                        'STEP 4'   => 'bg-primary text-white',
-                                        'STEP 5'   => 'bg-primary text-white',
-                                        'WHATSAPP' => 'bg-success text-white',
-                                        'END'      => 'bg-dark text-white',
-                                    ];
-                                @endphp
-                                @foreach ($order->logs as $i => $log)
-                                    @php
-                                        $rowClass = match ($log->level) {
-                                            'error'   => 'table-danger',
-                                            'warning' => 'table-warning',
-                                            'success' => 'table-success',
-                                            default   => '',
-                                        };
-                                    @endphp
-                                    <tr class="{{ $rowClass }}">
-                                        <td class="text-muted">{{ $i + 1 }}</td>
-                                        <td>
-                                            <span class="badge {{ $levelColors[$log->level] ?? 'bg-label-secondary' }}">
-                                                {{ strtoupper($log->level) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            @if ($log->step)
-                                                <span class="badge {{ $stepColors[$log->step] ?? 'bg-secondary' }}" style="font-size:0.7rem">
-                                                    {{ $log->step }}
-                                                </span>
-                                            @else
-                                                <span class="text-muted">—</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($log->confirmation_type === 'manual')
-                                                <span class="badge bg-label-warning" style="font-size:0.7rem">
-                                                    <i class="ti ti-user-check"></i> يدوي
-                                                </span>
-                                            @elseif ($log->confirmation_type === 'automatic')
-                                                <span class="badge bg-label-primary" style="font-size:0.7rem">
-                                                    <i class="ti ti-robot"></i> تلقائي
-                                                </span>
-                                            @else
-                                                <span class="text-muted">—</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <span class="{{ in_array($log->level, ['error']) ? 'fw-bold text-danger' : '' }}">
-                                                {{ $log->message }}
-                                            </span>
-                                        </td>
-                                        <td class="text-muted" style="font-size:0.75rem; white-space:nowrap">
-                                            {{ $log->created_at->format('Y-m-d H:i:s') }}
-                                        </td>
-                                        <td class="text-muted" style="font-size:0.75rem">
-                                            {{ $log->ip ?? '—' }}
-                                        </td>
-                                        <td class="text-center">
-                                            @if ($log->context)
-                                                <button type="button" class="btn btn-xs btn-icon btn-outline-secondary p-1"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#logContextModal{{ $log->id }}"
-                                                    title="عرض البيانات">
-                                                    <i class="ti ti-code" style="font-size:0.8rem"></i>
-                                                </button>
+                <div class="card-body pb-2" style="max-height: 650px; overflow-y: auto;">
 
-                                                {{-- Modal for context --}}
-                                                <div class="modal fade" id="logContextModal{{ $log->id }}" tabindex="-1">
-                                                    <div class="modal-dialog modal-lg">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">
-                                                                    <i class="ti ti-code me-2"></i>
-                                                                    {{ $log->step ?? 'Log' }} #{{ $log->id }} — Context Data
-                                                                </h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                            </div>
-                                                            <div class="modal-body p-0">
-                                                                <pre class="mb-0 p-3 bg-dark text-light rounded-bottom" style="max-height:400px; overflow-y:auto; font-size:0.8rem; direction:ltr; text-align:left">{{ json_encode($log->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}</pre>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <span class="text-muted">—</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {{-- Process ID footer --}}
-                    @php $firstLog = $order->logs->first(); @endphp
+                    {{-- ملخص العملية في الأعلى --}}
                     @if ($firstLog && $firstLog->process_id)
-                        <div class="px-3 py-2 border-top bg-light" style="font-size:0.75rem; direction:ltr; text-align:left;">
-                            <i class="ti ti-fingerprint me-1 text-muted"></i>
-                            <strong>Process ID:</strong>
-                            <code>{{ $firstLog->process_id }}</code>
+                        <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded bg-light border" style="font-size:0.78rem; direction:ltr; text-align:left;">
+                            <i class="ti ti-fingerprint text-muted"></i>
+                            <span class="text-muted">رقم العملية:</span>
+                            <code class="text-dark">{{ $firstLog->process_id }}</code>
+                            <span class="text-muted ms-auto">IP: {{ $firstLog->ip ?? '—' }}</span>
                         </div>
                     @endif
+
+                    <ul class="order-timeline">
+                        @foreach ($order->logs as $i => $log)
+                            @php
+                                $cfg   = $levelConfig[$log->level] ?? $levelConfig['info'];
+                                $step  = $stepLabels[$log->step]  ?? null;
+                                $msg   = $translateMessage($log->message);
+                                $cardCls = match($log->level) {
+                                    'error'   => 'tl-error',
+                                    'warning' => 'tl-warning',
+                                    'success' => 'tl-success',
+                                    default   => '',
+                                };
+                            @endphp
+                            <li class="order-timeline-item">
+                                {{-- أيقونة دائرة الجدول الزمني --}}
+                                <div class="order-timeline-icon"
+                                     style="background-color: {{ $cfg['bg'] }}; color: {{ $cfg['color'] }};">
+                                    <i class="ti {{ $cfg['icon'] }}" style="font-size:0.9rem;"></i>
+                                </div>
+
+                                <div class="order-timeline-card {{ $cardCls }}"
+                                     style="background-color: {{ $cfg['bg'] }};">
+                                    <div class="d-flex flex-wrap align-items-start gap-1 mb-1">
+                                        {{-- شارة المرحلة --}}
+                                        @if ($step)
+                                            <span class="tl-step-badge"
+                                                  style="background:{{ $cfg['color'] }}22; color:{{ $cfg['color'] }}; border:1px solid {{ $cfg['color'] }}55;">
+                                                <i class="ti {{ $step['icon'] }}" style="font-size:0.65rem;"></i>
+                                                {{ $step['label'] }}
+                                            </span>
+                                        @endif
+
+                                        {{-- شارة التأكيد --}}
+                                        @if ($log->confirmation_type === 'manual')
+                                            <span class="tl-confirmation-badge bg-label-warning">
+                                                <i class="ti ti-user-check" style="font-size:0.7rem;"></i> تأكيد يدوي
+                                            </span>
+                                        @elseif ($log->confirmation_type === 'automatic')
+                                            <span class="tl-confirmation-badge bg-label-primary">
+                                                <i class="ti ti-robot" style="font-size:0.7rem;"></i> تأكيد تلقائي
+                                            </span>
+                                        @endif
+
+                                        {{-- التوقيت --}}
+                                        <span class="order-timeline-meta ms-auto text-nowrap">
+                                            <i class="ti ti-clock me-1"></i>
+                                            {{ $log->created_at->format('H:i:s') }}
+                                            <span class="d-none d-md-inline">— {{ $log->created_at->format('Y/m/d') }}</span>
+                                        </span>
+                                    </div>
+
+                                    {{-- الرسالة --}}
+                                    <p class="order-timeline-msg mb-0 {{ $log->level === 'error' ? 'fw-semibold text-danger' : '' }}"
+                                       style="{{ $log->level !== 'error' ? 'color:#1e293b;' : '' }}">
+                                        {{ $msg }}
+                                    </p>
+
+                                    {{-- زر البيانات التقنية --}}
+                                    @if ($log->context)
+                                        <div class="mt-2 text-end">
+                                            <button type="button"
+                                                    class="btn btn-sm py-0 px-2"
+                                                    style="font-size:0.72rem; border:1px solid #cbd5e1; background:#fff; color:#64748b;"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#logCtxModal{{ $log->id }}">
+                                                <i class="ti ti-code me-1"></i>تفاصيل تقنية
+                                            </button>
+                                        </div>
+
+                                        {{-- Modal بيانات السياق --}}
+                                        <div class="modal fade" id="logCtxModal{{ $log->id }}" tabindex="-1">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h6 class="modal-title">
+                                                            <i class="ti ti-code me-2 text-primary"></i>
+                                                            بيانات تقنية —
+                                                            @if($step) {{ $step['label'] }} @endif
+                                                            ({{ $log->created_at->format('H:i:s') }})
+                                                        </h6>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body p-0">
+                                                        <pre class="mb-0 p-3 bg-dark text-light rounded-bottom"
+                                                             style="max-height:420px; overflow-y:auto; font-size:0.78rem; direction:ltr; text-align:left;">{{ json_encode($log->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}</pre>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
         </div>
