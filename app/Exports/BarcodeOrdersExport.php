@@ -93,7 +93,7 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
             $mobile = '0' . $mobile;
         }
 
-        $mobile = $mobile."/" . ($order->temp_mobile ?? "");
+
 
         // Notes: base note + backup number if exists
         $notes = 'يسلم لاي شخص دون الرجوع للرقم القومي \ او يتم الاتصال بالراسل في حال تعذر التسليم';
