@@ -10,16 +10,20 @@ class AddFeeToShippingMethodsTable extends Migration
     {
         Schema::table('shipping_methods', function (Blueprint $table) {
             // add the fee field defaulting to 0.00
-            $table->decimal('fee', 8, 2)
-                  ->default(0)
-                  ->after('phones');
+            if (!Schema::hasColumn('shipping_methods', 'fee')) {
+                $table->decimal('fee', 8, 2)
+                      ->default(0)
+                      ->after('phones');
+            }
         });
     }
 
     public function down()
     {
         Schema::table('shipping_methods', function (Blueprint $table) {
-            $table->dropColumn('fee');
+            if (Schema::hasColumn('shipping_methods', 'fee')) {
+                $table->dropColumn('fee');
+            }
         });
     }
 }
