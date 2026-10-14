@@ -13,12 +13,14 @@ class CreateStagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('stages', function (Blueprint $table) {
-            $table->id();
-            $table->string('photo')->default('default.png');
-            $table->enum('is_active', [0, 1])->default(1);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('stages')) {
+            Schema::create('stages', function (Blueprint $table) {
+                $table->id();
+                $table->string('photo')->default('default.png');
+                $table->enum('is_active', [0, 1])->default(1);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

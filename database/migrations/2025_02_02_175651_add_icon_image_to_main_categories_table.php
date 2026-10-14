@@ -14,7 +14,9 @@ class AddIconImageToMainCategoriesTable extends Migration
     public function up()
     {
         Schema::table('main_categories', function (Blueprint $table) {
-            $table->string('icon_image')->nullable(); // ✅ Ensure this column doesn't already exist
+            if (!Schema::hasColumn('main_categories', 'icon_image')) {
+                $table->string('icon_image')->nullable();
+            }
         });
     }
 
@@ -27,7 +29,9 @@ class AddIconImageToMainCategoriesTable extends Migration
     public function down()
     {
         Schema::table('main_categories', function (Blueprint $table) {
-            $table->dropColumn('icon_image'); // ✅ This should match the column name
+            if (Schema::hasColumn('main_categories', 'icon_image')) {
+                $table->dropColumn('icon_image');
+            }
         });
     }
 }

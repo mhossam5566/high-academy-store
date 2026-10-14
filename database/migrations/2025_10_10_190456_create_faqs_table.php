@@ -13,14 +13,16 @@ class CreateFaqsTable extends Migration
      */
     public function up()
     {
-        Schema::create('faqs', function (Blueprint $table) {
-            $table->id();
-            $table->string('question'); // The question text
-            $table->text('answer'); // The answer text
-            $table->integer('order')->default(0); // For ordering/sorting FAQs
-            $table->enum('status', ['active', 'inactive'])->default('active'); // Status for enabling/disabling FAQs
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('faqs')) {
+            Schema::create('faqs', function (Blueprint $table) {
+                $table->id();
+                $table->string('question'); // The question text
+                $table->text('answer'); // The answer text
+                $table->integer('order')->default(0); // For ordering/sorting FAQs
+                $table->enum('status', ['active', 'inactive'])->default('active'); // Status for enabling/disabling FAQs
+                $table->timestamps();
+            });
+        }
     }
 
     /**

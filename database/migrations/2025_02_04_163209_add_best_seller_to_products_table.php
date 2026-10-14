@@ -14,14 +14,18 @@ class AddBestSellerToProductsTable extends Migration
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->boolean('best_seller')->default(false)->after('final_price'); // Add the column after 'final_price'
+            if (!Schema::hasColumn('products', 'best_seller')) {
+                $table->boolean('best_seller')->default(false)->after('final_price');
+            }
         });
     }
 
     public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('best_seller');
+            if (Schema::hasColumn('products', 'best_seller')) {
+                $table->dropColumn('best_seller');
+            }
         });
     }
 }

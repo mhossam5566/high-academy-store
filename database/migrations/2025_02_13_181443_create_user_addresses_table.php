@@ -13,18 +13,20 @@ class CreateUserAddressesTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_addresses', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('governorate', 100);
-            $table->string('city', 100);
-            $table->text('address');
-            $table->string('name', 255);
-            $table->string('mobile', 20);
-            $table->string('temp_mobile', 20)->nullable();
-            $table->string('near_post', 255);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('user_addresses')) {
+            Schema::create('user_addresses', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->string('governorate', 100);
+                $table->string('city', 100);
+                $table->text('address');
+                $table->string('name', 255);
+                $table->string('mobile', 20);
+                $table->string('temp_mobile', 20)->nullable();
+                $table->string('near_post', 255);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

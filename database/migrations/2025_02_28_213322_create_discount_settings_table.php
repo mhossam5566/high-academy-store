@@ -14,19 +14,21 @@ class CreateDiscountSettingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('discount_settings', function (Blueprint $table) {
-            $table->id();
-            // Global flag to enable/disable the discount feature
-            $table->boolean('discount_enabled')->default(true);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('discount_settings')) {
+            Schema::create('discount_settings', function (Blueprint $table) {
+                $table->id();
+                // Global flag to enable/disable the discount feature
+                $table->boolean('discount_enabled')->default(true);
+                $table->timestamps();
+            });
 
-        // Optionally, insert a default setting
-        DB::table('discount_settings')->insert([
-            'discount_enabled' => true,
-            'created_at'       => now(),
-            'updated_at'       => now(),
-        ]);
+            // Optionally, insert a default setting
+            DB::table('discount_settings')->insert([
+                'discount_enabled' => true,
+                'created_at'       => now(),
+                'updated_at'       => now(),
+            ]);
+        }
     }
 
     /**

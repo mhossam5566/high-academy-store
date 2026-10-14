@@ -13,17 +13,19 @@ class CreateDiscountTable extends Migration
      */
     public function up()
     {
-        Schema::create('discount', function (Blueprint $table) {
-            $table->id();
-            $table->string('code')->unique();
-            // The fixed discount amount (e.g. 30 means £30 off)
-            $table->decimal('discount', 8, 2);
-            // Optional usage limit (null means unlimited)
-            $table->integer('usage_limit')->nullable();
-            // Track how many times the coupon has been used
-            $table->integer('used')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('discount')) {
+            Schema::create('discount', function (Blueprint $table) {
+                $table->id();
+                $table->string('code')->unique();
+                // The fixed discount amount (e.g. 30 means £30 off)
+                $table->decimal('discount', 8, 2);
+                // Optional usage limit (null means unlimited)
+                $table->integer('usage_limit')->nullable();
+                // Track how many times the coupon has been used
+                $table->integer('used')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

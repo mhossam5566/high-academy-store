@@ -14,16 +14,26 @@ class UpdateOffersTable extends Migration
     public function up()
     {
         Schema::table('offers', function (Blueprint $table) {
-            $table->enum('type', ['percentage', 'fixed'])->default('percentage'); // Type of discount
-            $table->decimal('value', 8, 2)->default(0); // Discount value (percentage or fixed amount)
-            $table->integer('minimum_books')->default(10); // Minimum number of books required for discount
+            if (!Schema::hasColumn('offers', 'type')) {
+                $table->enum('type', ['percentage', 'fixed'])->default('percentage'); // Type of discount
+            }
+            if (!Schema::hasColumn('offers', 'value')) {
+                $table->decimal('value', 8, 2)->default(0); // Discount value (percentage or fixed amount)
+            }
+            if (!Schema::hasColumn('offers', 'minimum_books')) {
+                $table->integer('minimum_books')->default(10); // Minimum number of books required for discount
+            }
         });
     }
 
     public function down()
     {
         Schema::table('offers', function (Blueprint $table) {
-            $table->dropColumn(['type', 'value', 'minimum_books']);
+            foreach (['type', 'value', 'minimum_books'] as $column) {
+                if (Schema::hasColumn('offers', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
         });
     }
 }

@@ -7,14 +7,18 @@ return new class extends Migration {
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->boolean('is_deleted')->default(false)->after('best_seller');
+            if (!Schema::hasColumn('products', 'is_deleted')) {
+                $table->boolean('is_deleted')->default(false)->after('best_seller');
+            }
         });
     }
 
     public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('is_deleted');
+            if (Schema::hasColumn('products', 'is_deleted')) {
+                $table->dropColumn('is_deleted');
+            }
         });
     }
 };

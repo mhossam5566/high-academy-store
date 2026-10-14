@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('offers', function (Blueprint $table) {
-            $table->id();
-            $table->string('image'); // Stores the image path
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('offers')) {
+            Schema::create('offers', function (Blueprint $table) {
+                $table->id();
+                $table->string('image'); // Stores the image path
+                $table->timestamps();
+            });
+        }
     }
 
     public function down()

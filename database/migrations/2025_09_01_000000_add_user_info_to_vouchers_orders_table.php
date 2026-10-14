@@ -14,9 +14,15 @@ return new class extends Migration
     public function up()
     {
         Schema::table('vouchers_orders', function (Blueprint $table) {
-            $table->string('user_name')->nullable()->after('user_id');
-            $table->string('user_email')->nullable()->after('user_name');
-            $table->string('user_phone')->nullable()->after('user_email');
+            if (!Schema::hasColumn('vouchers_orders', 'user_name')) {
+                $table->string('user_name')->nullable()->after('user_id');
+            }
+            if (!Schema::hasColumn('vouchers_orders', 'user_email')) {
+                $table->string('user_email')->nullable()->after('user_name');
+            }
+            if (!Schema::hasColumn('vouchers_orders', 'user_phone')) {
+                $table->string('user_phone')->nullable()->after('user_email');
+            }
         });
     }
 
@@ -28,7 +34,11 @@ return new class extends Migration
     public function down()
     {
         Schema::table('vouchers_orders', function (Blueprint $table) {
-            $table->dropColumn(['user_name', 'user_email', 'user_phone']);
+            foreach (['user_name', 'user_email', 'user_phone'] as $column) {
+                if (Schema::hasColumn('vouchers_orders', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
         });
     }
 };

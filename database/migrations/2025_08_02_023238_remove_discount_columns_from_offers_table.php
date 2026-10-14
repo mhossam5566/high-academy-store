@@ -14,14 +14,10 @@ class RemoveDiscountColumnsFromOffersTable extends Migration
     public function up()
     {
         Schema::table('offers', function (Blueprint $table) {
-            if (Schema::hasColumn('offers', 'type')) {
-                $table->dropColumn('type');
-            }
-            if (Schema::hasColumn('offers', 'value')) {
-                $table->dropColumn('value');
-            }
-            if (Schema::hasColumn('offers', 'minimum_books')) {
-                $table->dropColumn('minimum_books');
+            foreach (['type', 'value', 'minimum_books'] as $column) {
+                if (Schema::hasColumn('offers', $column)) {
+                    $table->dropColumn($column);
+                }
             }
         });
     }

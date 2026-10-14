@@ -13,16 +13,18 @@ class StagesTranslations extends Migration
      */
     public function up()
     {
-        Schema::create('stages_translations', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('stage_id');
-            $table->string('locale')->index();
-            $table->string('title');
+        if (!Schema::hasTable('stages_translations')) {
+            Schema::create('stages_translations', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('stage_id');
+                $table->string('locale')->index();
+                $table->string('title');
 
-            $table->unique(['stage_id', 'locale']);
-            $table->foreign('stage_id')->references('id')->on('stages')->onDelete('cascade');
-            $table->timestamps();
-        });
+                $table->unique(['stage_id', 'locale']);
+                $table->foreign('stage_id')->references('id')->on('stages')->onDelete('cascade');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

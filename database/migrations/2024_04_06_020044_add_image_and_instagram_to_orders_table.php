@@ -13,12 +13,14 @@ class AddImageAndInstagramToOrdersTable extends Migration
      */
     public function up()
     {
-        {
-            Schema::table('orders', function (Blueprint $table) {
+        Schema::table('orders', function (Blueprint $table) {
+            if (!Schema::hasColumn('orders', 'image')) {
                 $table->string('image')->nullable();
+            }
+            if (!Schema::hasColumn('orders', 'instapay')) {
                 $table->string('instapay')->nullable();
-            });
-        }
+            }
+        });
     }
 
     /**
@@ -29,8 +31,12 @@ class AddImageAndInstagramToOrdersTable extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('image');
-            $table->dropColumn('instapay');
+            if (Schema::hasColumn('orders', 'image')) {
+                $table->dropColumn('image');
+            }
+            if (Schema::hasColumn('orders', 'instapay')) {
+                $table->dropColumn('instapay');
+            }
         });
     }
 }
