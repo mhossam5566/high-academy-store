@@ -195,6 +195,10 @@
                                 <span class="badge bg-primary fs-6">طلب محجوز</span>
                             @break
 
+                            @case('returned')
+                                <span class="badge bg-dark fs-6">طلب مرتجع</span>
+                            @break
+
                             @default
                                 <span class="badge bg-secondary fs-6">حالة غير معروفة</span>
                         @endswitch
