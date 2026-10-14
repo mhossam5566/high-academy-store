@@ -253,6 +253,7 @@
                                     <th style="width:40px">#</th>
                                     <th style="width:80px">Level</th>
                                     <th style="width:80px">Step</th>
+                                    <th style="width:110px">Confirmation</th>
                                     <th>Message</th>
                                     <th style="width:160px">Timestamp</th>
                                     <th style="width:120px">IP</th>
