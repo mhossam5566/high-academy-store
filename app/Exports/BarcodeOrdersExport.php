@@ -108,7 +108,7 @@ class BarcodeOrdersExport implements FromCollection, WithHeadings, WithMapping, 
                     ?? 'منتج محذوف';
                 return "{$title} - عدد : {$detail->amout}";
             })
-            ->implode(' - ');
+            ->implode(' || ');
 
         return [
             '',           // Package_Serial
