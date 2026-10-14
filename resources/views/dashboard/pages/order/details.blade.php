@@ -551,8 +551,7 @@
                                         {{-- التوقيت --}}
                                         <span class="order-timeline-meta ms-auto text-nowrap">
                                             <i class="ti ti-clock me-1"></i>
-                                            {{ $log->created_at->format('H:i:s') }}
-                                            <span class="d-none d-md-inline">— {{ $log->created_at->format('Y/m/d') }}</span>
+                                            {{ $log->created_at->format('H:i:s') }} — {{ $log->created_at->format('Y/m/d') }}
                                         </span>
                                     </div>
 
