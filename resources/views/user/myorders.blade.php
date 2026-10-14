@@ -115,6 +115,10 @@
                                     <span class="badge bg-info">طلب معلق</span>
                                 @break
 
+                                @case('returned')
+                                    <span class="badge bg-dark">طلب مرتجع</span>
+                                @break
+
                                 @default
                                     <span class="badge bg-secondary">غير معروف</span>
                             @endswitch
