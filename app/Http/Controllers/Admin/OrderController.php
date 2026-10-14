@@ -181,6 +181,8 @@ class OrderController extends Controller
                         return "<h2 class='badge bg-info'>طلب معلق</h2>";
                     case "reserved":
                         return "<h2 class='badge bg-primary'>طلب محجوز</h2>";
+                    case "returned":
+                        return "<h2 class='badge bg-dark'>طلب مرتجع</h2>";
                     default:
                         return '';
                 }
