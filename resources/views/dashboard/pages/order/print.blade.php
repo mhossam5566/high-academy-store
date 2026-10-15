@@ -357,6 +357,20 @@
                     }
                 },
                 drawCallback: function() {
+                    // Collect all IDs currently returned and rendered in the table
+                    let currentTableIds = new Set();
+                    $('.order-select-chk').each(function() {
+                        currentTableIds.add($(this).val());
+                    });
+
+                    // Prune selectedIds: remove any IDs that are no longer part of the current table results
+                    // (e.g. if a shipping method or status filter was unchecked or changed)
+                    for (let id of Array.from(selectedIds)) {
+                        if (!currentTableIds.has(id)) {
+                            selectedIds.delete(id);
+                        }
+                    }
+
                     // Update row checkboxes state from selectedIds set
                     let allCheckedOnPage = true;
                     let hasRows = false;
@@ -418,13 +432,15 @@
 
                 // Check if all on current page are checked
                 let allChecked = true;
+                let hasRows = false;
                 $('.order-select-chk').each(function() {
+                    hasRows = true;
                     if (!$(this).is(':checked')) {
                         allChecked = false;
                         return false;
                     }
                 });
-                $('#checkAll').prop('checked', allChecked);
+                $('#checkAll').prop('checked', hasRows && allChecked);
 
                 updateUIButtons();
             });
@@ -432,17 +448,19 @@
             // Check All change
             $('#checkAll').on('change', function() {
                 let isChecked = $(this).is(':checked');
-                $('.order-select-chk').each(function() {
-                    let id = $(this).val();
-                    $(this).prop('checked', isChecked);
-                    if (isChecked) {
+                if (isChecked) {
+                    // Select all currently visible rows in the table
+                    $('.order-select-chk').each(function() {
+                        let id = $(this).val();
                         selectedIds.add(id);
+                        $(this).prop('checked', true);
                         $(this).closest('tr').addClass('table-active');
-                    } else {
-                        selectedIds.delete(id);
-                        $(this).closest('tr').removeClass('table-active');
-                    }
-                });
+                    });
+                } else {
+                    // Deselect all
+                    selectedIds.clear();
+                    $('.order-select-chk').prop('checked', false).closest('tr').removeClass('table-active');
+                }
                 updateUIButtons();
             });
 
