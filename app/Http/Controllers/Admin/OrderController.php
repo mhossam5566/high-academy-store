@@ -1552,6 +1552,19 @@ class OrderController extends Controller
     public function printOrders()
     {
         $shippingMethods = ShippingMethod::all();
+
+        // Calculate active (uncompleted) successful orders count for each shipping method
+        $counts = Order::where('status', 'success')
+            ->where('printed_completed', 0)
+            ->selectRaw('shipping_method, count(*) as total')
+            ->groupBy('shipping_method')
+            ->pluck('total', 'shipping_method')
+            ->toArray();
+
+        foreach ($shippingMethods as $method) {
+            $method->orders_count = ($counts[$method->id] ?? 0) + ($counts[$method->name] ?? 0);
+        }
+
         return view('dashboard.pages.order.print', compact('shippingMethods'));
     }
 
@@ -1572,8 +1585,34 @@ class OrderController extends Controller
             $query->where('printed_completed', 1);
         }
 
-        // Shipping filter
-        if ($request->filled('shipping') && $request->shipping !== 'all') {
+        // Shipping methods multi-select filter
+        if ($request->has('shipping_methods')) {
+            $shippingMethodsParam = $request->get('shipping_methods');
+            if (is_string($shippingMethodsParam)) {
+                $shippingMethods = array_filter(explode(',', $shippingMethodsParam), function ($val) {
+                    return $val !== '' && $val !== null && $val !== 'none';
+                });
+            } elseif (is_array($shippingMethodsParam)) {
+                $shippingMethods = array_filter($shippingMethodsParam, function ($val) {
+                    return $val !== '' && $val !== null && $val !== 'none';
+                });
+            } else {
+                $shippingMethods = [];
+            }
+
+            if (empty($shippingMethods)) {
+                // When all shipping methods are deselected, return empty results
+                $query->whereRaw('1 = 0');
+            } else {
+                $selectedNames = ShippingMethod::whereIn('id', $shippingMethods)->pluck('name')->toArray();
+                $query->where(function ($q) use ($shippingMethods, $selectedNames) {
+                    $q->whereIn('shipping_method', $shippingMethods);
+                    if (!empty($selectedNames)) {
+                        $q->orWhereIn('shipping_method', $selectedNames);
+                    }
+                });
+            }
+        } elseif ($request->filled('shipping') && $request->shipping !== 'all') {
             $query->where('shipping_method', $request->shipping);
         }
 
