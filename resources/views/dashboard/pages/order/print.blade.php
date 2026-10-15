@@ -101,7 +101,7 @@
             <div class="d-flex flex-wrap align-items-center gap-2 pt-2 border-top">
                 <button type="button" id="btnExportPdf" class="btn btn-success d-inline-flex align-items-center gap-1" disabled>
                     <i class="ti ti-file-text fs-5"></i>
-                    <span>تصدير الطلبات بالتفصيل (PDF)</span>
+                    <span>تصدير الطلبات الناجحة بالتفصيل (PDF)</span>
                 </button>
 
                 <button type="button" id="btnExportExcel" class="btn btn-warning d-inline-flex align-items-center gap-1" disabled>

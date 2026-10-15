@@ -1640,7 +1640,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Export selected orders as detailed PDF.
+     * Export selected orders as grouped detailed PDF.
      */
     public function printExportPdf(Request $request)
     {
@@ -1672,9 +1672,9 @@ class OrderController extends Controller
             'format' => 'A4',
         ]);
 
-        $html = view('dashboard.pages.order.successExport', compact('orders'))->render();
+        $html = view('dashboard.pages.order.groupedExport', compact('orders'))->render();
         $mpdf->WriteHTML($html);
-        $mpdf->Output('orders-details-' . now()->format('Y-m-d') . '.pdf', 'D');
+        $mpdf->Output('grouped-orders-' . now()->format('Y-m-d') . '.pdf', 'D');
         exit;
     }
 
