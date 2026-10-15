@@ -258,10 +258,10 @@
                 serverSide: true,
                 scrollX: true,
                 lengthMenu: [
-                    [10, 25, 50, 100, 200, -1],
-                    [10, 25, 50, 100, 200, "الكل"]
+                    [-1, 10, 25, 50, 100, 200],
+                    ["الكل", 10, 25, 50, 100, 200]
                 ],
-                pageLength: 25,
+                pageLength: -1,
                 ajax: {
                     url: "{{ route('dashboard.orders.print.datatable') }}",
                     data: function(d) {
