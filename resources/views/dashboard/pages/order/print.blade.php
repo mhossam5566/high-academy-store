@@ -252,6 +252,7 @@
     <script>
         $(document).ready(function() {
             let selectedIds = new Set();
+            let isSelectAllMode = false;
 
             const table = $('#printOrdersTable').DataTable({
                 processing: true,
@@ -357,17 +358,35 @@
                     }
                 },
                 drawCallback: function() {
-                    // Collect all IDs currently returned and rendered in the table
+                    let api = this.api();
                     let currentTableIds = new Set();
-                    $('.order-select-chk').each(function() {
-                        currentTableIds.add($(this).val());
+
+                    // Read IDs from DataTables dataset directly
+                    api.rows().every(function() {
+                        let rowData = this.data();
+                        if (rowData && rowData.id) {
+                            currentTableIds.add(String(rowData.id));
+                        }
                     });
 
-                    // Prune selectedIds: remove any IDs that are no longer part of the current table results
-                    // (e.g. if a shipping method or status filter was unchecked or changed)
-                    for (let id of Array.from(selectedIds)) {
-                        if (!currentTableIds.has(id)) {
-                            selectedIds.delete(id);
+                    // Also check DOM nodes as fallback
+                    $('.order-select-chk').each(function() {
+                        let val = $(this).val();
+                        if (val) {
+                            currentTableIds.add(String(val));
+                        }
+                    });
+
+                    if (isSelectAllMode && currentTableIds.size > 0) {
+                        // If user previously selected all, maintain select-all for the newly filtered rows
+                        selectedIds.clear();
+                        currentTableIds.forEach(id => selectedIds.add(String(id)));
+                    } else {
+                        // Prune selectedIds: remove any IDs that are no longer part of the current table results
+                        for (let id of Array.from(selectedIds)) {
+                            if (!currentTableIds.has(String(id))) {
+                                selectedIds.delete(id);
+                            }
                         }
                     }
 
@@ -377,7 +396,7 @@
 
                     $('.order-select-chk').each(function() {
                         hasRows = true;
-                        let id = $(this).val();
+                        let id = String($(this).val());
                         if (selectedIds.has(id)) {
                             $(this).prop('checked', true);
                             $(this).closest('tr').addClass('table-active');
@@ -388,7 +407,7 @@
                         }
                     });
 
-                    $('#checkAll').prop('checked', hasRows && allCheckedOnPage);
+                    $('#checkAll').prop('checked', hasRows && (allCheckedOnPage || isSelectAllMode));
                     updateUIButtons();
                 }
             });
@@ -421,13 +440,14 @@
 
             // Checkbox individual change
             $(document).on('change', '.order-select-chk', function() {
-                let id = $(this).val();
+                let id = String($(this).val());
                 if ($(this).is(':checked')) {
                     selectedIds.add(id);
                     $(this).closest('tr').addClass('table-active');
                 } else {
                     selectedIds.delete(id);
                     $(this).closest('tr').removeClass('table-active');
+                    isSelectAllMode = false;
                 }
 
                 // Check if all on current page are checked
@@ -441,6 +461,9 @@
                     }
                 });
                 $('#checkAll').prop('checked', hasRows && allChecked);
+                if (hasRows && allChecked) {
+                    isSelectAllMode = true;
+                }
 
                 updateUIButtons();
             });
@@ -449,15 +472,15 @@
             $('#checkAll').on('change', function() {
                 let isChecked = $(this).is(':checked');
                 if (isChecked) {
-                    // Select all currently visible rows in the table
+                    isSelectAllMode = true;
                     $('.order-select-chk').each(function() {
-                        let id = $(this).val();
+                        let id = String($(this).val());
                         selectedIds.add(id);
                         $(this).prop('checked', true);
                         $(this).closest('tr').addClass('table-active');
                     });
                 } else {
-                    // Deselect all
+                    isSelectAllMode = false;
                     selectedIds.clear();
                     $('.order-select-chk').prop('checked', false).closest('tr').removeClass('table-active');
                 }
@@ -466,6 +489,7 @@
 
             // Clear selection button
             $('#btnClearSelection').on('click', function() {
+                isSelectAllMode = false;
                 selectedIds.clear();
                 $('#checkAll').prop('checked', false);
                 $('.order-select-chk').prop('checked', false).closest('tr').removeClass('table-active');
