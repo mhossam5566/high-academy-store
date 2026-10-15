@@ -23,40 +23,54 @@
         .shipping-card {
             cursor: pointer;
             user-select: none;
-            border-radius: 0.625rem;
-            transition: all 0.2s ease-in-out;
-            border-width: 2px !important;
+            border-radius: 0.5rem;
+            transition: all 0.15s ease-in-out;
+            border: 1.5px solid #d9dee3;
+            background-color: #fff;
+            padding: 0.45rem 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
         }
         .shipping-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 .25rem 1rem rgba(115, 103, 240, 0.15) !important;
+            border-color: #7367f0 !important;
+            box-shadow: 0 2px 6px rgba(115, 103, 240, 0.2);
         }
         .shipping-card.active {
             border-color: #7367f0 !important;
-            background-color: rgba(115, 103, 240, 0.05);
+            background-color: rgba(115, 103, 240, 0.08) !important;
         }
-        .shipping-card.active .shipping-icon-box {
+        .shipping-card.active .shipping-title {
+            color: #7367f0 !important;
+            font-weight: 600;
+        }
+        .shipping-card.active .shipping-icon {
+            color: #7367f0 !important;
+        }
+        .shipping-card.active .shipping-count-badge {
             background-color: #7367f0 !important;
             color: #fff !important;
         }
-        .shipping-card.active .shipping-title {
-            color: #7367f0;
-        }
         .shipping-card:not(.active) {
             border-color: #dbdade !important;
-            background-color: #fafafb;
-            opacity: 0.65;
-        }
-        .shipping-card:not(.active) .shipping-icon-box {
-            background-color: #ececec !important;
-            color: #a8aaae !important;
+            background-color: #fafafb !important;
+            opacity: 0.7;
         }
         .shipping-card:not(.active) .shipping-title {
-            color: #5d596c;
+            color: #6f6b7d !important;
+        }
+        .shipping-card:not(.active) .shipping-icon {
+            color: #a8aaae !important;
         }
         .shipping-card:not(.active) .shipping-count-badge {
             background-color: #ececec !important;
-            color: #a8aaae !important;
+            color: #8592a3 !important;
+        }
+        .shipping-card .shipping-method-chk {
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+            margin: 0;
         }
     </style>
 @endsection
@@ -78,69 +92,48 @@
         </div>
     </div>
 
-    <!-- Shipping Methods Cards (Flex Selection) -->
-    <div class="mb-4">
+    <!-- Shipping Methods Compact Filter (Flex Sized-to-Word Rectangles) -->
+    <div class="card mb-4 p-3">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
-            <h6 class="mb-0 fw-bold d-flex align-items-center text-dark">
-                <i class="ti ti-truck-delivery me-2 text-primary fs-4"></i>وسائل الشحن
-                <span class="text-muted fw-normal ms-2 fs-7">(انقر على الوسيلة لتحديدها أو إلغاء تحديدها)</span>
-            </h6>
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn btn-xs btn-outline-primary" id="btnSelectAllShipping">
+            <span class="fw-bold text-dark d-flex align-items-center">
+                <i class="ti ti-truck-delivery me-2 text-primary fs-5"></i>طرق الشحن:
+                <small class="text-muted fw-normal ms-2">(انقر على الوسيلة لتحديدها أو استبعادها)</small>
+            </span>
+            <div class="d-flex align-items-center gap-1">
+                <button type="button" class="btn btn-xs btn-label-primary py-1 px-2" id="btnSelectAllShipping">
                     <i class="ti ti-check-all me-1"></i>تحديد الكل
                 </button>
-                <button type="button" class="btn btn-xs btn-outline-secondary" id="btnUnselectAllShipping">
-                    <i class="ti ti-x me-1"></i>إلغاء تحديد الكل
+                <button type="button" class="btn btn-xs btn-label-secondary py-1 px-2" id="btnUnselectAllShipping">
+                    <i class="ti ti-x me-1"></i>إلغاء التحديد
                 </button>
             </div>
         </div>
 
-        <div class="d-flex flex-wrap gap-3 align-items-stretch" id="shippingCardsContainer">
+        <div class="d-flex flex-wrap gap-2 align-items-center" id="shippingCardsContainer">
             @foreach ($shippingMethods as $method)
                 @php
                     $icon = 'ti-truck';
-                    $typeLabel = 'شحن عام';
                     if ($method->type === 'post') {
                         $icon = 'ti-mailbox';
-                        $typeLabel = 'مكتب بريد';
                     } elseif ($method->type === 'home') {
                         $icon = 'ti-home';
-                        $typeLabel = 'توصيل لباب البيت';
                     } elseif ($method->type === 'branch') {
                         $icon = 'ti-building-store';
-                        $typeLabel = 'استلام من الفرع';
                     }
                 @endphp
-                <div class="shipping-card card flex-fill border border-2 active shadow-none mb-0"
-                    data-id="{{ $method->id }}"
-                    style="min-width: 220px;">
-                    <div class="card-body p-3">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <div class="avatar avatar-md rounded p-2 d-flex align-items-center justify-content-center shipping-icon-box shadow-xs"
-                                style="transition: all 0.2s ease;">
-                                <i class="ti {{ $icon }} fs-3"></i>
-                            </div>
-                            <div class="form-check m-0 p-0">
-                                <input class="form-check-input shipping-method-chk"
-                                    type="checkbox"
-                                    value="{{ $method->id }}"
-                                    id="ship_method_{{ $method->id }}"
-                                    checked
-                                    style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
-                            </div>
-                        </div>
-                        <div>
-                            <h6 class="mb-1 fw-bold shipping-title" style="transition: color 0.2s ease;">{{ $method->name }}</h6>
-                            <div class="d-flex align-items-center justify-content-between">
-                                <small class="text-muted">{{ $typeLabel }}</small>
-                                @if(isset($method->orders_count))
-                                    <span class="badge rounded-pill shipping-count-badge bg-label-primary">
-                                        {{ $method->orders_count }} طلب
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
+                <div class="shipping-card active" data-id="{{ $method->id }}" title="{{ $method->name }}">
+                    <input class="form-check-input shipping-method-chk"
+                        type="checkbox"
+                        value="{{ $method->id }}"
+                        id="ship_method_{{ $method->id }}"
+                        checked>
+                    <i class="ti {{ $icon }} fs-5 shipping-icon"></i>
+                    <span class="shipping-title text-nowrap">{{ $method->name }}</span>
+                    @if(isset($method->orders_count))
+                        <span class="badge rounded-pill shipping-count-badge">
+                            {{ $method->orders_count }}
+                        </span>
+                    @endif
                 </div>
             @endforeach
         </div>
