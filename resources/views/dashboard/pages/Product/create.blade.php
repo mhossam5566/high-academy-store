@@ -387,33 +387,6 @@
 
             $('#offer_type, #price, #offer_value').on('change input', calculateFinalPrice);
 
-            // AJAX Form Submit
-            $('#productForm').submit(function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                let formData = new FormData(this);
-                let submitBtn = $(this).find('button[type="submit"]');
-
-                submitBtn.prop('disabled', true).html(
-                    '<span class="spinner-border spinner-border-sm me-1"></span>جاري الحفظ...');
-
-                $.ajax({
-                    url: '{{ route('dashboard.store.product') }}',
-                    type: "POST",
-                    dataType: "json",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم الحفظ',
-                            text: 'تم حفظ المنتج بنجاح',
-                            confirmButtonText: 'موافق'
-                        }).then(() => {
-                            window.location.href = "{{ route('dashboard.product') }}";
-                        });
-                    },
                     error: function(xhr) {
                         submitBtn.prop('disabled', false).html(
                             '<i class="ti ti-device-floppy me-2"></i>حفظ المنتج');

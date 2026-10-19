@@ -24,8 +24,7 @@
         </a>
     </div>
 
-    <form id="productForm"
-        action="{{ route('dashboard.product.update') }}" method="POST" enctype="multipart/form-data">
+    <form id="productForm" data-ajax data-redirect="{{ route('dashboard.product') }}" action="{{ route('dashboard.product.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="product_id" value="{{ $product->id }}">
 
@@ -515,34 +514,7 @@
                 $('#offer_type_div').show();
                 $('#offer_value_div').show();
             }
-
-            // AJAX Form Submit
-            $('#productForm').submit(function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                let formData = new FormData(this);
-                let submitBtn = $(this).find('button[type="submit"]');
-
-                submitBtn.prop('disabled', true).html(
-                    '<span class="spinner-border spinner-border-sm me-1"></span>جاري التحديث...');
-
-                $.ajax({
-                    url: '{{ route('dashboard.product.update') }}',
-                    type: "POST",
-                    dataType: "json",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم التحديث',
-                            text: 'تم تحديث المنتج بنجاح',
-                            confirmButtonText: 'موافق'
-                        }).then(() => {
-                            window.location.href = "{{ route('dashboard.product') }}";
-                        });
-                    },
+},
                     error: function(xhr) {
                         submitBtn.prop('disabled', false).html(
                             '<i class="ti ti-device-floppy me-2"></i>تحديث المنتج');
