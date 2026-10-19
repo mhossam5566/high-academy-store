@@ -13,7 +13,7 @@
 @endsection
 
 @section('page-script')
-    <script src="{{ asset('dashboard/assets/js/form-ajax.js') }}"></script>
+
 @endsection
 
 @section('content')
@@ -44,8 +44,8 @@
                     </ul>
 
                     @foreach (config('translatable.locales') as $locale)
-                        <div class="tab-pane fade @if ($loop->first) show active @endif mt-3"
-                            id="slider-{{ $locale }}" role="tabpanel">
+                        <div class="tab-pane fade @if ($loop->first) show active @endif mt-3" id="slider-{{ $locale }}"
+                            role="tabpanel">
                             <div class="row g-3">
                                 <div class="col-12">
                                     <label class="form-label">عنوان الصف الدراسي ({{ strtoupper($locale) }})</label>
