@@ -390,6 +390,7 @@
             // AJAX Form Submit
             $('#productForm').submit(function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 let formData = new FormData(this);
                 let submitBtn = $(this).find('button[type="submit"]');
 

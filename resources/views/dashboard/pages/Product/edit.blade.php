@@ -24,7 +24,7 @@
         </a>
     </div>
 
-    <form id="productForm" data-ajax data-redirect="{{ route('dashboard.product') }}"
+    <form id="productForm"
         action="{{ route('dashboard.product.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="product_id" value="{{ $product->id }}">
@@ -519,6 +519,7 @@
             // AJAX Form Submit
             $('#productForm').submit(function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 let formData = new FormData(this);
                 let submitBtn = $(this).find('button[type="submit"]');
 
