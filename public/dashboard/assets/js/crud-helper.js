@@ -48,48 +48,64 @@ window.CRUDHelper = {
                     }
 
                     let $btn = $(e.currentTarget);
-                    let id = $btn.data("id");
+                    let id = $btn.data("id") ?? $btn.attr("data-id") ?? $btn.attr("slider_id") ?? $btn.attr("stage_id") ?? $btn.attr("category_id") ?? $btn.attr("id");
                     let originalHtml = $btn.html();
 
                     $btn.prop("disabled", true);
-                    $btn.html(`<span class="spinner-border spinner-border-sm me-1"></span>${window.translations.loading || 'Loading...'}`);
+                    const trans = window.translations || {};
+                    $btn.html(`<span class="spinner-border spinner-border-sm me-1"></span>${trans.loading || 'Loading...'}`);
 
                     Swal.fire({
-                        title: window.translations.delete_confirm || "Are you sure?",
-                        text: window.translations.delete_text || "You won't be able to revert this!",
+                        title: trans.delete_confirm || "Are you sure?",
+                        text: trans.delete_text || "You won't be able to revert this!",
                         icon: "warning",
                         showCancelButton: true,
-                        confirmButtonText: window.translations.delete_btn || "Delete",
-                        cancelButtonText: window.translations.cancel_btn || "Cancel",
+                        confirmButtonText: trans.delete_btn || "Delete",
+                        cancelButtonText: trans.cancel_btn || "Cancel",
                         reverseButtons: true,
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Swal.fire({
-                                title: window.translations.deleting_title || "Deleting...",
-                                text: window.translations.deleting_wait || "Please wait",
+                                title: trans.deleting_title || "Deleting...",
+                                text: trans.deleting_wait || "Please wait",
                                 allowOutsideClick: false,
                                 allowEscapeKey: false,
                                 showConfirmButton: false,
                                 didOpen: () => Swal.showLoading(),
                             });
 
+                            let reqUrl = self.config.delete.url;
+                            if (reqUrl.includes(":id") && id !== undefined) {
+                                reqUrl = reqUrl.replace(":id", id);
+                            }
+
+                            const method = (self.config.delete.method || self.config.delete.type || (self.config.delete.url.includes(':id') ? 'DELETE' : 'POST')).toUpperCase();
+
+                            const payload = {
+                                _token: $('meta[name="csrf-token"]').attr("content"),
+                                id: id
+                            };
+
                             $.ajax({
-                                url: self.config.delete.url.replace(":id", id),
-                                type: "DELETE",
-                                data: { _token: $('meta[name="csrf-token"]').attr("content") },
+                                url: reqUrl,
+                                type: method,
+                                data: payload,
                                 success: () => {
                                     Swal.fire({
-                                        title: window.translations.deleted_title || "Deleted!",
-                                        text: window.translations.deleted_success || "Deleted successfully.",
+                                        title: trans.deleted_title || "Deleted!",
+                                        text: trans.deleted_success || "Deleted successfully.",
                                         icon: "success",
                                     }).then(() => {
-                                        $(self.config.tableSelector).DataTable().ajax.reload();
+                                        $(self.config.tableSelector).DataTable().ajax.reload(null, false);
                                     });
                                 },
-                                error: () => {
+                                error: (xhr) => {
+                                    const errMsg = (xhr.responseJSON && xhr.responseJSON.message)
+                                        ? xhr.responseJSON.message
+                                        : (trans.error_text || "There was a problem deleting the record.");
                                     Swal.fire(
-                                        window.translations.error_title || "Error!",
-                                        window.translations.error_text || "There was a problem deleting the record.",
+                                        trans.error_title || "Error!",
+                                        errMsg,
                                         "error"
                                     );
                                 },

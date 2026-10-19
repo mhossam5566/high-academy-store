@@ -68,7 +68,7 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::post('/store/stages', [StageController::class, 'store'])->name('store.stage');
     Route::get('stages/edit/{id}', [StageController::class, 'edit'])->name('stage.edit');
     Route::post('stages/update', [StageController::class, 'update'])->name('stage.update');
-    Route::post('stages/destroy', [StageController::class, 'destroy'])->name('stage.destroy');
+    Route::match(['post', 'delete'], 'stages/destroy/{id?}', [StageController::class, 'destroy'])->name('stage.destroy');
 
     // Slider Section
     Route::get('/sliders', [SliderController::class, 'index'])->name('slider');
@@ -77,7 +77,7 @@ Route::middleware('auth:admin')->name('dashboard.')->group(function () {
     Route::post('/store/sliders', [SliderController::class, 'store'])->name('store.slider');
     Route::get('slider/edit/{id}', [SliderController::class, 'edit'])->name('slider.edit');
     Route::post('slider/update', [SliderController::class, 'update'])->name('slider.update');
-    Route::post('slider/destroy', [SliderController::class, 'destroy'])->name('slider.destroy');
+    Route::match(['post', 'delete'], 'slider/destroy/{id?}', [SliderController::class, 'destroy'])->name('slider.destroy');
 
     // Category Section
     Route::get('/categories', [CategoryController::class, 'index'])->name('category');

@@ -51,9 +51,13 @@ class StageController extends Controller
                 return $image;
             })
             ->addColumn('operation', function ($row) {
-                $delete = '<a stage_id=' . $row->id . ' class="btn btn-lg btn-block btn-danger lift text-uppercase delete_btn"> حذف</a>';
-                $edit = '<a href="' . route('dashboard.stage.edit', $row->id) . '" type="button" class="btn btn-lg btn-block btn-success lift text-uppercase">تعديل</a>';
-                return $edit . ' ' . $delete;
+                $edit = '<a href="' . route('dashboard.stage.edit', $row->id) . '" class="btn btn-sm btn-primary me-2">
+                    <i class="ti ti-edit me-1"></i>تعديل
+                </a>';
+                $delete = '<button type="button" data-id="' . $row->id . '" stage_id="' . $row->id . '" class="btn btn-sm btn-danger delete_btn">
+                    <i class="ti ti-trash me-1"></i>حذف
+                </button>';
+                return '<div class="d-inline-flex align-items-center">' . $edit . $delete . '</div>';
             })
             ->rawColumns(['operation' => 'operation', 'photo' => 'photo'])
             ->toJson();
@@ -85,13 +89,14 @@ class StageController extends Controller
         return $this->JsonData($stage);
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request, $id = null)
     {
-        $stage = stage::FindOrFail($request->id);
+        $id = $request->id ?? $id;
+        $stage = Stage::findOrFail($id);
         if ($stage->photo && $stage->photo != 'default.png') {
             self::deleteMedia($stage->photo);
         }
-        return $this->Delete($request->id, $stage);
+        return $this->Delete($id, $stage);
     }
 
 }
