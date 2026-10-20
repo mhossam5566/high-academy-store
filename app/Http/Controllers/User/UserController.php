@@ -446,8 +446,36 @@ class UserController extends Controller
     }
     public function order_details($id)
     {
-        $order = Order::findorfail($id);
-        return view('user.orderdetails', compact('order'));
+        $order = Order::with('logs')->findOrFail($id);
+
+        // Build a map of status milestone => the timestamp it actually occurred.
+        // We read from order_logs (context->new_status) so each step shows its own date.
+        $statusDates = [];
+
+        foreach ($order->logs as $log) {
+            $ctx = is_array($log->context) ? $log->context : [];
+            $newStatus = $ctx['new_status'] ?? null;
+
+            if ($newStatus && !isset($statusDates[$newStatus])) {
+                $statusDates[$newStatus] = $log->created_at;
+            }
+
+            // Also capture tracker changes stored in context
+            $trackerStatus = $ctx['new_tracker'] ?? null;
+            if ($trackerStatus && !isset($statusDates['tracker_' . $trackerStatus])) {
+                $statusDates['tracker_' . $trackerStatus] = $log->created_at;
+            }
+        }
+
+        // Fallbacks for steps that may not have a log entry
+        // Paid date: when payment was confirmed (success/reserved log), else order created_at
+        if (!isset($statusDates['paid'])) {
+            if ($order->is_paid) {
+                $statusDates['paid'] = $statusDates['success'] ?? $statusDates['reserved'] ?? $order->created_at;
+            }
+        }
+
+        return view('user.orderdetails', compact('order', 'statusDates'));
     }
 
     public function login()
