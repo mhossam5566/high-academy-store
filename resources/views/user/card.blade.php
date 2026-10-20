@@ -1368,21 +1368,6 @@
         function selectAddress(card) {
             document.querySelectorAll('.saved-addr-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
-
-            // ── [CHECKOUT] RAW card dataset ──────────────────────────────────
-            console.group('[CHECKOUT] selectAddress — raw card dataset');
-            console.log('data-id       :', card.dataset.id);
-            console.log('data-gov      :', card.dataset.gov);
-            console.log('data-gov-id   :', card.dataset.govId);
-            console.log('data-city     :', card.dataset.city);
-            console.log('data-city-id  :', card.dataset.cityId);
-            console.log('data-address  :', card.dataset.address);
-            console.log('data-name     :', card.dataset.name);
-            console.log('data-mobile   :', card.dataset.mobile);
-            console.log('data-temp     :', card.dataset.temp);
-            console.log('data-nearpost :', card.dataset.nearpost);
-            console.groupEnd();
-
             selectedAddressData = {
                 govId: card.dataset.govId || '',
                 cityId: card.dataset.cityId || '',
@@ -1392,10 +1377,6 @@
                 temp: card.dataset.temp || '',
                 nearpost: card.dataset.nearpost || '',
             };
-
-            // ── [CHECKOUT] Resolved selectedAddressData ──────────────────────
-            console.log('[CHECKOUT] selectedAddressData (after resolution):', JSON.parse(JSON.stringify(selectedAddressData)));
-
             fillFormFromData(selectedAddressData);
             document.getElementById('selected-addr-banner').style.display = 'block';
             const divider = document.getElementById('addr-divider');
@@ -1409,29 +1390,11 @@
 
         function fillFormFromData(d) {
             const govSel = document.getElementById('governorates');
-
-            // ── [CHECKOUT] fillFormFromData — before setting values ──────────
-            console.group('[CHECKOUT] fillFormFromData');
-            console.log('govId to set        :', d.govId, '(type:', typeof d.govId, ')');
-            console.log('cityId to set       :', d.cityId, '(type:', typeof d.cityId, ')');
-            console.log('governorates options:', [...govSel.options].map(o => ({value: o.value, text: o.text})));
-
             govSel.value = d.govId;
-            console.log('governorates.value AFTER set :', govSel.value,
-                        '→ match found?', [...govSel.options].some(o => o.value === d.govId));
-            console.groupEnd();
-
             govSel.dispatchEvent(new Event('change'));
             setTimeout(() => {
                 const citySel = document.getElementById('cities');
-                // ── [CHECKOUT] city select (inside timeout) ──────────────────
-                console.group('[CHECKOUT] fillFormFromData — city timeout (120 ms)');
-                console.log('cityId to set       :', d.cityId);
-                console.log('cities options      :', [...citySel.options].map(o => ({value: o.value, text: o.text})));
                 if (citySel) citySel.value = d.cityId;
-                console.log('cities.value AFTER set :', citySel ? citySel.value : 'N/A',
-                            '→ match found?', citySel ? [...citySel.options].some(o => o.value === d.cityId) : false);
-                console.groupEnd();
             }, 120);
             document.getElementById('address').value = d.address;
             document.getElementById('user_name').value = d.name;
@@ -1467,18 +1430,6 @@
         }
 
         function validateStep2() {
-            // ── [CHECKOUT] validateStep2 — snapshot of form state ───────────
-            console.group('[CHECKOUT] validateStep2');
-            console.log('selectedAddressData :', selectedAddressData ? JSON.parse(JSON.stringify(selectedAddressData)) : null);
-            console.log('path                :', selectedAddressData ? 'SAVED ADDRESS' : 'MANUAL FORM');
-            console.log('governorates.value  :', document.getElementById('governorates').value);
-            console.log('cities.value        :', document.getElementById('cities').value);
-            console.log('address.value       :', document.getElementById('address').value);
-            console.log('user_name.value     :', document.getElementById('user_name').value);
-            console.log('mobile.value        :', document.getElementById('mobile').value);
-            console.log('temp_mobile.value   :', document.getElementById('temp_mobile').value);
-            console.groupEnd();
-
             // Card selected → fields already filled
             if (selectedAddressData) {
                 goTo(3);
@@ -1584,19 +1535,6 @@
                 const postRow = document.getElementById('post_cost_row');
                 const homeVal = document.getElementById('home_shipping_cost');
                 const postVal = document.getElementById('post_shipping_cost');
-
-                // ── [CHECKOUT] updateShippingInfo called ─────────────────────
-                const _govId = document.getElementById('governorates').value;
-                const _cityId = document.getElementById('cities').value;
-                const _matchedGov = governoratesData.find(g => g.id == _govId);
-                console.group('[CHECKOUT] updateShippingInfo');
-                console.log('shippingSelect.value :', sel);
-                console.log('matched method (m)   :', m ? {id: m.id, type: m.type, name: m.name, fee: m.fee} : null);
-                console.log('governorates.value   :', _govId);
-                console.log('cities.value         :', _cityId);
-                console.log('matched governorate  :', _matchedGov ? {id: _matchedGov.id, name: _matchedGov.governorate_name_ar, home: _matchedGov.home_shipping_price, post: _matchedGov.post_shipping_price, price: _matchedGov.price} : null);
-                console.log('selectedAddressData  :', selectedAddressData ? JSON.parse(JSON.stringify(selectedAddressData)) : null);
-                console.groupEnd();
 
                 if (!m) {
                     wrapper.style.display = 'none';
