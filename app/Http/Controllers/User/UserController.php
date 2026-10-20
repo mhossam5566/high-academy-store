@@ -281,9 +281,9 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        // 1. Get saved addresses (only those created on or after 2026-07-01)
+        // 1. Get saved addresses (only those created on or after 2026-08-01)
         $savedAddresses = \App\Models\UserAddress::where('user_id', $user->id)
-            ->where('created_at', '>=', '2026-07-01')
+            ->where('created_at', '>=', '2026-08-01')
             ->get();
 
         // 2. Get addresses from the last 3 orders (only those placed on or after 2026-07-01) and parse them
