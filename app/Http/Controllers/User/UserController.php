@@ -283,7 +283,6 @@ class UserController extends Controller
 
         // 1. Get saved addresses (only those created on or after 2026-08-01)
         $savedAddresses = \App\Models\UserAddress::where('user_id', $user->id)
-            ->where('created_at', '>=', '2026-08-01')
             ->get();
 
         // 2. Get addresses from the last 3 orders (only those placed on or after 2026-07-01) and parse them
@@ -291,7 +290,6 @@ class UserController extends Controller
             ->whereHas('shipping', function ($query) {
                 $query->where('type', '!=', 'branch');
             })
-            ->where('created_at', '>=', '2026-07-01')
             ->latest()
             ->limit(3)
             ->get()
