@@ -378,6 +378,16 @@ class OrderController extends Controller
             $order->tracker = "delivered"; // third stage
             $order->save();
 
+            OrderLog::info(
+                "Order tracker changed to: delivered (barcode assigned by admin)",
+                $order->id,
+                null,
+                'STATUS_CHANGE',
+                ['new_tracker' => 'delivered', 'admin_id' => auth('admin')->id()],
+                request()->ip(),
+                OrderLog::CONFIRMATION_MANUAL
+            );
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -874,6 +884,16 @@ class OrderController extends Controller
 
             // Update tracker to delivered after successful email sending
             $order->update(['tracker' => 'delivered']);
+
+            OrderLog::info(
+                "Order tracker changed to: delivered (branch notification sent by admin)",
+                $order->id,
+                null,
+                'STATUS_CHANGE',
+                ['new_tracker' => 'delivered', 'admin_id' => auth('admin')->id()],
+                request()->ip(),
+                OrderLog::CONFIRMATION_MANUAL
+            );
 
             return response()->json([
                 'success' => true,
