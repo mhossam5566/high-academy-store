@@ -1020,8 +1020,9 @@
                                 data-name="{{ $address->name ?? '' }}" data-mobile="{{ $address->mobile ?? '' }}"
                                 data-temp="{{ $address->temp_mobile ?? '' }}"
                                 data-nearpost="{{ $address->near_post ?? '' }}"
-                                @if ($address->id) data-gov-id="{{ \App\Models\Governorate::where('governorate_name_ar', $address->governorate)->value('id') ?? '' }}"
-                        data-city-id="{{ \App\Models\City::where('name_ar', $address->city)->value('id') ?? '' }}" @endif>
+                                data-gov-id="{{ \App\Models\Governorate::where('governorate_name_ar', $address->governorate)->value('id') ?? '' }}"
+                                data-city-id="{{ \App\Models\City::where('name_ar', $address->city)->value('id') ?? '' }}"
+                                >
                                 <div class="saved-addr-check">✓</div>
                                 <div class="saved-addr-row">
                                     <span class="saved-addr-label">المحافظة</span>
