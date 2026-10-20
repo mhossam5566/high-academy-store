@@ -175,27 +175,33 @@
                                     $reservedDone = true;
                                     $prepDone = in_array($order->tracker, ['shipped', 'processing', 'delivered']);
                                     $delivDone = $order->tracker === 'delivered';
+
+                                    // Per-step dates from logs (fall back to updated_at / created_at)
+                                    $delivDate  = ($statusDates['tracker_delivered'] ?? $statusDates['delivered'] ?? null)?->format('M d, Y') ?? $order->updated_at->format('M d, Y');
+                                    $prepDateR  = ($statusDates['reserved'] ?? null)?->format('M d, Y') ?? $order->updated_at->format('M d, Y');
+                                    $reservDate = $order->created_at->format('M d, Y');
+                                    $paidDateR  = ($statusDates['paid'] ?? $statusDates['reserved'] ?? null)?->format('M d, Y') ?? $order->created_at->format('M d, Y');
                                 @endphp
 
                                 <div class="order-tracking step-4 {{ $delivDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
                                     <p>تم
-                                        التوصيل<br><span>{{ $delivDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                        التوصيل<br><span>{{ $delivDone ? $delivDate : 'قريباً' }}</span>
                                     </p>
                                 </div>
                                 <div class="order-tracking step-4 {{ $prepDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
                                     <p>قيد
-                                        التجهيز<br><span>{{ $prepDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                        التجهيز<br><span>{{ $prepDone ? $prepDateR : 'قريباً' }}</span>
                                     </p>
                                 </div>
                                 <div class="order-tracking step-4 {{ $reservedDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>تم الحجز<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
+                                    <p>تم الحجز<br><span>{{ $reservDate }}</span></p>
                                 </div>
                                 <div class="order-tracking step-4 {{ $paidDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>{{ $paidDone ? 'تم الدفع' : 'في انتظار الدفع' }}<br><span>{{ $paidDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                    <p>{{ $paidDone ? 'تم الدفع' : 'في انتظار الدفع' }}<br><span>{{ $paidDone ? $paidDateR : 'قريباً' }}</span>
                                     </p>
                                 </div>
                             @else
@@ -204,23 +210,28 @@
                                     $paidDone = $order->is_paid || $order->status === 'success';
                                     $prepDone = $order->status === 'success';
                                     $delivDone = $order->tracker === 'delivered';
+
+                                    // Per-step dates from logs (fall back to updated_at / created_at)
+                                    $delivDateN = ($statusDates['tracker_delivered'] ?? $statusDates['delivered'] ?? null)?->format('M d, Y') ?? $order->updated_at->format('M d, Y');
+                                    $prepDateN  = ($statusDates['success'] ?? null)?->format('M d, Y') ?? $order->updated_at->format('M d, Y');
+                                    $paidDateN  = ($statusDates['paid'] ?? $statusDates['success'] ?? null)?->format('M d, Y') ?? $order->created_at->format('M d, Y');
                                 @endphp
 
                                 <div class="order-tracking {{ $delivDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
                                     <p>قيد
-                                        التوصيل<br><span>{{ $delivDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                        التوصيل<br><span>{{ $delivDone ? $delivDateN : 'قريباً' }}</span>
                                     </p>
                                 </div>
                                 <div class="order-tracking {{ $prepDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
                                     <p>قيد
-                                        التجهيز<br><span>{{ $prepDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                        التجهيز<br><span>{{ $prepDone ? $prepDateN : 'قريباً' }}</span>
                                     </p>
                                 </div>
                                 <div class="order-tracking {{ $paidDone ? 'completed' : '' }}">
                                     <span class="is-complete"></span>
-                                    <p>{{ $paidDone ? 'تم الدفع' : 'في انتظار الدفع' }}<br><span>{{ $paidDone ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span>
+                                    <p>{{ $paidDone ? 'تم الدفع' : 'في انتظار الدفع' }}<br><span>{{ $paidDone ? $paidDateN : 'قريباً' }}</span>
                                     </p>
                                 </div>
                             @endif
