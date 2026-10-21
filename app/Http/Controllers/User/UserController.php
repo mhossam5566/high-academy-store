@@ -496,7 +496,8 @@ class UserController extends Controller
 
         $loginField = $request->input('email');
         $password = $request->input('password');
-        $remember = $request->has('remember');
+        // تسجيل الدخول محفوظ لمدة سنة افتراضياً (حتى لو لم يحدد المستخدم "تذكرني")
+        $remember = true;
 
         // تحديد نوع الحقل (إيميل أو رقم موبايل)
         $fieldType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';

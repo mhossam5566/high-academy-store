@@ -198,4 +198,16 @@ return [
 
     'same_site' => 'lax',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Remember Me Duration
+    |--------------------------------------------------------------------------
+    |
+    | The number of minutes that a "remember me" authentication cookie should
+    | be kept alive. Defaults to 1 year (365 days * 24 hours * 60 minutes).
+    |
+    */
+
+    'remember' => env('SESSION_REMEMBER_LIFETIME', 525600),
+
 ];
