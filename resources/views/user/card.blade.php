@@ -451,6 +451,12 @@
             text-align: center;
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            .pickup-cta {
+                animation: none !important;
+            }
+        }
+
         /* ─── Summary Rows ─── */
         .summary-lines {
             direction: rtl;
@@ -1252,7 +1258,8 @@
                 </div>
 
                 {{-- Prominent CTA: pickup process guide --}}
-                <a href="{{ route('user.fqa') }}" target="_blank" rel="noopener" class="pickup-cta">
+                <a href="{{ route('user.fqa') }}" target="_blank" rel="noopener"
+                    class="pickup-cta animate__animated animate__tada animate__repeat-3">
                     <span class="pickup-cta-icon">📮</span>
                     <span class="pickup-cta-text">تعرف على عملية الاستلام من مكتب البريد</span>
                     <span class="pickup-cta-arrow">←</span>
