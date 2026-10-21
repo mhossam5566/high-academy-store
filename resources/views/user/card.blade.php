@@ -1275,9 +1275,8 @@
 
                 {{-- Pickup process accordion (content to be filled in later) --}}
                 <div class="pickup-acc">
-                    <button type="button" class="pickup-acc-btn collapsed"
-                        data-bs-toggle="collapse" data-bs-target="#pickup_process_panel"
-                        aria-expanded="false" aria-controls="pickup_process_panel">
+                    <button type="button" class="pickup-acc-btn collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#pickup_process_panel" aria-expanded="false" aria-controls="pickup_process_panel">
                         <span class="pickup-acc-icon">📮</span>
                         <span class="pickup-acc-text">تعرف على عملية الاستلام من مكتب البريد</span>
                         <span class="pickup-acc-chevron">⌄</span>
@@ -1285,7 +1284,29 @@
 
                     <div id="pickup_process_panel" class="collapse">
                         <div class="pickup-acc-panel">
-                            <p>يتم إدخال نص شرح عملية الاستلام هنا.</p>
+                            <p>لو اختارت الشحن لاقرب مكتب بريد
+                                لازم تكون معاك بطاقة لأن الاستلام بيكون بالبطاقة طب لو مش معاك اكتب اسم ولي امرك وانت بتعمل
+                                الاوردر وهو هيستلم عادي
+
+                                لازم الشخص اللي بتكتبه وانت بتعمل الاوردر هو اللي يستلم
+
+                                لازم تكتب اسم مكتب البريد اللي حابب يجيلك عليه الاوردر صح ، طب لو مش عارف الاسم .. ادخل على
+                                جوجل وشوف اقرب مكتب بريد فى منطقتك
+
+                                اي اوردر انت بتعمله بيتشحنلك تاني يوم على طول وبنبعتلك باركود بتعمل بيه تتبع الشحنة بتضغط
+                                عالتلت شرط فى الموقع وبعدها طلباتي هتلاقي الاوردر اضغط تفاصيل الطلب وتلاقي الباركود بنبعته
+                                بعد الشحن
+
+
+                                اول ما بتعمل تتبع للشحنة بيجيلك تحركاتها من اول ما بتطلع من عندى لحد ما توصلك
+
+
+
+                                لما تلاقي مكتوب تم وصول الشحنة الي مكتب بريد ( الاسم اللي انت كتبته بتاع مكتب البريد القريب
+                                منك). وقتها ممكن تروح تستلم بالبطاقة و مواعيد العمل بتكون من الحد للخميس من 8 ص لـ 3 عصرا فى
+                                أغلب المكاتب
+
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -1868,7 +1889,7 @@
             }
         }
     }
-        ?>
+            ?>
 
     @if ($orders !== null)
         <script>
