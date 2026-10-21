@@ -1163,53 +1163,33 @@ $(document).ready(function() {
     });
 
     // ==========================================
-    // LIBRARY STATISTICS TAB LOGIC
+    // LIBRARY STATISTICS TAB LOGIC (moved above)
     // ==========================================
 
-    // Initialize Select2 for stats product filter
-    $('.select2-stats-product').select2({
-        placeholder: '-- جميع الكتب والأصناف --',
-        allowClear: true,
-        width: '100%',
-        dir: 'rtl'
-    });
+    // Persist active tab across page refresh & URL hash
+    function checkUrlTab() {
+        const hash = window.location.hash;
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
 
-    // Handle Quick Period Preset Buttons (اليوم، هذا الأسبوع، هذا الشهر، هذه السنة، فترة مخصصة)
-    $('#quickPeriodGroup button').on('click', function() {
-        const period = $(this).data('period');
-        $('#quickPeriodGroup button').removeClass('active');
-        $(this).addClass('active');
-        $('#statsPeriodInput').val(period);
-
-        if (period === 'custom') {
-            $('#fromDateCol, #toDateCol').slideDown(200);
-            $('#stats_from_date').focus();
-        } else {
-            $('#fromDateCol, #toDateCol').slideUp(200);
-            // Automatically submit filter when selecting a quick preset
-            fetchStatistics();
+        if (hash === '#statistics' || tabParam === 'statistics') {
+            const statsTabBtn = document.getElementById('tab-stats-btn');
+            if (statsTabBtn) {
+                new bootstrap.Tab(statsTabBtn).show();
+            }
         }
+    }
+
+    checkUrlTab();
+
+    $('#tab-booking-btn').on('shown.bs.tab', function() {
+        window.history.replaceState(null, null, window.location.pathname + '?tab=booking');
     });
 
-    // Filter Form Submit
-    $('#statsFilterForm').on('submit', function(e) {
-        e.preventDefault();
-        fetchStatistics();
+    $('#tab-stats-btn').on('shown.bs.tab', function() {
+        window.history.replaceState(null, null, window.location.pathname + '?tab=statistics');
     });
-
-    // Reset Filter Button
-    $('#btnResetStatsFilter').on('click', function() {
-        $('#statsPeriodInput').val('month');
-        $('#quickPeriodGroup button').removeClass('active');
-        $('#quickPeriodGroup button[data-period="month"]').addClass('active');
-        $('#fromDateCol, #toDateCol').hide();
-        $('#stats_from_date').val('');
-        $('#stats_to_date').val('');
-        $('#stats_branch_id').val('all');
-        $('#stats_product_id').val('all').trigger('change');
-        $('#stats_status').val('all');
-        fetchStatistics();
-    });
+});
 
     // Function to fetch statistics via AJAX
     function fetchStatistics() {
