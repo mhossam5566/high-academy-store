@@ -1009,8 +1009,8 @@
                                     </div>
                                 </td>
                                 <td style="text-align: center;">
-                                    <button type="button" class="btn-remove-item"
-                                        onclick="removeCartItem('{{ $item->rowId }}')" title="حذف المنتج">🗑️</button>
+                                    <button type="button" class="btn-remove-item" onclick="removeCartItem('{{ $item->rowId }}')"
+                                        title="حذف المنتج">🗑️</button>
                                 </td>
                             </tr>
                         @endforeach
@@ -1031,9 +1031,7 @@
                     <form action="{{ route('user.checkout.applyDiscount') }}" method="POST">
                         @csrf
                         <div class="coupon-row">
-                            <input type="text" name="coupon_code" class="form-control-custom"
-                                placeholder="ادخل كود الخصم"
-                                @if (session()->has('applied_discount')) value="{{ session('applied_discount')['code'] }}" @endif>
+                            <input type="text" name="coupon_code" class="form-control-custom" placeholder="ادخل كود الخصم" @if (session()->has('applied_discount')) value="{{ session('applied_discount')['code'] }}" @endif>
                             <button type="submit" class="btn-apply">تطبيق</button>
                         </div>
                     </form>
@@ -1075,15 +1073,13 @@
                     <div id="address-cards-grid"
                         style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; direction:rtl;">
                         @foreach ($addresses as $address)
-                            <div class="saved-addr-card" onclick="selectAddress(this)"
-                                data-id="{{ $address->id ?? '' }}" data-gov="{{ $address->governorate ?? '' }}"
-                                data-city="{{ $address->city ?? '' }}" data-address="{{ $address->address ?? '' }}"
-                                data-name="{{ $address->name ?? '' }}" data-mobile="{{ $address->mobile ?? '' }}"
-                                data-temp="{{ $address->temp_mobile ?? '' }}"
+                            <div class="saved-addr-card" onclick="selectAddress(this)" data-id="{{ $address->id ?? '' }}"
+                                data-gov="{{ $address->governorate ?? '' }}" data-city="{{ $address->city ?? '' }}"
+                                data-address="{{ $address->address ?? '' }}" data-name="{{ $address->name ?? '' }}"
+                                data-mobile="{{ $address->mobile ?? '' }}" data-temp="{{ $address->temp_mobile ?? '' }}"
                                 data-nearpost="{{ $address->near_post ?? '' }}"
                                 data-gov-id="{{ \App\Models\Governorate::where('governorate_name_ar', $address->governorate)->value('id') ?? '' }}"
-                                data-city-id="{{ \App\Models\City::where('name_ar', $address->city)->value('id') ?? '' }}"
-                                >
+                                data-city-id="{{ \App\Models\City::where('name_ar', $address->city)->value('id') ?? '' }}">
                                 <div class="saved-addr-check">✓</div>
                                 <div class="saved-addr-row">
                                     <span class="saved-addr-label">المحافظة</span>
@@ -1108,8 +1104,8 @@
                                     <span class="saved-addr-val">{{ $address->mobile }}</span>
                                 </div>
                                 @if ($address->id)
-                                    <a href="{{ route('user.shipping.edit', $address->id) }}"
-                                        onclick="event.stopPropagation()" class="saved-addr-edit">تعديل ←</a>
+                                    <a href="{{ route('user.shipping.edit', $address->id) }}" onclick="event.stopPropagation()"
+                                        class="saved-addr-edit">تعديل ←</a>
                                 @endif
                             </div>
                         @endforeach
@@ -1177,15 +1173,15 @@
                         <div class="col-md-6">
                             <div class="form-group-custom">
                                 <label class="form-label-custom" for="user_name">الاسم ثلاثي</label>
-                                <input class="form-control-custom" id="user_name" name="user_name"
-                                    placeholder="اسم المستلم" required />
+                                <input class="form-control-custom" id="user_name" name="user_name" placeholder="اسم المستلم"
+                                    required />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group-custom">
                                 <label class="form-label-custom" for="mobile">رقم الموبايل</label>
-                                <input class="form-control-custom" type="number" id="mobile" name="mobile"
-                                    pattern="\d{11}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
+                                <input class="form-control-custom" type="number" id="mobile" name="mobile" pattern="\d{11}"
+                                    minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
                             </div>
                         </div>
                         <div class="col-12">
@@ -1258,6 +1254,7 @@
                 </div>
 
                 {{-- Prominent CTA: pickup process guide --}}
+                <p>خلي بالك . هتحتاج البطاقة وانت بتستلم من البريد</p>
                 <a href="{{ route('user.fqa') }}" target="_blank" rel="noopener"
                     class="pickup-cta animate__animated animate__tada animate__repeat-3">
                     <span class="pickup-cta-icon">📮</span>
@@ -1356,7 +1353,8 @@
         <div class="contact-strip" style="margin-top:20px;">
             <p>لو قابلتك أي مشكلة تواصل معنا</p>
             <div class="contact-btns">
-                <a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '201550234324') }}" target="_blank" class="btn-contact btn-wa">📲 واتساب</a>
+                <a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '201550234324') }}" target="_blank"
+                    class="btn-contact btn-wa">📲 واتساب</a>
                 <a href="https://www.facebook.com/highacademy2?mibextid=ZbWKwL" target="_blank"
                     class="btn-contact btn-fb">📘 فيس بوك</a>
             </div>
@@ -1555,7 +1553,7 @@
         }
 
         /* ─── Shipping Options ─── */
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const governoratesSelect = document.getElementById('governorates');
             const shippingSelect = document.getElementById('shipping_method');
 
@@ -1565,14 +1563,14 @@
                 shippingMethods.forEach(m => {
                     const isPickup = m.type === 'branch';
                     if (!isPickup || (governoratesSelect.value && m.government == governoratesSelect
-                            .value)) {
+                        .value)) {
                         const opt = document.createElement('option');
                         opt.value = m.id;
                         opt.textContent = {
                             branch: 'استلام من المكتبة',
                             home: 'شحن لباب البيت',
                             post: 'شحن لمكتب بريد'
-                        } [m.type] + ' — ' + m.name;
+                        }[m.type] + ' — ' + m.name;
                         shippingSelect.appendChild(opt);
                     }
                 });
@@ -1670,7 +1668,7 @@
             updateShippingOptions();
 
             // Cities
-            governoratesSelect.addEventListener('change', function() {
+            governoratesSelect.addEventListener('change', function () {
                 const govId = this.value;
                 const citiesSelect = document.getElementById('cities');
                 citiesSelect.innerHTML = '<option value="">اختر المدينة</option>';
@@ -1753,7 +1751,7 @@
 
         /* ─── Payment Handlers ─── */
         function setupPaymentHandler(buttonId, routeUrl, extraFormId = null) {
-            $(buttonId).click(function() {
+            $(buttonId).click(function () {
                 const btn = $(this);
                 const orig = btn.text();
                 btn.prop('disabled', true).text('جاري المعالجة...');
@@ -1787,7 +1785,7 @@
                     headers: {
                         'X-CSRF-TOKEN': "{{ csrf_token() }}"
                     },
-                    success: function(r) {
+                    success: function (r) {
                         if (r.url) window.location.href = r.url;
                         else if (r.success) {
                             Swal.fire({
@@ -1805,7 +1803,7 @@
                             });
                         }
                     },
-                    error: function(x) {
+                    error: function (x) {
                         btn.prop('disabled', false).text(orig);
                         Swal.fire({
                             icon: 'error',
@@ -1842,7 +1840,7 @@
             }
         }
     }
-    ?>
+        ?>
 
     @if ($orders !== null)
         <script>
@@ -1913,11 +1911,11 @@
                     rowId: rowId,
                     product_qty: newQty
                 },
-                success: function(response) {
+                success: function (response) {
                     // إعادة تحميل الصفحة لتحديث كل الحسابات (شحن، إجمالي، Hidden forms)
                     window.location.reload();
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     Swal.fire({
                         icon: 'error',
                         title: 'خطأ',
@@ -1955,10 +1953,10 @@
                             _token: '{{ csrf_token() }}',
                             cart_id: rowId
                         },
-                        success: function(response) {
+                        success: function (response) {
                             window.location.reload();
                         },
-                        error: function(xhr) {
+                        error: function (xhr) {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'خطأ',
