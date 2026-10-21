@@ -1275,20 +1275,6 @@
             // LIBRARY STATISTICS TAB LOGIC (moved above)
             // ==========================================
 
-            // Persist active tab across page refresh & URL hash
-            function checkUrlTab() {
-                const hash = window.location.hash;
-                const urlParams = new URLSearchParams(window.location.search);
-                const tabParam = urlParams.get('tab');
-
-                if (hash === '#statistics' || tabParam === 'statistics') {
-                    const statsTabBtn = document.getElementById('tab-stats-btn');
-                    if (statsTabBtn) {
-                        new bootstrap.Tab(statsTabBtn).show();
-                    }
-                }
-            }
-
             checkUrlTab();
 
             $('#tab-booking-btn').on('shown.bs.tab', function () {
@@ -1298,6 +1284,25 @@
             $('#tab-stats-btn').on('shown.bs.tab', function () {
                 window.history.replaceState(null, null, window.location.pathname + '?tab=statistics');
             });
+
+            // Switch to the statistics tab when it is requested via ?tab=statistics or #statistics
+            function checkUrlTab() {
+                const hash = (window.location.hash || '').replace('#', '');
+                const tabParam = new URLSearchParams(window.location.search).get('tab');
+
+                if (hash !== 'statistics' && tabParam !== 'statistics') {
+                    return;
+                }
+
+                const statsTabBtn = document.getElementById('tab-stats-btn');
+                if (!statsTabBtn || typeof bootstrap === 'undefined' || !bootstrap.Tab) {
+                    return;
+                }
+
+                if (!statsTabBtn.classList.contains('active')) {
+                    new bootstrap.Tab(statsTabBtn).show();
+                }
+            }
         });
     </script>
 @endsection
