@@ -144,6 +144,11 @@
                                 <i class="fas fa-clock"></i>
                                 <span class="btn-text">سيتوفر قريباً</span>
                             </button>
+                        @else
+                            <button class="add-to-cart-btn unavailable-btn" disabled>
+                                <i class="fas fa-times-circle"></i>
+                                <span class="btn-text">غير متاح</span>
+                            </button>
                         @endif
                     @endauth
 
@@ -493,6 +498,17 @@
     }
 
     .add-to-cart-btn.coming-soon-btn:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .add-to-cart-btn.unavailable-btn {
+        background: linear-gradient(135deg, #9ca3af, #6b7280);
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .add-to-cart-btn.unavailable-btn:hover {
         transform: none;
         box-shadow: none;
     }
