@@ -1250,6 +1250,13 @@
                     <input type="text" id="near_post" name="near_post" class="form-control-custom"
                         placeholder="ادخل اسم مكتب البريد" />
                 </div>
+
+                {{-- Prominent CTA: pickup process guide --}}
+                <a href="{{ route('user.fqa') }}" target="_blank" rel="noopener" class="pickup-cta">
+                    <span class="pickup-cta-icon">📮</span>
+                    <span class="pickup-cta-text">تعرف على عملية الاستلام من مكتب البريد</span>
+                    <span class="pickup-cta-arrow">←</span>
+                </a>
             </div>
 
             <!-- Live Total Preview -->
