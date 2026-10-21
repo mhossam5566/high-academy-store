@@ -1015,18 +1015,24 @@ class OrderController extends Controller
             'status' => 'nullable|in:success,reserved,new,pending',
             'discount' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string|max:1000',
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'nullable|numeric|min:0',
+            // Business rule: a library booking order holds exactly one book title (with a quantity)
+            'items' => 'required|array|size:1',
+            'items.0.product_id' => 'required|exists:products,id',
+            'items.0.quantity' => 'required|integer|min:1',
+            'items.0.price' => 'nullable|numeric|min:0',
         ], [
             'student_name.required' => 'اسم الطالب مطلوب',
             'mobile.required' => 'رقم هاتف الطالب مطلوب',
             'mobile.regex' => 'رقم الهاتف يجب أن يكون رقم مصري صحيح مكون من 11 رقم (010/011/012/015)',
             'temp_mobile.regex' => 'رقم الهاتف الإضافي يجب أن يكون رقم مصري صحيح مكون من 11 رقم',
             'shipping_method_id.required' => 'يرجى اختيار فرع الاستلام بالمكتبة',
-            'items.required' => 'يجب اختيار كتاب واحد على الأقل',
-            'items.min' => 'يجب اختيار كتاب واحد على الأقل',
+            'items.required' => 'يجب اختيار كتاب للطلب',
+            'items.array' => 'بيانات الكتاب غير صحيحة',
+            'items.size' => 'يُسمح بكتاب واحد فقط (عنوان واحد) في الطلب الواحد',
+            'items.0.product_id.required' => 'يجب اختيار كتاب للطلب',
+            'items.0.product_id.exists' => 'الكتاب المختار غير موجود',
+            'items.0.quantity.required' => 'يجب تحديد كمية الكتاب',
+            'items.0.quantity.min' => 'الكمية يجب أن تكون 1 على الأقل',
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -1055,42 +1061,41 @@ class OrderController extends Controller
 
             $deliveryFee = 0;
 
-            // 3. Process products & calculate totals
+            // 3. Process the single book of the order & calculate totals
             $amount = 0;
             $itemsData = [];
 
-            foreach ($request->items as $item) {
-                $product = Product::findOrFail($item['product_id']);
-                $qty = (int) $item['quantity'];
-                $availableStock = (int) ($product->quantity ?? 0);
-                $prodTitle = $product->short_name ?: $product->name;
+            $item = $request->items[0];
+            $product = Product::findOrFail($item['product_id']);
+            $qty = (int) $item['quantity'];
+            $availableStock = (int) ($product->quantity ?? 0);
+            $prodTitle = $product->short_name ?: $product->name;
 
-                if ($availableStock <= 0) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'items' => ["عفواً، الكتاب '{$prodTitle}' نفد من المخزن (الكمية المتاحة: 0) ولا يمكن إتمام الحجز به."],
-                    ]);
-                }
-
-                if ($qty > $availableStock) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'items' => ["الكمية المطلوبة من كتاب '{$prodTitle}' ({$qty} نسخة) تتجاوز الرصيد المتاح بالمخزن ({$availableStock} نسخة فقط)."],
-                    ]);
-                }
-                
-                $unitPrice = isset($item['price']) && $item['price'] !== '' && is_numeric($item['price'])
-                    ? (float) $item['price']
-                    : (float) ($product->final_price ?? $product->price ?? 0);
-
-                $itemTotal = $unitPrice * $qty;
-                $amount += $itemTotal;
-
-                $itemsData[] = [
-                    'product' => $product,
-                    'quantity' => $qty,
-                    'price' => $unitPrice,
-                    'total_price' => $itemTotal,
-                ];
+            if ($availableStock <= 0) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'items' => ["عفواً، الكتاب '{$prodTitle}' نفد من المخزن (الكمية المتاحة: 0) ولا يمكن إتمام الحجز به."],
+                ]);
             }
+
+            if ($qty > $availableStock) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'items' => ["الكمية المطلوبة من كتاب '{$prodTitle}' ({$qty} نسخة) تتجاوز الرصيد المتاح بالمخزن ({$availableStock} نسخة فقط)."],
+                ]);
+            }
+
+            $unitPrice = isset($item['price']) && $item['price'] !== '' && is_numeric($item['price'])
+                ? (float) $item['price']
+                : (float) ($product->final_price ?? $product->price ?? 0);
+
+            $itemTotal = $unitPrice * $qty;
+            $amount += $itemTotal;
+
+            $itemsData[] = [
+                'product' => $product,
+                'quantity' => $qty,
+                'price' => $unitPrice,
+                'total_price' => $itemTotal,
+            ];
 
             $discount = (float) ($request->discount ?? 0);
             $total = max(0, ($amount + $deliveryFee) - $discount);

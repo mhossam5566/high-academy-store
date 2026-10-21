@@ -265,7 +265,7 @@
                                 <h5 class="card-title mb-0 d-flex align-items-center text-success">
                                     <i class="ti ti-books me-2 fs-4"></i>اختيار الكتاب (عنوان واحد لكل طلب)
                                 </h5>
-                                <span class="badge bg-secondary" id="selectedItemsCount">لم يتم اختيار كتاب</span>
+                                <span class="badge bg-secondary" id="selectedBookCountBadge">لم يتم اختيار كتاب</span>
                             </div>
                             <div class="card-body pt-4">
                                 {{-- Product Search Selector --}}
@@ -278,6 +278,14 @@
                                         </div>
                                     </div>
                                 @endif
+
+                                <div class="alert alert-label-info d-flex align-items-start mb-4 py-2 px-3" role="alert">
+                                    <i class="ti ti-info-circle fs-5 me-2 mt-1"></i>
+                                    <div class="small">
+                                        كل طلب يُسجَّل لعنوان كتاب واحد فقط (مع تحديد الكمية المطلوبة). لإضافة عنوان آخر، أنشئ
+                                        طلباً جديداً.
+                                    </div>
+                                </div>
 
                                 <div class="alert alert-label-info d-flex align-items-start mb-4 py-2 px-3" role="alert">
                                     <i class="ti ti-info-circle fs-5 me-2 mt-1"></i>
@@ -1029,7 +1037,24 @@
                     return;
                 }
 
-                const currentQty = selectedItems[productId] ? selectedItems[productId].quantity : 0;
+                // Enforce the business rule: one book title per order
+                if (selectedBook && Number(selectedBook.id) !== Number(productId)) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'عنوان واحد لكل طلب',
+                        html: `
+                        <div class="text-start">
+                            <p class="mb-2">هذا الطلب يحتوي بالفعل على الكتاب: <strong>${selectedBook.name}</strong></p>
+                            <p class="mb-0 text-muted small">يمكنك تسجيل عنوان كتاب واحد فقط في الطلب الواحد. احذف الكتاب الحالي أولاً أو أنشئ طلباً جديداً لإضافة عنوان آخر.</p>
+                        </div>
+                    `,
+                        confirmButtonText: 'حسناً',
+                        customClass: { confirmButton: 'btn btn-primary' }
+                    });
+                    return;
+                }
+
+                const currentQty = selectedBook ? selectedBook.quantity : 0;
                 const totalQty = currentQty + qtyToAdd;
 
                 if (totalQty > stock) {
@@ -1053,182 +1078,142 @@
                     return;
                 }
 
-                if (selectedItems[productId]) {
-                    selectedItems[productId].quantity = totalQty;
-                } else {
-                    selectedItems[productId] = {
-                        id: productId,
-                        name: name,
-                        brand: brand,
-                        stage: stage,
-                        price: price,
-                        stock: stock,
-                        quantity: qtyToAdd
-                    };
-                }
+                selectedBook = {
+                    id: productId,
+                    name: name,
+                    brand: brand,
+                    stage: stage,
+                    price: price,
+                    stock: stock,
+                    quantity: totalQty
+                };
 
-                renderItemsTable();
+                renderSelectedBook();
                 calculateTotals();
 
                 // Reset selector
                 select.val('').trigger('change');
                 $('#quickQuantity').val(1).attr('max', 99);
                 $('#quickMaxStockHint').text('');
-                $('#stockAvailabilityBadge').hide();
+                $('#stockAvailabilityBadge').hide().empty();
             });
 
-            // Render items table
-            function renderItemsTable() {
-                const tbody = $('#itemsTableBody');
-                const keys = Object.keys(selectedItems);
+            // Render the single selected book card
+            function renderSelectedBook() {
+                const empty = $('#selectedBookEmpty');
+                const card = $('#selectedBookCard');
+                const badge = $('#selectedBookCountBadge');
 
-                $('#selectedItemsCount').text(keys.length + ' كتب مختارة');
-
-                if (keys.length === 0) {
-                    tbody.html(`
-                    <tr id="emptyRow">
-                        <td colspan="5" class="text-center py-4 text-muted">
-                            <i class="ti ti-shopping-cart-x fs-1 d-block mb-2 text-secondary opacity-50"></i>
-                            لم يتم إضافة أي كتب للطلب بعد. اختر كتاباً من القائمة أعلاه واضغط "إضافة".
-                        </td>
-                    </tr>
-                `);
+                if (!selectedBook) {
+                    empty.show();
+                    card.hide();
+                    badge.removeClass('bg-success').addClass('bg-secondary').text('لم يتم اختيار كتاب');
+                    $('#selectedBookId').val('');
                     return;
                 }
 
-                let html = '';
-                let index = 0;
+                empty.hide();
+                card.show();
+                badge.removeClass('bg-secondary').addClass('bg-success').text('كتاب واحد مختار');
 
-                keys.forEach(id => {
-                    const item = selectedItems[id];
-                    const itemTotal = (item.price * item.quantity).toFixed(2);
-                    const isMaxReached = (item.quantity >= item.stock);
+                $('#selectedBookId').val(selectedBook.id);
+                $('#selectedBookName').text(selectedBook.name);
 
-                    html += `
-                    <tr class="item-row" data-id="${item.id}">
-                        <td>
-                            <input type="hidden" name="items[${index}][product_id]" value="${item.id}">
-                            <div class="fw-bold text-dark">${item.name}</div>
-                            <div class="small text-muted">
-                                ${item.brand ? '<span class="badge bg-label-info me-1">مدرس: ' + item.brand + '</span>' : ''}
-                                ${item.stage ? '<span class="badge bg-label-secondary me-1">' + item.stage + '</span>' : ''}
-                                <span class="badge ${item.stock > 0 ? 'bg-label-success' : 'bg-label-danger'} badge-stock">
-                                    المتاح في المخزن: ${item.stock}
-                                </span>
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <div class="input-group input-group-sm justify-content-center" style="max-width: 120px; margin: 0 auto;">
-                                <input type="number" step="0.5" min="0"
-                                       name="items[${index}][price]"
-                                       class="form-control text-center item-price-input"
-                                       data-id="${item.id}"
-                                       value="${item.price}">
-                                <span class="input-group-text">ج.م</span>
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex align-items-center justify-content-center gap-1">
-                                <button type="button" class="btn btn-sm btn-outline-secondary qty-btn btn-decrease" data-id="${item.id}">
-                                    <i class="ti ti-minus"></i>
-                                </button>
-                                <input type="number" min="1" max="${item.stock}"
-                                       name="items[${index}][quantity]"
-                                       class="form-control form-control-sm text-center item-qty-input fw-bold"
-                                       data-id="${item.id}"
-                                       value="${item.quantity}"
-                                       style="width: 60px;">
-                                <button type="button" class="btn btn-sm ${isMaxReached ? 'btn-label-secondary' : 'btn-outline-secondary'} qty-btn btn-increase" data-id="${item.id}" ${isMaxReached ? 'title="تم الوصول لأقصى كمية متاحة بالمخزن"' : ''}>
-                                    <i class="ti ti-plus"></i>
-                                </button>
-                            </div>
-                            ${isMaxReached ? '<small class="text-danger d-block mt-1 font-monospace" style="font-size: 0.7rem;">(الحد الأقصى)</small>' : ''}
-                        </td>
-                        <td class="text-center fw-bold text-primary">
-                            <span class="row-total">${itemTotal}</span> ج.م
-                        </td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-sm btn-icon btn-label-danger btn-remove-item" data-id="${item.id}" title="حذف الكتاب">
-                                <i class="ti ti-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                    index++;
-                });
+                let meta = '';
+                if (selectedBook.brand) {
+                    meta += `<span class="badge bg-label-info me-1">مدرس: ${selectedBook.brand}</span>`;
+                }
+                if (selectedBook.stage) {
+                    meta += `<span class="badge bg-label-secondary me-1">${selectedBook.stage}</span>`;
+                }
+                $('#selectedBookMeta').html(meta);
 
-                tbody.html(html);
+                $('#selectedBookStock')
+                    .removeClass('bg-label-success bg-label-danger')
+                    .addClass(selectedBook.stock > 0 ? 'bg-label-success' : 'bg-label-danger')
+                    .text(`المتاح في المخزن: ${selectedBook.stock}`);
+
+                $('#selectedBookPrice').val(selectedBook.price);
+                $('#selectedBookQuantity').val(selectedBook.quantity).attr('max', selectedBook.stock);
+                $('#selectedBookTotal').text((selectedBook.price * selectedBook.quantity).toFixed(2) + ' ج.م');
+
+                const isMaxReached = (selectedBook.quantity >= selectedBook.stock);
+                $('#btnQtyIncrease')
+                    .prop('disabled', isMaxReached)
+                    .attr('title', isMaxReached ? 'تم الوصول لأقصى كمية متاحة بالمخزن' : '');
             }
 
-            // Item quantity / price change events
-            $(document).on('click', '.btn-increase', function () {
-                const id = $(this).data('id');
-                if (selectedItems[id]) {
-                    const stock = selectedItems[id].stock;
-                    if (selectedItems[id].quantity >= stock) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'الحد الأقصى للمخزون',
-                            text: `لا يمكنك زيادة الكمية. الرصيد المتاح في المخزن لهذا الكتاب هو (${stock}) نسخة فقط.`,
-                            confirmButtonText: 'حسناً',
-                            customClass: { confirmButton: 'btn btn-primary' }
-                        });
-                        return;
-                    }
-                    selectedItems[id].quantity += 1;
-                    renderItemsTable();
+            // Quantity / price handlers for the selected book
+            function setSelectedQuantity(rawValue) {
+                if (!selectedBook) {
+                    return;
+                }
+
+                let val = parseInt(rawValue) || 1;
+                const stock = selectedBook.stock;
+
+                if (val > stock) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'تجاوز الكمية المتاحة',
+                        text: `الكمية المدخلة (${val}) تتجاوز المتاح في المخزن (${stock}). تم تعديل الكمية تلقائياً إلى الحد الأقصى (${stock}).`,
+                        confirmButtonText: 'حسناً',
+                        customClass: { confirmButton: 'btn btn-primary' }
+                    });
+                    val = stock;
+                }
+
+                if (val < 1) {
+                    val = 1;
+                }
+
+                selectedBook.quantity = val;
+                renderSelectedBook();
+                calculateTotals();
+            }
+
+            $('#btnQtyIncrease').on('click', function () {
+                if (!selectedBook) {
+                    return;
+                }
+                if (selectedBook.quantity >= selectedBook.stock) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'الحد الأقصى للمخزون',
+                        text: `لا يمكنك زيادة الكمية. الرصيد المتاح في المخزن لهذا الكتاب هو (${selectedBook.stock}) نسخة فقط.`,
+                        confirmButtonText: 'حسناً',
+                        customClass: { confirmButton: 'btn btn-primary' }
+                    });
+                    return;
+                }
+                selectedBook.quantity += 1;
+                renderSelectedBook();
+                calculateTotals();
+            });
+
+            $('#btnQtyDecrease').on('click', function () {
+                if (selectedBook && selectedBook.quantity > 1) {
+                    selectedBook.quantity -= 1;
+                    renderSelectedBook();
                     calculateTotals();
                 }
             });
 
-            $(document).on('click', '.btn-decrease', function () {
-                const id = $(this).data('id');
-                if (selectedItems[id] && selectedItems[id].quantity > 1) {
-                    selectedItems[id].quantity -= 1;
-                    renderItemsTable();
+            $('#selectedBookQuantity').on('change input', function () {
+                setSelectedQuantity($(this).val());
+            });
+
+            $('#selectedBookPrice').on('change input', function () {
+                if (selectedBook) {
+                    selectedBook.price = Math.max(0, parseFloat($(this).val()) || 0);
+                    $('#selectedBookTotal').text((selectedBook.price * selectedBook.quantity).toFixed(2) + ' ج.م');
                     calculateTotals();
                 }
             });
 
-            $(document).on('change input', '.item-qty-input', function () {
-                const id = $(this).data('id');
-                let val = parseInt($(this).val()) || 1;
-                if (selectedItems[id]) {
-                    const stock = selectedItems[id].stock;
-                    if (val > stock) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'تجاوز الكمية المتاحة',
-                            text: `الكمية المدخلة (${val}) تتجاوز المتاح في المخزن (${stock}). تم تعديل الكمية تلقائياً إلى الحد الأقصى (${stock}).`,
-                            confirmButtonText: 'حسناً',
-                            customClass: { confirmButton: 'btn btn-primary' }
-                        });
-                        val = stock;
-                        $(this).val(val);
-                    }
-                    if (val < 1) {
-                        val = 1;
-                        $(this).val(1);
-                    }
-                    selectedItems[id].quantity = val;
-                    renderItemsTable();
-                    calculateTotals();
-                }
-            });
-
-            $(document).on('change input', '.item-price-input', function () {
-                const id = $(this).data('id');
-                const val = parseFloat($(this).val()) || 0;
-                if (selectedItems[id]) {
-                    selectedItems[id].price = Math.max(0, val);
-                    calculateTotals();
-                }
-            });
-
-            $(document).on('click', '.btn-remove-item', function () {
-                const id = $(this).data('id');
-                delete selectedItems[id];
-                renderItemsTable();
+            $('#btnRemoveBook').on('click', function () {
+                selectedBook = null;
+                renderSelectedBook();
                 calculateTotals();
             });
 
@@ -1245,10 +1230,7 @@
 
             // Calculate totals & balances
             function calculateTotals() {
-                let subtotal = 0;
-                Object.values(selectedItems).forEach(item => {
-                    subtotal += (item.price * item.quantity);
-                });
+                const subtotal = selectedBook ? (selectedBook.price * selectedBook.quantity) : 0;
 
                 const discount = parseFloat($('#discount').val()) || 0;
                 const grandTotal = Math.max(0, subtotal - discount);
@@ -1279,13 +1261,12 @@
 
             // Form submission validation
             $('#libraryBookingForm').on('submit', function (e) {
-                const keys = Object.keys(selectedItems);
-                if (keys.length === 0) {
+                if (!selectedBook) {
                     e.preventDefault();
                     Swal.fire({
                         icon: 'error',
                         title: 'تنبيه',
-                        text: 'يجب اختيار وإضافة كتاب واحد على الأقل للطلب قبل الحفظ.',
+                        text: 'يجب اختيار كتاب واحد للطلب قبل الحفظ.',
                         confirmButtonText: 'حسناً',
                         customClass: { confirmButton: 'btn btn-primary' }
                     });
@@ -1307,15 +1288,13 @@
                     return false;
                 }
 
-                // Validate stock for all selected items before sending
+                // Validate stock for the selected book before sending
                 let stockError = null;
-                Object.values(selectedItems).forEach(item => {
-                    if (item.stock <= 0) {
-                        stockError = `الكتاب "${item.name}" رصيده بالمخزن (0) ولا يمكن إتمام الحجز به. يرجى حذفه أولاً.`;
-                    } else if (item.quantity > item.stock) {
-                        stockError = `الكمية المطلوبة من كتاب "${item.name}" (${item.quantity} نسخة) تتجاوز الرصيد المتاح بالمخزن (${item.stock} نسخة).`;
-                    }
-                });
+                if (selectedBook.stock <= 0) {
+                    stockError = `الكتاب "${selectedBook.name}" رصيده بالمخزن (0) ولا يمكن إتمام الحجز به. يرجى حذفه أولاً.`;
+                } else if (selectedBook.quantity > selectedBook.stock) {
+                    stockError = `الكمية المطلوبة من كتاب "${selectedBook.name}" (${selectedBook.quantity} نسخة) تتجاوز الرصيد المتاح بالمخزن (${selectedBook.stock} نسخة).`;
+                }
 
                 if (stockError) {
                     e.preventDefault();
