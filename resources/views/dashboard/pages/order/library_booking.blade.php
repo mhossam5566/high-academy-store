@@ -107,15 +107,15 @@
     {{-- Navigation Tabs --}}
     <ul class="nav nav-pills mb-4 gap-2" id="libraryBookingTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link {{ ($activeTab ?? 'booking') === 'booking' ? 'active' : '' }} fw-bold px-4 py-2" 
-                    id="tab-booking-btn" data-bs-toggle="pill" data-bs-target="#tab-booking-pane" type="button" role="tab" 
+            <button class="nav-link {{ ($activeTab ?? 'booking') === 'booking' ? 'active' : '' }} fw-bold px-4 py-2"
+                    id="tab-booking-btn" data-bs-toggle="pill" data-bs-target="#tab-booking-pane" type="button" role="tab"
                     aria-controls="tab-booking-pane" aria-selected="{{ ($activeTab ?? 'booking') === 'booking' ? 'true' : 'false' }}">
                 <i class="ti ti-edit me-2 fs-5"></i>حجز طلب جديد بالمكتبة
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link {{ ($activeTab ?? 'booking') === 'statistics' ? 'active' : '' }} fw-bold px-4 py-2" 
-                    id="tab-stats-btn" data-bs-toggle="pill" data-bs-target="#tab-stats-pane" type="button" role="tab" 
+            <button class="nav-link {{ ($activeTab ?? 'booking') === 'statistics' ? 'active' : '' }} fw-bold px-4 py-2"
+                    id="tab-stats-btn" data-bs-toggle="pill" data-bs-target="#tab-stats-pane" type="button" role="tab"
                     aria-controls="tab-stats-pane" aria-selected="{{ ($activeTab ?? 'booking') === 'statistics' ? 'true' : 'false' }}">
                 <i class="ti ti-chart-bar me-2 fs-5"></i>إحصائيات المبيعات والفروع
                 <span class="badge bg-primary ms-2" id="tabStatsBadge">{{ number_format($stats['grand_total_books'] ?? 0) }} كتاب</span>
@@ -125,7 +125,7 @@
 
     <div class="tab-content p-0 border-0 shadow-none bg-transparent" id="libraryBookingTabsContent">
         {{-- TAB 1: Booking Form --}}
-        <div class="tab-pane fade {{ ($activeTab ?? 'booking') === 'booking' ? 'show active' : '' }}" 
+        <div class="tab-pane fade {{ ($activeTab ?? 'booking') === 'booking' ? 'show active' : '' }}"
              id="tab-booking-pane" role="tabpanel" aria-labelledby="tab-booking-btn">
 
     @if ($errors->any())
@@ -161,7 +161,7 @@
                                 </label>
                                 <div class="input-group input-group-merge">
                                     <span class="input-group-text"><i class="ti ti-user"></i></span>
-                                    <input type="text" id="student_name" name="student_name" 
+                                    <input type="text" id="student_name" name="student_name"
                                            class="form-control" placeholder="أدخل اسم الطالب ثلاثي أو رباعي"
                                            value="{{ old('student_name') }}" required autocomplete="off">
                                 </div>
@@ -173,7 +173,7 @@
                                 </label>
                                 <div class="input-group input-group-merge">
                                     <span class="input-group-text"><i class="ti ti-phone"></i></span>
-                                    <input type="text" id="mobile" name="mobile" 
+                                    <input type="text" id="mobile" name="mobile"
                                            class="form-control" placeholder="01xxxxxxxxx (11 رقم)"
                                            value="{{ old('mobile') }}" maxlength="11" required autocomplete="off">
                                 </div>
@@ -186,7 +186,7 @@
                                 </label>
                                 <div class="input-group input-group-merge">
                                     <span class="input-group-text"><i class="ti ti-phone-call"></i></span>
-                                    <input type="text" id="temp_mobile" name="temp_mobile" 
+                                    <input type="text" id="temp_mobile" name="temp_mobile"
                                            class="form-control" placeholder="01xxxxxxxxx"
                                            value="{{ old('temp_mobile') }}" maxlength="11" autocomplete="off">
                                 </div>
@@ -198,7 +198,7 @@
                                 </label>
                                 <div class="input-group input-group-merge">
                                     <span class="input-group-text"><i class="ti ti-notes"></i></span>
-                                    <input type="text" id="notes" name="notes" 
+                                    <input type="text" id="notes" name="notes"
                                            class="form-control" placeholder="أي ملاحظات خاصة بالطلب أو الطالب"
                                            value="{{ old('notes') }}" autocomplete="off">
                                 </div>
@@ -245,14 +245,14 @@
                                                     $stage = $product->sliders->name ?? '';
                                                     $brand = $product->brands->name ?? '';
                                                 @endphp
-                                                <option value="{{ $product->id }}" 
+                                                <option value="{{ $product->id }}"
                                                         data-name="{{ $product->name }}"
                                                         data-short-name="{{ $product->short_name ?: $product->name }}"
                                                         data-price="{{ $prodPrice }}"
                                                         data-stock="{{ $stock }}"
                                                         data-brand="{{ $brand }}"
                                                         data-stage="{{ $stage }}">
-                                                    {{ $product->short_name ?: $product->name }} 
+                                                    {{ $product->short_name ?: $product->name }}
                                                     @if($brand) - [مدرس: {{ $brand }}] @endif
                                                     @if($stage) - [{{ $stage }}] @endif
                                                     ({{ $prodPrice }} ج.م) - [المتاح: {{ $stock }}]
@@ -269,7 +269,7 @@
                                                     $stage = $product->sliders->name ?? '';
                                                     $brand = $product->brands->name ?? '';
                                                 @endphp
-                                                <option value="{{ $product->id }}" 
+                                                <option value="{{ $product->id }}"
                                                         data-name="{{ $product->name }}"
                                                         data-short-name="{{ $product->short_name ?: $product->name }}"
                                                         data-price="{{ $prodPrice }}"
@@ -277,7 +277,7 @@
                                                         data-brand="{{ $brand }}"
                                                         data-stage="{{ $stage }}"
                                                         disabled>
-                                                    {{ $product->short_name ?: $product->name }} 
+                                                    {{ $product->short_name ?: $product->name }}
                                                     @if($brand) - [مدرس: {{ $brand }}] @endif
                                                     @if($stage) - [{{ $stage }}] @endif
                                                     ({{ $prodPrice }} ج.م) - [نفد من المخزن: 0]
@@ -373,7 +373,7 @@
                         {{-- Payment Type Selector --}}
                         <div class="mb-3">
                             <label class="form-label fw-bold">نظام الدفع <span class="required-star">*</span></label>
-                            
+
                             <div class="d-flex flex-column gap-2">
                                 <label class="payment-option-card active" for="pay_full">
                                     <div class="d-flex align-items-center">
@@ -414,8 +414,8 @@
                             </label>
                             <div class="input-group input-group-merge">
                                 <span class="input-group-text"><i class="ti ti-cash"></i></span>
-                                <input type="number" id="deposit_amount" name="deposit_amount" 
-                                       class="form-control form-control-lg fw-bold text-primary" 
+                                <input type="number" id="deposit_amount" name="deposit_amount"
+                                       class="form-control form-control-lg fw-bold text-primary"
                                        placeholder="أدخل قيمة العربون" min="1" step="1" value="50">
                                 <span class="input-group-text">ج.م</span>
                             </div>
@@ -441,7 +441,7 @@
                             </label>
                             <div class="input-group input-group-merge">
                                 <span class="input-group-text"><i class="ti ti-discount"></i></span>
-                                <input type="number" id="discount" name="discount" 
+                                <input type="number" id="discount" name="discount"
                                        class="form-control" placeholder="0" min="0" step="0.5"
                                        value="{{ old('discount', 0) }}">
                                 <span class="input-group-text">ج.م</span>
@@ -489,7 +489,7 @@
         </div> {{-- End Tab 1 Booking Pane --}}
 
         {{-- TAB 2: Statistics & Reports --}}
-        <div class="tab-pane fade {{ ($activeTab ?? 'booking') === 'statistics' ? 'show active' : '' }}" 
+        <div class="tab-pane fade {{ ($activeTab ?? 'booking') === 'statistics' ? 'show active' : '' }}"
              id="tab-stats-pane" role="tabpanel" aria-labelledby="tab-stats-btn">
 
             {{-- Filter Toolbar Card --}}
@@ -591,7 +591,7 @@
                         <div class="fw-bold text-dark fs-6">جاري جلب إحصائيات المبيعات والأصناف...</div>
                     </div>
                 </div>
-                
+
                 <div id="statsContentPlaceholder">
                     @include('dashboard.pages.order.partials.library_stats_content', ['stats' => $stats])
                 </div>
@@ -688,6 +688,7 @@ jQuery(function($) {
             type: 'GET',
             data: formData,
             dataType: 'json',
+            timeout: 30000,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         }).done(function(response) {
             if (response && response.status === 'success' && typeof response.html === 'string') {
@@ -948,10 +949,10 @@ $(document).ready(function() {
                     </td>
                     <td class="text-center">
                         <div class="input-group input-group-sm justify-content-center" style="max-width: 120px; margin: 0 auto;">
-                            <input type="number" step="0.5" min="0" 
-                                   name="items[${index}][price]" 
-                                   class="form-control text-center item-price-input" 
-                                   data-id="${item.id}" 
+                            <input type="number" step="0.5" min="0"
+                                   name="items[${index}][price]"
+                                   class="form-control text-center item-price-input"
+                                   data-id="${item.id}"
                                    value="${item.price}">
                             <span class="input-group-text">ج.م</span>
                         </div>
@@ -961,11 +962,11 @@ $(document).ready(function() {
                             <button type="button" class="btn btn-sm btn-outline-secondary qty-btn btn-decrease" data-id="${item.id}">
                                 <i class="ti ti-minus"></i>
                             </button>
-                            <input type="number" min="1" max="${item.stock}" 
-                                   name="items[${index}][quantity]" 
-                                   class="form-control form-control-sm text-center item-qty-input fw-bold" 
-                                   data-id="${item.id}" 
-                                   value="${item.quantity}" 
+                            <input type="number" min="1" max="${item.stock}"
+                                   name="items[${index}][quantity]"
+                                   class="form-control form-control-sm text-center item-qty-input fw-bold"
+                                   data-id="${item.id}"
+                                   value="${item.quantity}"
                                    style="width: 60px;">
                             <button type="button" class="btn btn-sm ${isMaxReached ? 'btn-label-secondary' : 'btn-outline-secondary'} qty-btn btn-increase" data-id="${item.id}" ${isMaxReached ? 'title="تم الوصول لأقصى كمية متاحة بالمخزن"' : ''}>
                                 <i class="ti ti-plus"></i>
