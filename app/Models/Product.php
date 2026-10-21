@@ -111,6 +111,21 @@ class Product extends Model implements TranslatableContract
     } // end of get profit attribute
 
 
+    /**
+     * ترتيب المنتجات بحيث تظهر المنتجات المتاحة أولاً والغير متاحة (أو التي نفذت كميتها) في آخر القائمة.
+     */
+    public function scopeOrderByAvailability($query, string $direction = 'desc')
+    {
+        return $query->orderByRaw(
+            '(CASE
+                WHEN products.is_deleted = 1 THEN 0
+                WHEN (state IS NULL OR state = 0) THEN 0
+                WHEN state = 1 AND COALESCE(quantity, 0) <= 0 THEN 0
+                ELSE 1
+            END) ' . $direction
+        );
+    }
+
     /* getProductByCart */
     public static function getProductByCart($id)
     {

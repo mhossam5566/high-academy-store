@@ -90,7 +90,7 @@ class UserController extends Controller
             ->when($request->main_category_id, fn($q) => $q->where('main_category_id', $request->main_category_id))
             ->when($request->size, fn($q) => $q->whereJsonContains('sizes', $request->size))
             ->when($request->color, fn($q) => $q->whereJsonContains('colors', $request->color))
-            ->orderBy('is_deleted', 'asc') // Show active products first
+            ->orderByAvailability('desc') // المتاح أولاً، والغير متاح أو المنتهي في آخر القائمة
             ->orderBy('created_at', 'desc')
             ->paginate(15)
             ->onEachSide(0);
