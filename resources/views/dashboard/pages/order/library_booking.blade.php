@@ -39,6 +39,22 @@
             padding: 0.25rem 0.5rem;
         }
 
+        .selected-book-card {
+            border: 1px solid #e7e7e8;
+            border-radius: 10px;
+            padding: 16px;
+            background-color: #fafafa;
+        }
+
+        .selected-book-card.is-empty {
+            border-style: dashed;
+            background-color: #fff;
+        }
+
+        .selected-book-card .book-price-input {
+            max-width: 160px;
+        }
+
         .payment-option-card {
             border: 2px solid #e7e7e8;
             border-radius: 8px;
@@ -247,9 +263,9 @@
                             <div
                                 class="card-header bg-label-success py-3 d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0 d-flex align-items-center text-success">
-                                    <i class="ti ti-books me-2 fs-4"></i>اختيار الكتب والمنتجات
+                                    <i class="ti ti-books me-2 fs-4"></i>اختيار الكتاب (عنوان واحد لكل طلب)
                                 </h5>
-                                <span class="badge bg-success" id="selectedItemsCount">0 كتب مختارة</span>
+                                <span class="badge bg-secondary" id="selectedItemsCount">لم يتم اختيار كتاب</span>
                             </div>
                             <div class="card-body pt-4">
                                 {{-- Product Search Selector --}}
@@ -262,6 +278,14 @@
                                         </div>
                                     </div>
                                 @endif
+
+                                <div class="alert alert-label-info d-flex align-items-start mb-4 py-2 px-3" role="alert">
+                                    <i class="ti ti-info-circle fs-5 me-2 mt-1"></i>
+                                    <div class="small">
+                                        كل طلب يُسجَّل لعنوان كتاب واحد فقط (مع تحديد الكمية المطلوبة). لإضافة عنوان آخر، أنشئ
+                                        طلباً جديداً.
+                                    </div>
+                                </div>
 
                                 <div class="row g-2 align-items-end mb-4">
                                     <div class="col-md-8">
@@ -333,29 +357,66 @@
                                     </div>
                                 </div>
 
-                                {{-- Selected Items Table --}}
-                                <div class="table-responsive border rounded">
-                                    <table class="table table-hover align-middle mb-0" id="itemsTable">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th style="width: 40%;">الكتاب / المنتج</th>
-                                                <th style="width: 20%;" class="text-center">سعر الوحدة</th>
-                                                <th style="width: 20%;" class="text-center">الكمية</th>
-                                                <th style="width: 15%;" class="text-center">الإجمالي</th>
-                                                <th style="width: 5%;" class="text-center">حذف</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="itemsTableBody">
-                                            <tr id="emptyRow">
-                                                <td colspan="5" class="text-center py-4 text-muted">
-                                                    <i
-                                                        class="ti ti-shopping-cart-x fs-1 d-block mb-2 text-secondary opacity-50"></i>
-                                                    لم يتم إضافة أي كتب للطلب بعد. اختر كتاباً من القائمة أعلاه واضغط
-                                                    "إضافة".
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                {{-- Selected Book (single title per order) --}}
+                                <div id="selectedBookWrapper">
+                                    <div class="selected-book-card is-empty" id="selectedBookEmpty">
+                                        <div class="text-center py-4 text-muted">
+                                            <i
+                                                class="ti ti-book-2 fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                            لم يتم اختيار كتاب بعد. اختر كتاباً من القائمة أعلاه واضغط "إضافة".
+                                        </div>
+                                    </div>
+
+                                    <div class="selected-book-card" id="selectedBookCard" style="display: none;">
+                                        <div class="d-flex justify-content-between align-items-start gap-3">
+                                            <div>
+                                                <div class="fw-bold text-dark fs-6" id="selectedBookName">-</div>
+                                                <div class="small text-muted mt-1" id="selectedBookMeta"></div>
+                                                <div class="mt-2">
+                                                    <span class="badge bg-label-success badge-stock" id="selectedBookStock">-</span>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-icon btn-label-danger"
+                                                id="btnRemoveBook" title="حذف الكتاب من الطلب">
+                                                <i class="ti ti-trash"></i>
+                                            </button>
+                                        </div>
+
+                                        <input type="hidden" name="items[0][product_id]" id="selectedBookId" value="">
+
+                                        <div class="row g-3 mt-1 align-items-end">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold" for="selectedBookPrice">سعر الوحدة</label>
+                                                <div class="input-group input-group-sm book-price-input">
+                                                    <input type="number" step="0.5" min="0" id="selectedBookPrice"
+                                                        name="items[0][price]" class="form-control text-center fw-bold"
+                                                        value="0">
+                                                    <span class="input-group-text">ج.م</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold" for="selectedBookQuantity">الكمية</label>
+                                                <div class="input-group input-group-sm">
+                                                    <button type="button" class="btn btn-outline-secondary qty-btn"
+                                                        id="btnQtyDecrease">
+                                                        <i class="ti ti-minus"></i>
+                                                    </button>
+                                                    <input type="number" min="1" id="selectedBookQuantity"
+                                                        name="items[0][quantity]"
+                                                        class="form-control form-control-sm text-center fw-bold"
+                                                        value="1" style="width: 60px;">
+                                                    <button type="button" class="btn btn-outline-secondary qty-btn"
+                                                        id="btnQtyIncrease">
+                                                        <i class="ti ti-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">إجمالي الكتاب</label>
+                                                <div class="fw-bold fs-5 text-primary" id="selectedBookTotal">0.00 ج.م</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -845,7 +906,7 @@
         });
 
         // ==========================================
-        // LIBRARY BOOKING FORM LOGIC
+        // LIBRARY BOOKING FORM LOGIC (ONE BOOK TITLE PER ORDER)
         // ==========================================
         $(document).ready(function () {
             // Initialize Select2
@@ -856,7 +917,8 @@
                 dir: 'rtl'
             });
 
-            let selectedItems = {};
+            // The order holds a single book title only (with a quantity)
+            let selectedBook = null;
 
             // Payment Type Radio Handlers
             $('input[name="payment_type"]').on('change', function () {
