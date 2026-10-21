@@ -396,6 +396,61 @@
             font-weight: 700;
         }
 
+        /* ─── Pickup Process CTA (full-width highlight button) ─── */
+        .pickup-cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin: 16px 0 0;
+            padding: 15px 22px;
+            direction: rtl;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: #fff !important;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 6px 18px rgba(224, 123, 57, .35);
+            transition: transform .15s, box-shadow .15s, filter .2s;
+        }
+
+        .pickup-cta:hover {
+            color: #fff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 9px 24px rgba(224, 123, 57, .45);
+            filter: brightness(1.04);
+        }
+
+        .pickup-cta:active {
+            transform: translateY(0);
+        }
+
+        .pickup-cta .pickup-cta-icon {
+            font-size: 19px;
+            line-height: 1;
+        }
+
+        .pickup-cta .pickup-cta-arrow {
+            margin-right: auto;
+            font-size: 17px;
+            line-height: 1;
+            transition: transform .15s;
+        }
+
+        .pickup-cta:hover .pickup-cta-arrow {
+            transform: translateX(-4px);
+        }
+
+        .pickup-cta .pickup-cta-text {
+            flex: 1;
+            text-align: center;
+        }
+
         /* ─── Summary Rows ─── */
         .summary-lines {
             direction: rtl;
@@ -1177,11 +1232,7 @@
                 </div>
                 <div class="info-row" id="post_cost_row" style="display:none;">
                     <span class="info-label">تكلفة التوصيل لمكتب البريد</span>
-                    <span class="info-value">
-                        <span id="post_shipping_cost">0.00</span> جنيه &nbsp;
-                        <a href="{{ route('user.fqa') }}"
-                            style="color:var(--accent); font-size:12px; font-weight:700;">تعرف على الاستلام ←</a>
-                    </span>
+                    <span class="info-value"><span id="post_shipping_cost">0.00</span> جنيه</span>
                 </div>
                 <div class="info-row" id="address_row" style="display:none;">
                     <span class="info-label">العنوان</span>
