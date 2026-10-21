@@ -396,63 +396,83 @@
             font-weight: 700;
         }
 
-        /* ─── Pickup Process CTA (full-width highlight button) ─── */
-        .pickup-cta {
+        /* ─── Pickup Process Accordion (full-width highlight trigger) ─── */
+        .pickup-acc {
+            margin-top: 16px;
+            direction: rtl;
+        }
+
+        .pickup-acc .pickup-acc-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             width: 100%;
-            margin: 16px 0 0;
             padding: 15px 22px;
             direction: rtl;
             background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-            color: #fff !important;
+            color: #fff;
             border: none;
             border-radius: var(--radius-sm);
             font-family: 'Cairo', sans-serif;
             font-size: 15px;
             font-weight: 800;
-            text-decoration: none;
             text-align: center;
             box-shadow: 0 6px 18px rgba(224, 123, 57, .35);
-            transition: transform .15s, box-shadow .15s, filter .2s;
+            transition: transform .15s, box-shadow .15s, filter .2s, border-radius .2s;
         }
 
-        .pickup-cta:hover {
-            color: #fff !important;
+        .pickup-acc .pickup-acc-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 9px 24px rgba(224, 123, 57, .45);
             filter: brightness(1.04);
         }
 
-        .pickup-cta:active {
+        .pickup-acc .pickup-acc-btn:active {
             transform: translateY(0);
         }
 
-        .pickup-cta .pickup-cta-icon {
+        .pickup-acc .pickup-acc-btn:not(.collapsed) {
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            box-shadow: 0 4px 12px rgba(224, 123, 57, .28);
+            transform: none;
+            filter: none;
+        }
+
+        .pickup-acc .pickup-acc-icon {
             font-size: 19px;
             line-height: 1;
         }
 
-        .pickup-cta .pickup-cta-arrow {
-            margin-right: auto;
-            font-size: 17px;
-            line-height: 1;
-            transition: transform .15s;
-        }
-
-        .pickup-cta:hover .pickup-cta-arrow {
-            transform: translateX(-4px);
-        }
-
-        .pickup-cta .pickup-cta-text {
+        .pickup-acc .pickup-acc-text {
             flex: 1;
             text-align: center;
         }
 
+        .pickup-acc .pickup-acc-chevron {
+            margin-right: auto;
+            font-size: 17px;
+            line-height: 1;
+            transition: transform .25s;
+        }
+
+        .pickup-acc .pickup-acc-btn:not(.collapsed) .pickup-acc-chevron {
+            transform: rotate(180deg);
+        }
+
+        .pickup-acc .pickup-acc-panel {
+            background: #fff8f3;
+            border: 1.5px solid #fde8d4;
+            border-top: none;
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            padding: 16px 20px;
+            font-size: 13.5px;
+            line-height: 1.9;
+            color: var(--text-main);
+        }
+
         @media (prefers-reduced-motion: reduce) {
-            .pickup-cta {
+            .pickup-acc .pickup-acc-btn {
                 animation: none !important;
             }
         }
@@ -1253,14 +1273,22 @@
                         placeholder="ادخل اسم مكتب البريد" />
                 </div>
 
-                {{-- Prominent CTA: pickup process guide --}}
-                <p>خلي بالك . هتحتاج البطاقة وانت بتستلم من البريد</p>
-                <a href="{{ route('user.fqa') }}" target="_blank" rel="noopener"
-                    class="pickup-cta animate__animated animate__tada animate__repeat-3">
-                    <span class="pickup-cta-icon">📮</span>
-                    <span class="pickup-cta-text">تعرف على عملية الاستلام من مكتب البريد</span>
-                    <span class="pickup-cta-arrow">←</span>
-                </a>
+                {{-- Pickup process accordion (content to be filled in later) --}}
+                <div class="pickup-acc">
+                    <button type="button" class="pickup-acc-btn collapsed"
+                        data-bs-toggle="collapse" data-bs-target="#pickup_process_panel"
+                        aria-expanded="false" aria-controls="pickup_process_panel">
+                        <span class="pickup-acc-icon">📮</span>
+                        <span class="pickup-acc-text">تعرف على عملية الاستلام من مكتب البريد</span>
+                        <span class="pickup-acc-chevron">⌄</span>
+                    </button>
+
+                    <div id="pickup_process_panel" class="collapse">
+                        <div class="pickup-acc-panel">
+                            <p>يتم إدخال نص شرح عملية الاستلام هنا.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Live Total Preview -->
