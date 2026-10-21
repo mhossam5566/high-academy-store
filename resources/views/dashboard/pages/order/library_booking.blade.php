@@ -491,7 +491,7 @@
         {{-- TAB 2: Statistics & Reports --}}
         <div class="tab-pane fade {{ ($activeTab ?? 'booking') === 'statistics' ? 'show active' : '' }}" 
              id="tab-stats-pane" role="tabpanel" aria-labelledby="tab-stats-btn">
-            
+
             {{-- Filter Toolbar Card --}}
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center">
@@ -602,6 +602,142 @@
 
 @section('page-script')
 <script>
+// ==========================================
+// LIBRARY STATISTICS TAB LOGIC
+// ==========================================
+jQuery(function($) {
+    const statsAutoDebounce = { timer: null };
+
+    function scheduleStatsAutoApply(delay) {
+        clearTimeout(statsAutoDebounce.timer);
+        statsAutoDebounce.timer = setTimeout(fetchStatistics, typeof delay === 'number' ? delay : 200);
+    }
+
+    // Initialize Select2 for the stats product filter
+    if ($.fn.select2 && $('.select2-stats-product').length) {
+        $('.select2-stats-product').select2({
+            placeholder: '-- جميع الكتب والأصناف --',
+            allowClear: true,
+            width: '100%',
+            dir: 'rtl'
+        });
+    }
+
+    // Auto-apply on select changes
+    $('#stats_branch_id, #stats_status').on('change', function() {
+        scheduleStatsAutoApply(120);
+    });
+
+    $('#stats_product_id').on('change', function() {
+        scheduleStatsAutoApply(120);
+    });
+
+    $('#stats_from_date, #stats_to_date').on('change', function() {
+        $('#statsPeriodInput').val('custom');
+        $('#quickPeriodGroup button').removeClass('active');
+        $('#quickPeriodGroup button[data-period="custom"]').addClass('active');
+        scheduleStatsAutoApply(120);
+    });
+
+    // Quick period presets
+    $('#quickPeriodGroup button').on('click', function() {
+        const period = $(this).data('period');
+        $('#quickPeriodGroup button').removeClass('active');
+        $(this).addClass('active');
+        $('#statsPeriodInput').val(period);
+
+        if (period === 'custom') {
+            $('#fromDateCol, #toDateCol').slideDown(200);
+            $('#stats_from_date').trigger('focus');
+        } else {
+            $('#fromDateCol, #toDateCol').slideUp(200);
+            fetchStatistics();
+        }
+    });
+
+    // Filter form submit
+    $('#statsFilterForm').on('submit', function(e) {
+        e.preventDefault();
+        fetchStatistics();
+    });
+
+    // Reset filter
+    $('#btnResetStatsFilter').on('click', function() {
+        $('#statsPeriodInput').val('month');
+        $('#quickPeriodGroup button').removeClass('active');
+        $('#quickPeriodGroup button[data-period="month"]').addClass('active');
+        $('#fromDateCol, #toDateCol').hide();
+        $('#stats_from_date').val('');
+        $('#stats_to_date').val('');
+        $('#stats_branch_id').val('all');
+        $('#stats_product_id').val('all').trigger('change.select2');
+        $('#stats_status').val('all');
+        fetchStatistics();
+    });
+
+    // Core fetch + render routine
+    function fetchStatistics() {
+        const formData = $('#statsFilterForm').serialize();
+        const exportBaseUrl = "{{ route('dashboard.orders.library_booking.stats.export') }}";
+
+        $('#statsLoadingOverlay').show();
+        $('#btnExportExcel').attr('href', exportBaseUrl + '?' + formData);
+
+        $.ajax({
+            url: "{{ route('dashboard.orders.library_booking.stats') }}",
+            type: 'GET',
+            data: formData,
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        }).done(function(response) {
+            if (response && response.status === 'success' && typeof response.html === 'string') {
+                $('#statsContentPlaceholder').html(response.html);
+                if (response.stats) {
+                    $('#tabStatsBadge').text(response.stats.grand_total_books + ' كتاب');
+                }
+                $('#btnExportExcel').attr('href', exportBaseUrl + '?' + formData);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: 'تم استلام استجابة غير صالحة من السيرفر، يرجى إعادة المحاولة.',
+                    confirmButtonText: 'حسناً',
+                    customClass: { confirmButton: 'btn btn-primary' }
+                });
+            }
+        }).fail(function(xhr) {
+            console.error('Error fetching library statistics:', xhr.status, xhr.responseText);
+            Swal.fire({
+                icon: 'error',
+                title: 'خطأ',
+                text: 'حدث خطأ أثناء تحميل بيانات الإحصائيات، يرجى المحاولة مرة أخرى.',
+                confirmButtonText: 'حسناً',
+                customClass: { confirmButton: 'btn btn-primary' }
+            });
+        }).always(function() {
+            $('#statsLoadingOverlay').hide();
+        });
+    }
+
+    // Keep ?tab= in the URL in sync so refresh stays on the same tab
+    const statsTabBtn = document.getElementById('tab-stats-btn');
+    const bookingTabBtn = document.getElementById('tab-booking-btn');
+
+    if (bookingTabBtn) {
+        bookingTabBtn.addEventListener('shown.bs.tab', function() {
+            window.history.replaceState(null, '', window.location.pathname + '?tab=booking');
+        });
+    }
+    if (statsTabBtn) {
+        statsTabBtn.addEventListener('shown.bs.tab', function() {
+            window.history.replaceState(null, '', window.location.pathname + '?tab=statistics');
+        });
+    }
+});
+
+// ==========================================
+// LIBRARY BOOKING FORM LOGIC
+// ==========================================
 $(document).ready(function() {
     // Initialize Select2
     $('.select2-products').select2({
