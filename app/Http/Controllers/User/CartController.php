@@ -58,15 +58,9 @@ class CartController extends Controller
                 $product->increment('quantity', $item->qty);
                 $product->refresh();
 
-                // Only update state if not state 2
-                if ($product->state != 2) {
-                    $newState = ($product->quantity > 02) ? 1 : 0;
-                    if ($oldState != $newState) {
-                        $product->state = $newState;
-                        $product->save();
-                        $this->logStateChange($product, $oldState, $newState, 'Cart Expiration');
-                    }
-                }
+                // Quantity is restored, but unavailable (0) stays unavailable —
+                // availability may only be re-enabled from the dashboard.
+                $this->logStateChange($product, $oldState, $product->state, 'Cart Expiration');
             }
             Cart::instance('shopping')->remove($item->rowId);
         }
@@ -146,11 +140,11 @@ class CartController extends Controller
             $oldState = $product_quantity->state;
             $product_quantity->quantity = max(0, $product_quantity->quantity - $product_qty);
 
-            if ($product_quantity->state != 2) {
-                $newState = ($product_quantity->quantity > 0) ? 1 : 0;
-                if ($oldState != $newState) {
-                    $product_quantity->state = $newState;
-                    $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Reservation Update');
+            // Only mark unavailable when stock hits 0; never auto-reactivate
+            if ($product_quantity->state != 2 && $product_quantity->quantity <= 0) {
+                $product_quantity->state = 0;
+                if ($oldState != 0) {
+                    $this->logStateChange($product_quantity, $oldState, 0, 'Cart Reservation Update');
                 }
             }
             $product_quantity->save();
@@ -224,11 +218,11 @@ class CartController extends Controller
         $oldState = $product_quantity->state;
         $product_quantity->quantity = max(0, $product_quantity->quantity - $product_qty);
 
-        if ($product_quantity->state != 2) {
-            $newState = ($product_quantity->quantity > 0) ? 1 : 0;
-            if ($oldState != $newState) {
-                $product_quantity->state = $newState;
-                $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Update');
+        // Only mark unavailable when stock hits 0; never auto-reactivate
+        if ($product_quantity->state != 2 && $product_quantity->quantity <= 0) {
+            $product_quantity->state = 0;
+            if ($oldState != 0) {
+                $this->logStateChange($product_quantity, $oldState, 0, 'Cart Update');
             }
         }
         $product_quantity->save();
@@ -252,11 +246,11 @@ class CartController extends Controller
         $oldState = $product_quantity->state;
         $product_quantity->quantity = max(0, $product_quantity->quantity - $product_qty);
 
-        if ($product_quantity->state != 2) {
-            $newState = ($product_quantity->quantity > 0) ? 1 : 0;
-            if ($oldState != $newState) {
-                $product_quantity->state = $newState;
-                $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Addition');
+        // Only mark unavailable when stock hits 0; never auto-reactivate
+        if ($product_quantity->state != 2 && $product_quantity->quantity <= 0) {
+            $product_quantity->state = 0;
+            if ($oldState != 0) {
+                $this->logStateChange($product_quantity, $oldState, 0, 'Cart Addition');
             }
         }
         $product_quantity->save();
@@ -340,13 +334,15 @@ class CartController extends Controller
             $oldState = $product->state;
             $product->quantity = $product->quantity + ($cart->qty - $request_quantity);
 
-            // Only update state if not state 2 and there's an actual change
-            if ($product->state != 2) {
-                $newState = ($product->quantity > 0) ? 1 : 0;
-                if ($oldState != $newState) {
-                    $product->state = $newState;
-                    $this->logStateChange($product, $oldState, $newState, 'Cart Update');
+            // Decreasing cart qty restores stock but must not auto-reactivate.
+            // Increasing cart qty may mark as unavailable when stock hits 0.
+            if ($product->state != 2 && $product->quantity <= 0) {
+                $product->state = 0;
+                if ($oldState != 0) {
+                    $this->logStateChange($product, $oldState, 0, 'Cart Update');
                 }
+            } else {
+                $this->logStateChange($product, $oldState, $product->state, 'Cart Update');
             }
             $product->save();
 
@@ -427,14 +423,9 @@ class CartController extends Controller
 
         $product->quantity = $product->quantity + $cart->qty;
 
-        // Only update state if not state 2 and there's an actual change
-        if ($product->state != 2) {
-            $newState = ($product->quantity > 0) ? 1 : 0;
-            if ($oldState != $newState) {
-                $product->state = $newState;
-                $this->logStateChange($product, $oldState, $newState, 'Cart Deletion');
-            }
-        }
+        // Restore quantity only — unavailable products stay unavailable
+        // until re-enabled from the dashboard.
+        $this->logStateChange($product, $oldState, $product->state, 'Cart Deletion');
         $product->save();
 
         $response['status'] = true;

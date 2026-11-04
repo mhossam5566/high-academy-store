@@ -350,13 +350,14 @@ class PaymentController extends Controller
 
                 $this->logToDB($dbLog, "Quantity restored by {$detail->amout}, new quantity: {$product->quantity}", 'info', 'STEP 5');
 
-                // Smart state update logic for cancelled orders
+                // Restore quantity only. Unavailable (0) stays unavailable —
+                // availability may only be re-enabled from the dashboard.
                 if ($originalState == 2) {
                     $product->state = 2;
                     $this->logToDB($dbLog, 'Kept state as reserved (2)', 'info', 'STEP 5');
-                } elseif ($originalState == 0 && $product->quantity > 0) {
-                    $product->state = 1;
-                    $this->logToDB($dbLog, 'Changed state from unavailable (0) to available (1)', 'info', 'STEP 5');
+                } elseif ($originalState == 0) {
+                    $product->state = 0;
+                    $this->logToDB($dbLog, 'Kept state as unavailable (0) — quantity restored without auto-reactivation', 'info', 'STEP 5');
                 } elseif ($originalState == 1) {
                     $product->state = $product->quantity > 0 ? 1 : 0;
                     $this->logToDB($dbLog, "Updated state based on quantity - new state: {$product->state}", 'info', 'STEP 5');
@@ -425,16 +426,11 @@ class PaymentController extends Controller
             $product->increment('quantity', $item->qty);
             $product->refresh();
 
-            // Smart state update logic
+            // Restore quantity only. Do not auto-reactivate unavailable products.
             if ($originalState == 2) {
-                // If it was reserved, keep it reserved regardless of quantity
                 $product->state = 2;
-            } elseif ($originalState == 0 && $product->quantity > 0) {
-                // If it was unavailable due to no stock, and now has stock, make it available
-                $product->state = 1;
             }
-            // If state was 1 and quantity > 0, keep it as 1
-            // If quantity is still 0, keep state as 0
+            // state 0 stays 0; state 1 stays 1 — availability only via dashboard
 
             $this->logStateChange($product, $originalState, $product->state, "Cart item expired", [
                 'cart_item_id' => $item->rowId,
@@ -464,15 +460,12 @@ class PaymentController extends Controller
                 $product->increment('quantity', $detail->amout);
                 $product->refresh();
 
-                // Smart state update logic for cancelled orders
+                // Restore quantity only. Unavailable stays unavailable until dashboard.
                 if ($originalState == 2) {
-                    // If it was reserved, keep it reserved regardless of quantity
                     $product->state = 2;
-                } elseif ($originalState == 0 && $product->quantity > 0) {
-                    // If it was unavailable due to no stock, and now has stock, make it available
-                    $product->state = 1;
+                } elseif ($originalState == 0) {
+                    $product->state = 0;
                 } elseif ($originalState == 1) {
-                    // If it was available, keep it available if quantity > 0
                     $product->state = $product->quantity > 0 ? 1 : 0;
                 }
 
@@ -510,15 +503,12 @@ class PaymentController extends Controller
                 $product->increment('quantity', $detail->amout);
                 $product->refresh();
 
-                // Smart state update logic for cancelled orders
+                // Restore quantity only. Unavailable stays unavailable until dashboard.
                 if ($originalState == 2) {
-                    // If it was reserved, keep it reserved regardless of quantity
                     $product->state = 2;
-                } elseif ($originalState == 0 && $product->quantity > 0) {
-                    // If it was unavailable due to no stock, and now has stock, make it available
-                    $product->state = 1;
+                } elseif ($originalState == 0) {
+                    $product->state = 0;
                 } elseif ($originalState == 1) {
-                    // If it was available, keep it available if quantity > 0
                     $product->state = $product->quantity > 0 ? 1 : 0;
                 }
 

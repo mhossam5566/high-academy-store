@@ -1179,8 +1179,9 @@ class OrderController extends Controller
                 $prod = $item['product'];
                 if ($prod->quantity !== null) {
                     $prod->quantity = max(0, $prod->quantity - $item['quantity']);
-                    if ($prod->state != 2) {
-                        $prod->state = ($prod->quantity > 0) ? 1 : 0;
+                    // Only mark unavailable when stock hits 0; never auto-reactivate
+                    if ($prod->state != 2 && $prod->quantity <= 0) {
+                        $prod->state = 0;
                     }
                     $prod->save();
                 }
