@@ -353,6 +353,24 @@
             cursor: not-allowed;
         }
 
+        .form-control-custom.is-invalid {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, .12);
+        }
+
+        .field-error {
+            display: none;
+            color: #dc2626;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 6px;
+            direction: rtl;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
         select.form-control-custom {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237b7b96' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
@@ -1066,7 +1084,7 @@
             @endif
 
             <div class="step-nav">
-                <button class="btn-next" onclick="goTo(2)">
+                <button class="btn-next" onclick="validateStep1()">
                     التالي — بيانات الشحن
                     <span>←</span>
                 </button>
@@ -1173,6 +1191,7 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                <div class="field-error" id="err-governorates"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -1181,6 +1200,7 @@
                                 <select class="form-control-custom" id="cities" name="city" disabled>
                                     <option value="">اختر المدينة</option>
                                 </select>
+                                <div class="field-error" id="err-cities"></div>
                             </div>
                         </div>
                         <div class="col-12">
@@ -1188,27 +1208,33 @@
                                 <label class="form-label-custom" for="address">العنوان التفصيلي</label>
                                 <input class="form-control-custom" id="address" name="address"
                                     placeholder="الشارع، الحي، المبنى..." />
+                                <div class="field-error" id="err-address"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group-custom">
                                 <label class="form-label-custom" for="user_name">الاسم ثلاثي</label>
-                                <input class="form-control-custom" id="user_name" name="user_name" placeholder="اسم المستلم"
+                                <input class="form-control-custom" id="user_name" name="user_name" placeholder="مثال: محمد أحمد علي"
                                     required />
+                                <div class="field-error" id="err-user_name"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group-custom">
                                 <label class="form-label-custom" for="mobile">رقم الموبايل</label>
-                                <input class="form-control-custom" type="number" id="mobile" name="mobile" pattern="\d{11}"
-                                    minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
+                                <input class="form-control-custom" type="tel" id="mobile" name="mobile" inputmode="numeric"
+                                    pattern="01[0125][0-9]{8}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx"
+                                    required />
+                                <div class="field-error" id="err-mobile"></div>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group-custom">
                                 <label class="form-label-custom" for="temp_mobile">رقم احتياطي</label>
-                                <input class="form-control-custom" type="number" id="temp_mobile" name="temp_mobile"
-                                    pattern="\d{11}" minlength="11" maxlength="11" placeholder="01xxxxxxxxx" required />
+                                <input class="form-control-custom" type="tel" id="temp_mobile" name="temp_mobile"
+                                    inputmode="numeric" pattern="01[0125][0-9]{8}" minlength="11" maxlength="11"
+                                    placeholder="01xxxxxxxxx" required />
+                                <div class="field-error" id="err-temp_mobile"></div>
                             </div>
                         </div>
                     </div>
@@ -1241,6 +1267,7 @@
                 <select class="form-control-custom" id="shipping_method" name="shipping_method_id">
                     <option value="">اختر طريقة الشحن</option>
                 </select>
+                <div class="field-error" id="err-shipping_method"></div>
             </div>
 
             <div id="shipping_info" class="ship-info-box" style="display:none;">
@@ -1271,6 +1298,7 @@
                     <label class="form-label-custom" for="near_post">اسم أقرب مكتب بريد</label>
                     <input type="text" id="near_post" name="near_post" class="form-control-custom"
                         placeholder="ادخل اسم مكتب البريد" />
+                    <div class="field-error" id="err-near_post"></div>
                 </div>
 
                 {{-- Pickup process accordion (content to be filled in later) --}}
@@ -1447,6 +1475,25 @@
 
         let currentStep = 1;
 
+        // Clear field errors while typing / changing
+        document.addEventListener('DOMContentLoaded', function () {
+            ['governorates', 'cities', 'address', 'user_name', 'mobile', 'temp_mobile', 'shipping_method', 'near_post']
+                .forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    el.addEventListener('input', () => clearFieldError(id));
+                    el.addEventListener('change', () => clearFieldError(id));
+                });
+
+            ['mobile', 'temp_mobile'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('input', function () {
+                    this.value = this.value.replace(/\D/g, '').slice(0, 11);
+                });
+            });
+        });
+
         /* ─── Stepper Navigation ─── */
         function goTo(n) {
             document.getElementById('step-' + currentStep).classList.add('hidden');
@@ -1541,37 +1588,155 @@
             }
         }
 
-        function validateStep2() {
-            // Card selected → fields already filled
-            if (selectedAddressData) {
-                goTo(3);
+        const PHONE_RE = /^01[0125][0-9]{8}$/;
+        const ARABIC_NAME_RE = /^[\u0600-\u06FF\s]+$/;
+        const ADDRESS_RE = /^[\u0600-\u06FFa-zA-Z0-9\u0660-\u0669\s\-\,\.\/\#\(\)]+$/;
+
+        function clearFieldError(id) {
+            const el = document.getElementById(id);
+            const err = document.getElementById('err-' + id);
+            if (el) el.classList.remove('is-invalid');
+            if (err) {
+                err.textContent = '';
+                err.classList.remove('show');
+            }
+        }
+
+        function setFieldError(id, message) {
+            const el = document.getElementById(id);
+            const err = document.getElementById('err-' + id);
+            if (el) el.classList.add('is-invalid');
+            if (err) {
+                err.textContent = message;
+                err.classList.add('show');
+            }
+        }
+
+        function arabicWordCount(value) {
+            const matches = value.match(/[\u0600-\u06FF]+/g);
+            return matches ? matches.length : 0;
+        }
+
+        function validateStep1() {
+            const cartCount = {{ Cart::instance('shopping')->count() }};
+            if (!cartCount) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'السلة فارغة',
+                    text: 'أضف منتجات إلى السلة قبل إتمام الطلب',
+                    confirmButtonColor: '#e07b39'
+                });
                 return;
             }
+            goTo(2);
+        }
 
-            // Manual form validation
+        function validateShippingFields() {
+            const fields = ['governorates', 'cities', 'address', 'user_name', 'mobile', 'temp_mobile'];
+            fields.forEach(clearFieldError);
+
             const gov = document.getElementById('governorates').value;
             const city = document.getElementById('cities').value;
             const addr = document.getElementById('address').value.trim();
             const name = document.getElementById('user_name').value.trim();
             const mob = document.getElementById('mobile').value.trim();
             const tmp = document.getElementById('temp_mobile').value.trim();
-            if (!gov || !city || !addr || !name || !mob || !tmp) {
+
+            let firstError = null;
+
+            if (!gov) {
+                setFieldError('governorates', 'يرجى اختيار المحافظة');
+                firstError = firstError || 'يرجى اختيار المحافظة';
+            }
+            if (!city) {
+                setFieldError('cities', 'يرجى اختيار المدينة');
+                firstError = firstError || 'يرجى اختيار المدينة';
+            }
+            if (!addr) {
+                setFieldError('address', 'يرجى إدخال العنوان التفصيلي');
+                firstError = firstError || 'يرجى إدخال العنوان التفصيلي';
+            } else if (!ADDRESS_RE.test(addr)) {
+                setFieldError('address', 'صيغة العنوان غير صحيحة، استخدم حروفًا وأرقامًا وعلامات الترقيم فقط');
+                firstError = firstError || 'صيغة العنوان غير صحيحة';
+            }
+            if (!name) {
+                setFieldError('user_name', 'يرجى إدخال الاسم الثلاثي');
+                firstError = firstError || 'يرجى إدخال الاسم الثلاثي';
+            } else if (!ARABIC_NAME_RE.test(name)) {
+                setFieldError('user_name', 'يجب كتابة الاسم باللغة العربية فقط');
+                firstError = firstError || 'يجب كتابة الاسم باللغة العربية فقط';
+            } else if (arabicWordCount(name) < 3) {
+                setFieldError('user_name', 'ادخل الاسم ثلاثى كما فى البطاقة الشخصية');
+                firstError = firstError || 'ادخل الاسم ثلاثى كما فى البطاقة الشخصية';
+            }
+            if (!mob) {
+                setFieldError('mobile', 'يرجى إدخال رقم الموبايل');
+                firstError = firstError || 'يرجى إدخال رقم الموبايل';
+            } else if (!PHONE_RE.test(mob)) {
+                setFieldError('mobile', 'رقم الهاتف غير صحيح، يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقم');
+                firstError = firstError || 'رقم الهاتف غير صحيح';
+            }
+            if (!tmp) {
+                setFieldError('temp_mobile', 'يرجى إدخال رقم الموبايل الاحتياطي');
+                firstError = firstError || 'يرجى إدخال رقم الموبايل الاحتياطي';
+            } else if (!PHONE_RE.test(tmp)) {
+                setFieldError('temp_mobile', 'رقم الهاتف الاحتياطي غير صحيح، يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقم');
+                firstError = firstError || 'رقم الهاتف الاحتياطي غير صحيح';
+            }
+
+            return firstError;
+        }
+
+        function validateStep2() {
+            // Even with a saved address, re-validate filled values against the same rules
+            if (!selectedAddressData && !manualFormVisible) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'بيانات ناقصة',
                     text: 'من فضلك اختار عنوان محفوظ أو أكمل جميع البيانات يدوياً',
                     confirmButtonColor: '#e07b39'
                 });
-                // Show the manual form if hidden
                 if (!manualFormVisible) toggleManualForm();
                 return;
             }
-            goTo(3);
+
+            if (!manualFormVisible && selectedAddressData) {
+                // ensure form is synced before validating
+                fillFormFromData(selectedAddressData);
+            } else if (!manualFormVisible) {
+                toggleManualForm();
+            }
+
+            // Wait briefly for city select to populate when address card was used
+            const runValidation = () => {
+                const error = validateShippingFields();
+                if (error) {
+                    if (!manualFormVisible) toggleManualForm();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'تحقق من البيانات',
+                        text: error,
+                        confirmButtonColor: '#e07b39'
+                    });
+                    return;
+                }
+                goTo(3);
+            };
+
+            if (selectedAddressData && selectedAddressData.cityId) {
+                setTimeout(runValidation, 150);
+            } else {
+                runValidation();
+            }
         }
 
         function validateStep3() {
+            clearFieldError('shipping_method');
+            clearFieldError('near_post');
+
             const method = document.getElementById('shipping_method').value;
             if (!method) {
+                setFieldError('shipping_method', 'يرجى اختيار طريقة شحن قبل المتابعة');
                 Swal.fire({
                     icon: 'warning',
                     title: 'اختار طريقة الشحن',
@@ -1583,6 +1748,7 @@
             const m = shippingMethods.find(x => x.id == method);
             const nearPost = document.getElementById('near_post').value.trim();
             if (m?.type === 'post' && !nearPost) {
+                setFieldError('near_post', 'يرجى إدخال اسم أقرب مكتب بريد');
                 Swal.fire({
                     icon: 'warning',
                     title: 'بيانات ناقصة',
@@ -1854,10 +2020,26 @@
                     },
                     error: function (x) {
                         btn.prop('disabled', false).text(orig);
+                        const res = x.responseJSON || {};
+                        let msg = res.msg || res.message || 'خطا اثناء التنفيذ';
+                        if (!res.msg && res.errors) {
+                            const firstKey = Object.keys(res.errors)[0];
+                            if (firstKey && res.errors[firstKey]?.[0]) {
+                                msg = res.errors[firstKey][0];
+                            }
+                        }
+                        // لو الخطأ من بيانات الشحن نرجّع المستخدم للخطوة المناسبة
+                        const shippingFields = ['user_name', 'mobile', 'temp_mobile', 'address', 'government', 'city', 'governorates', 'cities'];
+                        const errKeys = res.errors ? Object.keys(res.errors) : [];
+                        if (errKeys.some(k => shippingFields.includes(k))) {
+                            goTo(2);
+                        } else if (errKeys.some(k => ['shipping_method_id', 'shipping_method', 'near_post'].includes(k))) {
+                            goTo(3);
+                        }
                         Swal.fire({
                             icon: 'error',
-                            title: x.responseJSON?.msg || 'خطا اثناء التنفيذ',
-                            showConfirmButton: false
+                            title: msg,
+                            confirmButtonColor: '#e07b39'
                         });
                     }
                 });

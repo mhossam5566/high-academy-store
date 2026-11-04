@@ -18,6 +18,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
@@ -43,32 +44,48 @@ class CheckoutController extends Controller
      */
     protected function validateCommon(Request $request)
     {
+        // Normalize shipping field names coming from the checkout wizard
         if (!$request->filled('shipping_method') && $request->filled('shipping_method_id')) {
             $request->merge([
                 'shipping_method' => $request->shipping_method_id
             ]);
         }
+        if (!$request->filled('shipping_method_id') && $request->filled('shipping_method')) {
+            $request->merge([
+                'shipping_method_id' => $request->shipping_method
+            ]);
+        }
 
         $rules = [
-            'user_name' => ['required', 'string', 'min:3'],
+            'user_name' => [
+                'required',
+                'string',
+                'regex:/^[\p{Arabic}\s]+$/u',
+                function ($attr, $val, $fail) {
+                    preg_match_all('/\p{Arabic}+/u', (string) $val, $m);
+                    if (count($m[0]) < 3) {
+                        $fail('ادخل الاسم ثلاثى كما فى البطاقة الشخصية');
+                    }
+                },
+            ],
             'mobile' => ['required', 'string', 'regex:/^01[0125][0-9]{8}$/'],
             'temp_mobile' => ['required', 'string', 'regex:/^01[0125][0-9]{8}$/'],
             'shipping_method_id' => ['required', 'exists:shipping_methods,id'],
             'government' => ['required', 'integer', 'exists:governorates,id'],
             'city' => ['required', 'integer', 'exists:cities,id'],
-            'address' => ['required', 'string'],
+            'address' => ['required', 'string', 'regex:/^[\p{Arabic}a-zA-Z0-9\x{0660}-\x{0669}\s\-\,\.\/\#\(\)]+$/u'],
             'near_post' => ['nullable', 'string'],
         ];
 
         $messages = [
             'user_name.required' => 'يرجى إدخال الاسم',
-            'user_name.min' => 'الاسم يجب ألا يقل عن 3 أحرف',
+            'user_name.regex' => 'يجب كتابة الاسم باللغة العربية فقط',
 
             'mobile.required' => 'يرجى إدخال رقم الهاتف',
-            'mobile.regex' => 'رقم الهاتف غير صحيح',
+            'mobile.regex' => 'رقم الهاتف غير صحيح، يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقم',
 
             'temp_mobile.required' => 'يرجى إدخال رقم الهاتف الاحتياطي',
-            'temp_mobile.regex' => 'رقم الهاتف الاحتياطي غير صحيح',
+            'temp_mobile.regex' => 'رقم الهاتف الاحتياطي غير صحيح، يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقم',
 
             'shipping_method_id.required' => 'يرجى اختيار طريقة الشحن',
             'shipping_method_id.exists' => 'طريقة الشحن المختارة غير متاحة',
@@ -80,6 +97,7 @@ class CheckoutController extends Controller
             'city.exists' => 'المدينة المختارة غير صحيحة',
 
             'address.required' => 'يرجى إدخال العنوان',
+            'address.regex' => 'صيغة العنوان غير صحيحة، استخدم حروفًا وأرقامًا وعلامات الترقيم فقط بدون رموز خاصة',
 
             'near_post.required' => 'يرجى إدخال أقرب مكتب بريد',
         ];
@@ -106,6 +124,16 @@ class CheckoutController extends Controller
         });
 
         $validator->validate();
+    }
+
+    protected function validationErrorResponse(ValidationException $e)
+    {
+        return response()->json([
+            'success' => false,
+            'code' => 400,
+            'msg' => $e->validator->errors()->first(),
+            'errors' => $e->validator->errors(),
+        ], 400);
     }
     protected function normalizeProductShippingMethods($methods): array
     {
@@ -284,58 +312,13 @@ class CheckoutController extends Controller
      */
     public function fawry_pay(Request $request)
     {
-        // 1) نفس الـ validation من القديم:
-        $validator = Validator::make($request->all(), [
-            'shipping_method' => 'required|exists:shipping_methods,id',
-            'government' => 'required|numeric',
-            'city' => 'required|numeric',
-            'address' => ['required', 'string', 'regex:/^[\p{Arabic}a-zA-Z0-9\x{0660}-\x{0669}\s\-\,\.\/\#\(\)]+$/u'],
-            'user_name' => [
-                'required',
-                'regex:/^[\p{Arabic}\s]+$/u',
-                function ($attr, $val, $fail) {
-                    preg_match_all('/\p{Arabic}+/u', $val, $m);
-                    if (count($m[0]) < 3)
-                        $fail('ادخل الاسم ثلاثى كما فى البطاقه الشخصيه');
-                }
-            ],
-            'mobile' => [
-                'required',
-                'digits:11',
-                function ($attr, $val, $fail) {
-                    if (!preg_match('/^01[0125][0-9]{8}$/', $val))
-                        $fail('رقم الهاتف غير صحيح');
-                }
-            ],
-            'temp_mobile' => [
-                'required',
-                'digits:11',
-                function ($attr, $val, $fail) {
-                    if (!preg_match('/^01[0125][0-9]{8}$/', $val))
-                        $fail('رقم الهاتف الاحتياطي غير صحيح');
-                }
-            ],
-        ], [
-            'government.required' => 'برجاء اختيار المحافظة',
-            'city.required' => 'برجاء اختيار المدينة',
-            'address.required' => 'برجاء ادخال العنوان التفصيلي',
-            'user_name.required' => 'برجاء ادخال الاسم',
-            'user_name.regex' => 'يجب كتابة الاسم باللغة العربية',
-            'mobile.required' => 'برجاء ادخال رقم الموبايل',
-            'mobile.digits' => 'رقم الموبايل يجب أن يتكون من 11 رقمًا',
-            'temp_mobile.required' => 'برجاء ادخال رقم الموبايل الاحتياطي',
-            'temp_mobile.digits' => 'رقم الموبايل الاحتياطي يجب أن يتكون من 11 رقمًا',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'code' => 400,
-                'msg' => $validator->errors()->first()
-            ], 400);
+        try {
+            $this->validateCommon($request);
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($e);
         }
 
-        $method = ShippingMethod::find($request->shipping_method);
+        $method = ShippingMethod::find($request->shipping_method_id ?: $request->shipping_method);
         if (!$method || !$this->shippingMethodAllowedForCart($method)) {
             return response()->json([
                 'success' => false,
@@ -457,6 +440,9 @@ class CheckoutController extends Controller
                 'success' => true,
                 'msg' => 'تم إرسال الطلب للمراجعة'
             ], 200);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return $this->validationErrorResponse($e);
         } catch (\Throwable $e) {
             Log::error($e);
             DB::rollBack();
@@ -489,6 +475,9 @@ class CheckoutController extends Controller
                 'success' => true,
                 'url' => 'https://tap.example.com/checkout/' . $order->id
             ], 200);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return $this->validationErrorResponse($e);
         } catch (\Throwable $e) {
             Log::error($e);
             DB::rollBack();
