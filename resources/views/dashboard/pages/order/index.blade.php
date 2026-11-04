@@ -280,7 +280,8 @@
                     },
                     {
                         data: 'phone',
-                        name: 'mobile'
+                        name: 'mobile',
+                        className: 'text-nowrap'
                     },
                     {
                         data: 'address',

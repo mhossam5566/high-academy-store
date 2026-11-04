@@ -92,7 +92,11 @@ class OrderController extends Controller
                 return $row->name ?? ($row->user->name ?? 'N/A');
             })
             ->editColumn('phone', function ($row) {
-                return $row->mobile;
+                $html = '<span dir="ltr">' . e($row->mobile ?? '—') . '</span>';
+                if (!empty($row->temp_mobile)) {
+                    $html .= '<br><small class="text-muted" dir="ltr"><i class="ti ti-phone me-1"></i>' . e($row->temp_mobile) . '</small>';
+                }
+                return $html;
             })
             ->editColumn('temp_mobile', function ($row) {
                 return $row->temp_mobile;
@@ -247,7 +251,7 @@ class OrderController extends Controller
 
                 return '<div class="d-flex gap-1">' . $detailsBtn . $notifyBtn . '</div>';
             })
-            ->rawColumns(['details', 'edit_order', 'change_status', 'image', 'state', 'addbarcode', 'admin_addbarcode', 'tracker_state', 'branch_actions'])
+            ->rawColumns(['phone', 'details', 'edit_order', 'change_status', 'image', 'state', 'addbarcode', 'admin_addbarcode', 'tracker_state', 'branch_actions'])
             ->toJson();
     }
 
