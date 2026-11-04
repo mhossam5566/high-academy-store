@@ -92,9 +92,9 @@ class OrderController extends Controller
                 return $row->name ?? ($row->user->name ?? 'N/A');
             })
             ->editColumn('phone', function ($row) {
-                $html = '<span dir="ltr">' . e($row->mobile ?? '—') . '</span>';
+                $html = '<span dir="ltr">' . e($this->formatPhoneDisplay($row->mobile)) . '</span>';
                 if (!empty($row->temp_mobile)) {
-                    $html .= '<br><small class="text-muted" dir="ltr"><i class="ti ti-phone me-1"></i>' . e($row->temp_mobile) . '</small>';
+                    $html .= '<br><small class="text-muted" dir="ltr">' . e($this->formatPhoneDisplay($row->temp_mobile)) . '</small>';
                 }
                 return $html;
             })
@@ -914,6 +914,24 @@ class OrderController extends Controller
     /**
      * Send WhatsApp notification to customer on order status change
      */
+    /**
+     * Ensure Egyptian mobile numbers keep the leading zero when displayed.
+     */
+    private function formatPhoneDisplay(?string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $phone);
+        if ($digits === '') {
+            return '—';
+        }
+
+        // Numbers saved without the leading zero (e.g. 1030840965)
+        if (strlen($digits) === 10 && str_starts_with($digits, '1')) {
+            $digits = '0' . $digits;
+        }
+
+        return $digits;
+    }
+
     private function sendOrderStatusWhatsapp(Order $order, string $status): void
     {
         try {
@@ -1675,9 +1693,9 @@ class OrderController extends Controller
                 return $row->name ?? ($row->user->name ?? '—');
             })
             ->editColumn('mobile', function ($row) {
-                $html = '<span dir="ltr">' . e($row->mobile ?? '—') . '</span>';
+                $html = '<span dir="ltr">' . e($this->formatPhoneDisplay($row->mobile)) . '</span>';
                 if (!empty($row->temp_mobile)) {
-                    $html .= '<br><small class="text-muted" dir="ltr"><i class="ti ti-phone me-1"></i>' . e($row->temp_mobile) . '</small>';
+                    $html .= '<br><small class="text-muted" dir="ltr">' . e($this->formatPhoneDisplay($row->temp_mobile)) . '</small>';
                 }
                 return $html;
             })
