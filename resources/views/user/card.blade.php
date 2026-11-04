@@ -1590,7 +1590,7 @@
 
         const PHONE_RE = /^01[0125][0-9]{8}$/;
         const ARABIC_NAME_RE = /^[\u0600-\u06FF\s]+$/;
-        const ADDRESS_RE = /^[\u0600-\u06FFa-zA-Z0-9\u0660-\u0669\s\-\,\.\/\#\(\)]+$/;
+        const ADDRESS_RE = /^[\u0600-\u06FF0-9\u0660-\u0669\s\-\/]+$/;
 
         function clearFieldError(id) {
             const el = document.getElementById(id);
@@ -1656,7 +1656,7 @@
                 setFieldError('address', 'يرجى إدخال العنوان التفصيلي');
                 firstError = firstError || 'يرجى إدخال العنوان التفصيلي';
             } else if (!ADDRESS_RE.test(addr)) {
-                setFieldError('address', 'صيغة العنوان غير صحيحة، استخدم حروفًا وأرقامًا وعلامات الترقيم فقط');
+                setFieldError('address', 'صيغة العنوان غير صحيحة، يُسمح بالحروف العربية والأرقام والمسافات ورمزَي - و / فقط');
                 firstError = firstError || 'صيغة العنوان غير صحيحة';
             }
             if (!name) {

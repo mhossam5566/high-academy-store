@@ -73,7 +73,7 @@ class CheckoutController extends Controller
             'shipping_method_id' => ['required', 'exists:shipping_methods,id'],
             'government' => ['required', 'integer', 'exists:governorates,id'],
             'city' => ['required', 'integer', 'exists:cities,id'],
-            'address' => ['required', 'string', 'regex:/^[\p{Arabic}a-zA-Z0-9\x{0660}-\x{0669}\s\-\,\.\/\#\(\)]+$/u'],
+            'address' => ['required', 'string', 'regex:/^[\p{Arabic}0-9\x{0660}-\x{0669}\s\-\/]+$/u'],
             'near_post' => ['nullable', 'string'],
         ];
 
@@ -97,7 +97,7 @@ class CheckoutController extends Controller
             'city.exists' => 'المدينة المختارة غير صحيحة',
 
             'address.required' => 'يرجى إدخال العنوان',
-            'address.regex' => 'صيغة العنوان غير صحيحة، استخدم حروفًا وأرقامًا وعلامات الترقيم فقط بدون رموز خاصة',
+            'address.regex' => 'صيغة العنوان غير صحيحة، يُسمح بالحروف العربية والأرقام والمسافات ورمزَي - و / فقط',
 
             'near_post.required' => 'يرجى إدخال أقرب مكتب بريد',
         ];
