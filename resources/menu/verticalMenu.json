@@ -261,18 +261,6 @@
                     "permission": "view_orders"
                 },
                 {
-                    "url": "/dashboard/orders?state=reserved",
-                    "name": "الطلبات المحجوزة",
-                    "slug": "dashboard.orders",
-                    "permission": "view_orders"
-                },
-                {
-                    "url": "/dashboard/orders?state=pending",
-                    "name": "الطلبات المعلقة",
-                    "slug": "dashboard.orders",
-                    "permission": "view_orders"
-                },
-                {
                     "url": "/dashboard/orders/barcode",
                     "name": "الباركود",
                     "slug": "dashboard.orders.barcode",

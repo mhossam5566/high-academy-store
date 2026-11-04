@@ -273,9 +273,14 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
             if ($state == "1") {
+                $wasReserved = $order->status === 'reserved';
                 $order->status = "success";
                 $order->is_paid = "1";
                 $order->tracker = "shipped"; // second stage
+                // Reserved orders are printed before conversion — skip print queue
+                if ($wasReserved) {
+                    $order->printed_completed = 1;
+                }
                 $details = [
                     'id' => $order->id,
                     'name' => $order->name,
@@ -606,9 +611,17 @@ class OrderController extends Controller
     public function changeStatus($order_id, $status)
     {
         $order = Order::find($order_id);
+        $wasReserved = $order && $order->status === 'reserved';
+
         switch ($status) {
             case 'success':
-                $order->update(['status' => 'success']);
+                // Reserved orders are usually printed before conversion,
+                // so keep them out of the active print-orders queue.
+                $payload = ['status' => 'success'];
+                if ($wasReserved) {
+                    $payload['printed_completed'] = 1;
+                }
+                $order->update($payload);
                 break;
             case 'reserved':
                 $order->update(['status' => 'reserved']);
@@ -746,7 +759,11 @@ class OrderController extends Controller
         $orders = $query->get();
 
         foreach ($orders as $order) {
-            $order->update(['status' => 'success']);
+            // Already printed while reserved — don't send them back to print queue
+            $order->update([
+                'status' => 'success',
+                'printed_completed' => 1,
+            ]);
         }
 
         return redirect()->to(route('dashboard.orders'));
