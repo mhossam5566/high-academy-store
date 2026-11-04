@@ -1239,20 +1239,20 @@ class OrderController extends Controller
             $handle = fopen('php://output', 'w');
             fputs($handle, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel
 
-            fputcsv($handle, ['تقرير إحصائيات مبيعات فروع المكتبة']);
+            fputcsv($handle, ['تقرير إحصائيات الحجوزات اليدوية من المكتبة']);
             fputcsv($handle, ['الدورة / الفترة:', $stats['period_label']]);
             fputcsv($handle, ['من تاريخ:', $stats['from_date'], 'إلى تاريخ:', $stats['to_date']]);
             fputcsv($handle, []);
 
-            fputcsv($handle, ['إجمالي الكتب المباعة:', $stats['grand_total_books']]);
-            fputcsv($handle, ['إجمالي المبيعات (جنيه):', number_format($stats['grand_total_revenue'], 2)]);
+            fputcsv($handle, ['إجمالي الكتب المحجوزة يدوياً:', $stats['grand_total_books']]);
+            fputcsv($handle, ['إجمالي الإيرادات (جنيه):', number_format($stats['grand_total_revenue'], 2)]);
             fputcsv($handle, ['إجمالي عدد الطلبات:', $stats['grand_total_orders']]);
-            fputcsv($handle, ['أكثر الفروع مبيعاً:', $stats['top_branch']]);
-            fputcsv($handle, ['أكثر الكتب مبيعاً:', $stats['top_product']]);
+            fputcsv($handle, ['أكثر الفروع حجزاً:', $stats['top_branch']]);
+            fputcsv($handle, ['أكثر الكتب حجزاً:', $stats['top_product']]);
             fputcsv($handle, []);
 
-            fputcsv($handle, ['=== تفاصيل مبيعات كل فرع والأصناف ===']);
-            fputcsv($handle, ['الفرع', 'اسم الكتاب / الصنف', 'المدرس / المؤلف', 'سعر الوحدة', 'الكمية المباعة', 'إجمالي المبلغ']);
+            fputcsv($handle, ['=== تفاصيل الحجوزات اليدوية لكل فرع والأصناف ===']);
+            fputcsv($handle, ['الفرع', 'اسم الكتاب / الصنف', 'المدرس / المؤلف', 'سعر الوحدة', 'الكمية المحجوزة', 'إجمالي المبلغ']);
 
             foreach ($stats['branches_stats'] as $branch) {
                 if (empty($branch['items'])) {
@@ -1280,8 +1280,8 @@ class OrderController extends Controller
                 fputcsv($handle, []);
             }
 
-            fputcsv($handle, ['=== ملخص مبيعات الأصناف عبر جميع الفروع ===']);
-            fputcsv($handle, ['اسم الكتاب / الصنف', 'المدرس / المؤلف', 'سعر الوحدة', 'إجمالي الكمية المباعة', 'إجمالي المبيعات']);
+            fputcsv($handle, ['=== ملخص الحجوزات اليدوية للأصناف عبر جميع الفروع ===']);
+            fputcsv($handle, ['اسم الكتاب / الصنف', 'المدرس / المؤلف', 'سعر الوحدة', 'إجمالي الكمية المحجوزة', 'إجمالي الإيرادات']);
             foreach ($stats['products_summary'] as $prod) {
                 fputcsv($handle, [
                     $prod['product_name'],
@@ -1302,7 +1302,8 @@ class OrderController extends Controller
     }
 
     /**
-     * Calculate comprehensive statistics for library branch sales and book items.
+     * Calculate comprehensive statistics for manually entered library bookings
+     * (orders created from the dashboard booking tab — not website branch pickups).
      */
     protected function calculateLibraryBookingStats(Request $request)
     {
@@ -1372,8 +1373,16 @@ class OrderController extends Controller
             $filterBranchIds = [(int)$selectedBranchId];
         }
 
-        // Base Orders Query
+        // Manual library booking payment methods (created from dashboard booking tab)
+        $manualLibraryMethods = [
+            'كاش بالمكتبة',
+            'كاش بالمكتبة (عربون)',
+            'كاش عند الاستلام بالمكتبة',
+        ];
+
+        // Base Orders Query — only manually entered library bookings (not website pickup orders)
         $ordersQuery = Order::query()
+            ->whereIn('method', $manualLibraryMethods)
             ->where(function ($q) use ($filterBranchIds) {
                 $q->whereIn('shipping_method_id', $filterBranchIds)
                   ->orWhereIn('shipping_method', array_map('strval', $filterBranchIds))

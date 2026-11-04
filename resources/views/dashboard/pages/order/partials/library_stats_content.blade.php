@@ -8,8 +8,9 @@
                     <i class="ti ti-calendar-stats fs-3 text-white"></i>
                 </span>
                 <div>
-                    <h5 class="mb-0 fw-bold text-primary">إحصائيات دورة: <span id="currentPeriodTitle">{{ $stats['period_label'] }}</span></h5>
+                    <h5 class="mb-0 fw-bold text-primary">إحصائيات الحجوزات اليدوية: <span id="currentPeriodTitle">{{ $stats['period_label'] }}</span></h5>
                     <small class="text-muted">
+                        الطلبات المُدخلة من صفحة الحجز بالمكتبة فقط —
                         من تاريخ: <strong>{{ $stats['from_date'] }}</strong> إلى تاريخ: <strong>{{ $stats['to_date'] }}</strong>
                         @if($stats['selected_status'] && $stats['selected_status'] !== 'all')
                             | الحالة: <span class="badge bg-label-info">{{ $stats['selected_status'] }}</span>
@@ -41,7 +42,7 @@
                         </span>
                     </div>
                     <div>
-                        <span class="d-block text-muted small fw-semibold">إجمالي الكتب المباعة</span>
+                        <span class="d-block text-muted small fw-semibold">إجمالي الكتب المحجوزة يدوياً</span>
                         <h4 class="mb-0 fw-bold text-primary">{{ number_format($stats['grand_total_books']) }} <small class="fs-6 text-muted">كتاب</small></h4>
                     </div>
                 </div>
@@ -92,7 +93,7 @@
                         </span>
                     </div>
                     <div>
-                        <span class="d-block text-muted small fw-semibold">الفرع الأكثر مبيعاً</span>
+                        <span class="d-block text-muted small fw-semibold">الفرع الأكثر حجزاً يدوياً</span>
                         <h6 class="mb-0 fw-bold text-info text-truncate" style="max-width: 170px;" title="{{ $stats['top_branch'] }}">
                             {{ $stats['top_branch'] }}
                         </h6>
@@ -105,7 +106,7 @@
     {{-- Section 1: Per-Branch Detailed Breakdown --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0 fw-bold text-dark">
-            <i class="ti ti-building me-2 text-primary"></i>تفاصيل المبيعات والأصناف لكل فرع
+            <i class="ti ti-building me-2 text-primary"></i>تفاصيل الحجوزات اليدوية والأصناف لكل فرع
         </h5>
         <span class="badge bg-label-secondary">عدد الفروع: {{ count($stats['branches_stats']) }}</span>
     </div>
@@ -158,8 +159,8 @@
                                             <th style="width: 35%;">الكتاب / الصنف</th>
                                             <th style="width: 20%;">المدرس / المؤلف</th>
                                             <th style="width: 12%;" class="text-center">سعر الوحدة</th>
-                                            <th style="width: 13%;" class="text-center">الكمية المباعة</th>
-                                            <th style="width: 15%;" class="text-center">إجمالي المبيعات</th>
+                                            <th style="width: 13%;" class="text-center">الكمية المحجوزة</th>
+                                            <th style="width: 15%;" class="text-center">إجمالي الإيرادات</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -207,7 +208,7 @@
                         @else
                             <div class="text-center py-4 text-muted">
                                 <i class="ti ti-package-off fs-1 d-block mb-2 text-secondary opacity-50"></i>
-                                <span>لا توجد مبيعات مسجلة لهذا الفرع خلال الفترة المحددة ({{ $stats['period_label'] }}).</span>
+                                <span>لا توجد حجوزات يدوية مسجلة لهذا الفرع خلال الفترة المحددة ({{ $stats['period_label'] }}).</span>
                             </div>
                         @endif
                     </div>
@@ -227,10 +228,9 @@
     <div class="card border shadow-sm mb-4">
         <div class="card-header bg-label-info py-3 d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0 d-flex align-items-center text-info fw-bold">
-                <i class="ti ti-list-details me-2 fs-4"></i>ملخص مبيعات الأصناف والكتب عبر جميع الفروع
+                <i class="ti ti-list-details me-2 fs-4"></i>ملخص الحجوزات اليدوية للأصناف عبر جميع الفروع
             </h5>
-            <span class="badge bg-info text-white">{{ count($stats['products_summary']) }} أصناف مباعة</span>
-        </div>
+            <span class="badge bg-info text-white">{{ count($stats['products_summary']) }} أصناف محجوزة</span>        </div>
         <div class="card-body p-0">
             @if(!empty($stats['products_summary']))
                 <div class="table-responsive">
@@ -241,9 +241,9 @@
                                 <th style="width: 30%;">اسم الكتاب / الصنف</th>
                                 <th style="width: 15%;">المدرس / المؤلف</th>
                                 <th style="width: 10%;" class="text-center">السعر</th>
-                                <th style="width: 15%;" class="text-center">إجمالي الكمية المباعة</th>
-                                <th style="width: 10%;" class="text-center">إجمالي المبيعات</th>
-                                <th style="width: 15%;">توزيع المبيعات على الفروع</th>
+                                <th style="width: 15%;" class="text-center">إجمالي الكمية المحجوزة</th>
+                                <th style="width: 10%;" class="text-center">إجمالي الإيرادات</th>
+                                <th style="width: 15%;">توزيع الحجوزات على الفروع</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -290,7 +290,7 @@
             @else
                 <div class="text-center py-5 text-muted">
                     <i class="ti ti-books-off fs-1 d-block mb-2 text-secondary opacity-50"></i>
-                    <h6>لا توجد مبيعات لأي أصناف في هذه الفترة المحددة</h6>
+                    <h6>لا توجد حجوزات يدوية لأي أصناف في هذه الفترة المحددة</h6>
                     <small>يرجى اختيار دورة زمنية أخرى أو تعديل خيارات الفلتر أعلاه.</small>
                 </div>
             @endif

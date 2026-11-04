@@ -165,7 +165,7 @@
                 id="tab-stats-btn" data-bs-toggle="pill" data-bs-target="#tab-stats-pane" type="button" role="tab"
                 aria-controls="tab-stats-pane"
                 aria-selected="{{ ($activeTab ?? 'booking') === 'statistics' ? 'true' : 'false' }}">
-                <i class="ti ti-chart-bar me-2 fs-5"></i>إحصائيات المبيعات والفروع
+                <i class="ti ti-chart-bar me-2 fs-5"></i>إحصائيات الحجز اليدوي
                 <span class="badge bg-primary ms-2" id="tabStatsBadge">{{ number_format($stats['grand_total_books'] ?? 0) }}
                     كتاب</span>
             </button>
@@ -612,7 +612,7 @@
                 <div
                     class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center">
                     <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center">
-                        <i class="ti ti-filter me-2 text-primary"></i>تحديد دورة وفترة الإحصائيات
+                        <i class="ti ti-filter me-2 text-primary"></i>تحديد دورة وفترة إحصائيات الحجز اليدوي
                     </h5>
                     {{-- Quick Period Presets --}}
                     <div class="btn-group btn-group-sm mt-2 mt-sm-0" role="group" id="quickPeriodGroup">
@@ -724,7 +724,7 @@
                     <div class="text-center p-4">
                         <div class="spinner-border text-primary mb-2" role="status" style="width: 3rem; height: 3rem;">
                         </div>
-                        <div class="fw-bold text-dark fs-6">جاري جلب إحصائيات المبيعات والأصناف...</div>
+                        <div class="fw-bold text-dark fs-6">جاري جلب إحصائيات الحجوزات اليدوية...</div>
                     </div>
                 </div>
 
