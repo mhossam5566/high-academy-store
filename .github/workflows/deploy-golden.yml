@@ -1,5 +1,4 @@
 
-
 name: Deploy Golden to Hostinger
 
 on:
@@ -34,7 +33,7 @@ jobs:
           remote_port: ${{ secrets.GOLDEN_PORT }}
           remote_key: ${{ secrets.GOLDEN_SSH_KEY }}
 
-      - name: Install dependencies
+      - name: Install dependencies and refresh Laravel
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.GOLDEN_HOST }}
@@ -45,5 +44,7 @@ jobs:
             cd /home/u301812937/laravel-golden
 
             /opt/alt/php85/usr/bin/php $(which composer) install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+            /opt/alt/php85/usr/bin/php artisan migrate --force
 
             /opt/alt/php85/usr/bin/php artisan optimize:clear
