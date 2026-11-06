@@ -27,7 +27,7 @@ jobs:
         with:
           switches: "-avzr --exclude='.git/' --exclude='.github/' --exclude='.env' --exclude='storage/' --exclude='old/' --exclude='crm/' --exclude='myteacher/' --exclude='vendor/' --exclude='public/storage/'"
           path: ./
-          remote_path: /home/u301812937/laravel-golden/
+          remote_path: /home/u301812937/domains/goldenboox.com/public_html/main/
           remote_host: ${{ secrets.GOLDEN_HOST }}
           remote_user: ${{ secrets.GOLDEN_USER }}
           remote_port: ${{ secrets.GOLDEN_PORT }}
@@ -41,7 +41,7 @@ jobs:
           port: ${{ secrets.GOLDEN_PORT }}
           key: ${{ secrets.GOLDEN_SSH_KEY }}
           script: |
-            cd /home/u301812937/laravel-golden
+            cd /home/u301812937/domains/goldenboox.com/public_html/main
 
             /opt/alt/php84/usr/bin/php $(which composer) install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
