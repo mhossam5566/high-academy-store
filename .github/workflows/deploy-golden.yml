@@ -1,1 +1,49 @@
 
+
+name: Deploy Golden to Hostinger
+
+on:
+  push:
+    branches:
+      - golden
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: golden-hostinger-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy application files
+        uses: burnett01/rsync-deployments@7.0.2
+        with:
+          switches: "-avzr --exclude='.git/' --exclude='.github/' --exclude='.env' --exclude='storage/' --exclude='old/' --exclude='crm/' --exclude='myteacher/' --exclude='vendor/' --exclude='public/storage/'"
+          path: ./
+          remote_path: /home/u301812937/laravel-golden/
+          remote_host: ${{ secrets.GOLDEN_HOST }}
+          remote_user: ${{ secrets.GOLDEN_USER }}
+          remote_port: ${{ secrets.GOLDEN_PORT }}
+          remote_key: ${{ secrets.GOLDEN_SSH_KEY }}
+
+      - name: Install dependencies
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.GOLDEN_HOST }}
+          username: ${{ secrets.GOLDEN_USER }}
+          port: ${{ secrets.GOLDEN_PORT }}
+          key: ${{ secrets.GOLDEN_SSH_KEY }}
+          script: |
+            cd /home/u301812937/laravel-golden
+
+            /opt/alt/php85/usr/bin/php $(which composer) install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+            /opt/alt/php85/usr/bin/php artisan optimize:clear
